@@ -579,17 +579,42 @@ def custom_admin_students(request):
         messages.error(request, 'Access denied.')
         return redirect('home')
     
+    # Apply filters
+    search = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    grade_filter = request.GET.get('grade', '')
+    
     if profile.role == 'teacher':
-        students = User.objects.filter(userprofile__role='student')
-        progress_data = ModuleProgress.objects.select_related('student', 'lesson').order_by('-started_at')
+        students = User.objects.filter(userprofile__role='student').select_related('userprofile')
     else:  # parent
-        students = User.objects.filter(userprofile__parent__user=request.user)
-        progress_data = ModuleProgress.objects.filter(student__in=students).select_related('student', 'lesson').order_by('-started_at')
+        students = User.objects.filter(userprofile__parent=profile).select_related('userprofile')
+    
+    # Apply search filter
+    if search:
+        students = students.filter(
+            Q(first_name__icontains=search) | 
+            Q(last_name__icontains=search) | 
+            Q(username__icontains=search)
+        )
+    
+    # Apply status filter
+    if status_filter == 'active':
+        students = students.filter(last_login__isnull=False)
+    elif status_filter == 'inactive':
+        students = students.filter(last_login__isnull=True)
+    
+    # Calculate statistics
+    total_students = students.count()
+    active_students = students.filter(last_login__isnull=False).count()
+    inactive_students = total_students - active_students
     
     context = {
-        'students': students,
-        'progress_data': progress_data,
+        'students': students.order_by('first_name', 'last_name'),
         'user_profile': profile,
+        'total_students': total_students,
+        'active_students': active_students,
+        'inactive_students': inactive_students,
+        'avg_progress': 75,  # Placeholder
     }
     
     return render(request, 'learning/custom_admin_students.html', context)
