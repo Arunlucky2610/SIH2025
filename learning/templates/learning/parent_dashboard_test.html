@@ -1,0 +1,155 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}Enhanced Parent Dashboard - Test{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded p-4">
+                <h2>📊 Enhanced Parent Dashboard - Test Mode</h2>
+                <p>Testing new analytics features</p>
+            </div>
+        </div>
+    </div>
+
+    {% if children_progress %}
+        {% for child_data in children_progress %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>{{ child_data.child.first_name }} {{ child_data.child.last_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Basic Stats -->
+                            <div class="row mb-4">
+                                <div class="col-3">
+                                    <div class="text-center p-3 bg-primary text-white rounded">
+                                        <h3>{{ child_data.progress_percentage|floatformat:0 }}%</h3>
+                                        <p>Progress</p>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-center p-3 bg-success text-white rounded">
+                                        <h3>{{ child_data.current_streak }}</h3>
+                                        <p>Day Streak</p>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-center p-3 bg-info text-white rounded">
+                                        <h3>{{ child_data.weekly_time_hours }}h</h3>
+                                        <p>This Week</p>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-center p-3 bg-warning text-white rounded">
+                                        <h3>{{ child_data.completed_lessons }}</h3>
+                                        <p>Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Simple Progress Chart -->
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6>Monthly Progress Trend</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="progressChart{{ forloop.counter }}" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6>Subject Performance</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="subjectChart{{ forloop.counter }}" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calendar Data Debug -->
+                            <div class="mt-4">
+                                <h6>Calendar Activities (Debug):</h6>
+                                <small>{{ child_data.calendar_data|length }} activities this month</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No Children Linked</h4>
+            <p>You don't have any children linked to your parent account yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+{% for child_data in children_progress %}
+    // Progress Chart for Child {{ forloop.counter }}
+    const progressCtx{{ forloop.counter }} = document.getElementById('progressChart{{ forloop.counter }}').getContext('2d');
+    new Chart(progressCtx{{ forloop.counter }}, {
+        type: 'line',
+        data: {
+            labels: {{ child_data.progress_chart_data.labels|safe }},
+            datasets: [{
+                label: 'Lessons Completed',
+                data: {{ child_data.progress_chart_data.lessons|safe }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
+    // Subject Performance Chart for Child {{ forloop.counter }}
+    const subjectCtx{{ forloop.counter }} = document.getElementById('subjectChart{{ forloop.counter }}').getContext('2d');
+    new Chart(subjectCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ child_data.subject_performance_data.subjects|safe }},
+            datasets: [{
+                label: 'Completion %',
+                data: {{ child_data.subject_performance_data.completion|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+{% endfor %}
+</script>
+{% endblock %}

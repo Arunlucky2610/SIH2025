@@ -14,6 +14,10 @@ import json
 import os
 
 from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession
+from .analytics import (
+    get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
+    get_current_streak, update_all_analytics_for_student
+)
 
 def home(request):
     """Landing page - redirect based on user role"""
@@ -216,7 +220,7 @@ def teacher_dashboard(request):
 
 @login_required
 def parent_dashboard(request):
-    """Parent dashboard view"""
+    """Enhanced parent dashboard view with analytics"""
     profile = get_object_or_404(UserProfile, user=request.user)
     if profile.role != 'parent':
         messages.error(request, 'Access denied')
@@ -228,6 +232,11 @@ def parent_dashboard(request):
     children_progress = []
     for child_profile in children:
         child = child_profile.user
+        
+        # Update analytics for this child
+        update_all_analytics_for_student(child)
+        
+        # Basic progress data
         progress = ModuleProgress.objects.filter(student=child)
         completed_count = progress.filter(completed=True).count()
         total_count = progress.count()
@@ -235,6 +244,46 @@ def parent_dashboard(request):
         
         # Recent activity
         recent_progress = progress.order_by('-started_at')[:5]
+        
+        # Enhanced analytics
+        current_streak = get_current_streak(child)
+        
+        # Time spent this week
+        from .models import WeeklyProgress
+        from datetime import timedelta
+        today = timezone.now().date()
+        week_start = today - timedelta(days=today.weekday())
+        
+        try:
+            weekly_progress = WeeklyProgress.objects.get(student=child, week_start=week_start)
+            weekly_time = weekly_progress.total_time_spent.total_seconds() / 3600  # hours
+            weekly_lessons = weekly_progress.lessons_completed
+        except WeeklyProgress.DoesNotExist:
+            weekly_time = 0
+            weekly_lessons = 0
+        
+        # Get chart data for this child
+        progress_chart_data = get_progress_chart_data(child, period='month')
+        subject_performance_data = get_subject_performance_data(child)
+        
+        # Convert data to JSON-safe format
+        import json
+        progress_chart_json = {
+            'labels': json.dumps(progress_chart_data.get('labels', [])),
+            'lessons': json.dumps(progress_chart_data.get('lessons', [])),
+            'scores': json.dumps(progress_chart_data.get('scores', [])),
+            'time': json.dumps(progress_chart_data.get('time', []))
+        }
+        
+        subject_performance_json = {
+            'subjects': json.dumps(subject_performance_data.get('subjects', [])),
+            'completion': json.dumps(subject_performance_data.get('completion', [])),
+            'scores': json.dumps(subject_performance_data.get('scores', []))
+        }
+        
+        # Calendar data for current month
+        now = timezone.now()
+        calendar_data = get_learning_calendar_data(child, now.year, now.month)
         
         children_progress.append({
             'child': child,
@@ -244,14 +293,23 @@ def parent_dashboard(request):
             'avg_score': round(avg_score, 1),
             'progress_percentage': (completed_count / total_count * 100) if total_count > 0 else 0,
             'recent_progress': recent_progress,
+            # Enhanced analytics
+            'current_streak': current_streak,
+            'weekly_time_hours': round(weekly_time, 1),
+            'weekly_lessons': weekly_lessons,
+            'progress_chart_data': progress_chart_json,
+            'subject_performance_data': subject_performance_json,
+            'calendar_data': calendar_data,
         })
     
     context = {
         'children_progress': children_progress,
         'profile': profile,
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
     }
     
-    return render(request, 'learning/parent_dashboard.html', context)
+    return render(request, 'learning/parent_dashboard_test.html', context)
 
 @login_required
 def lesson_detail(request, lesson_id):

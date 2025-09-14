@@ -6,7 +6,9 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
-from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession
+from .models import (UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, 
+                     LessonDownload, LoginSession, LearningStreak, WeeklyProgress, 
+                     MonthlyProgress, SubjectPerformance, LearningActivity)
 
 # Customize admin site header and title
 admin.site.site_header = "Rural Digital Learning - Admin Panel"
@@ -345,6 +347,42 @@ class LoginSessionAdmin(admin.ModelAdmin):
         )
         self.message_user(request, f"Ended {updated} active session(s)")
     end_sessions.short_description = "End selected sessions"
+
+@admin.register(LearningStreak)
+class LearningStreakAdmin(admin.ModelAdmin):
+    list_display = ['student', 'date', 'lessons_completed', 'time_spent', 'streak_count']
+    list_filter = ['date', 'streak_count']
+    search_fields = ['student__username', 'student__first_name', 'student__last_name']
+    date_hierarchy = 'date'
+    readonly_fields = ['streak_count']
+
+@admin.register(WeeklyProgress)
+class WeeklyProgressAdmin(admin.ModelAdmin):
+    list_display = ['student', 'week_start', 'lessons_completed', 'total_time_spent', 'average_score', 'active_days']
+    list_filter = ['week_start', 'active_days']
+    search_fields = ['student__username', 'student__first_name', 'student__last_name']
+    date_hierarchy = 'week_start'
+
+@admin.register(MonthlyProgress)
+class MonthlyProgressAdmin(admin.ModelAdmin):
+    list_display = ['student', 'year', 'month', 'lessons_completed', 'total_time_spent', 'average_score', 'max_streak']
+    list_filter = ['year', 'month', 'max_streak']
+    search_fields = ['student__username', 'student__first_name', 'student__last_name']
+
+@admin.register(SubjectPerformance)
+class SubjectPerformanceAdmin(admin.ModelAdmin):
+    list_display = ['student', 'lesson_type', 'completion_percentage', 'average_score', 'total_time_spent', 'last_updated']
+    list_filter = ['lesson_type', 'last_updated']
+    search_fields = ['student__username', 'student__first_name', 'student__last_name']
+    readonly_fields = ['last_updated']
+
+@admin.register(LearningActivity)
+class LearningActivityAdmin(admin.ModelAdmin):
+    list_display = ['student', 'activity_type', 'lesson', 'created_at']
+    list_filter = ['activity_type', 'created_at']
+    search_fields = ['student__username', 'student__first_name', 'student__last_name', 'description']
+    date_hierarchy = 'created_at'
+    readonly_fields = ['created_at']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user__userprofile')

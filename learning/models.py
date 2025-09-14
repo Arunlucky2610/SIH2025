@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from datetime import timedelta, date
 
 # User Profile to extend Django's built-in User model
 class UserProfile(models.Model):
@@ -159,3 +160,97 @@ class LoginSession(models.Model):
     def is_currently_active(self):
         """Check if session is currently active"""
         return self.is_active and not self.logout_time
+
+# Track daily learning streaks
+class LearningStreak(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learning_streaks')
+    date = models.DateField(default=timezone.now)
+    lessons_completed = models.IntegerField(default=0)
+    time_spent = models.DurationField(default=timezone.timedelta(minutes=0))
+    streak_count = models.IntegerField(default=1)  # Current streak length
+    
+    class Meta:
+        unique_together = ['student', 'date']
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.date} (Streak: {self.streak_count})"
+
+# Track weekly learning progress
+class WeeklyProgress(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='weekly_progress')
+    week_start = models.DateField()  # Monday of the week
+    lessons_completed = models.IntegerField(default=0)
+    total_time_spent = models.DurationField(default=timezone.timedelta(minutes=0))
+    average_score = models.FloatField(default=0.0)
+    active_days = models.IntegerField(default=0)  # Days student was active this week
+    
+    class Meta:
+        unique_together = ['student', 'week_start']
+        ordering = ['-week_start']
+    
+    def __str__(self):
+        return f"{self.student.username} - Week of {self.week_start}"
+
+# Track monthly learning progress
+class MonthlyProgress(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='monthly_progress')
+    year = models.IntegerField()
+    month = models.IntegerField()  # 1-12
+    lessons_completed = models.IntegerField(default=0)
+    total_time_spent = models.DurationField(default=timezone.timedelta(minutes=0))
+    average_score = models.FloatField(default=0.0)
+    active_days = models.IntegerField(default=0)
+    max_streak = models.IntegerField(default=0)  # Longest streak this month
+    
+    class Meta:
+        unique_together = ['student', 'year', 'month']
+        ordering = ['-year', '-month']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.year}/{self.month:02d}"
+
+# Track subject-wise performance
+class SubjectPerformance(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subject_performance')
+    lesson_type = models.CharField(max_length=20, choices=Lesson.LESSON_TYPE_CHOICES)
+    total_lessons = models.IntegerField(default=0)
+    completed_lessons = models.IntegerField(default=0)
+    average_score = models.FloatField(default=0.0)
+    total_time_spent = models.DurationField(default=timezone.timedelta(minutes=0))
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['student', 'lesson_type']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.get_lesson_type_display()}"
+    
+    @property
+    def completion_percentage(self):
+        if self.total_lessons > 0:
+            return (self.completed_lessons / self.total_lessons) * 100
+        return 0
+
+# Track learning activities for calendar view
+class LearningActivity(models.Model):
+    ACTIVITY_TYPES = [
+        ('lesson_start', 'Lesson Started'),
+        ('lesson_complete', 'Lesson Completed'),
+        ('quiz_attempt', 'Quiz Attempted'),
+        ('quiz_passed', 'Quiz Passed'),
+        ('streak_milestone', 'Streak Milestone'),
+        ('weekly_goal', 'Weekly Goal Achieved'),
+    ]
+    
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learning_activities')
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True, blank=True)
+    description = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.get_activity_type_display()}"

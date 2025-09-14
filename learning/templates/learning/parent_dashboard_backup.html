@@ -1,0 +1,282 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}Parent Dashboard - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded p-4">
+                <h2 class="mb-1">Parent Dashboard</h2>
+                <p class="mb-0 opacity-75">Monitor your children's learning progress</p>
+                {% if children_progress %}
+                    <div class="mt-3">
+                        <span class="badge bg-white text-primary me-2">
+                            <i class="bi bi-people me-1"></i>
+                            {{ children_progress|length }} Child{{ children_progress|length|pluralize:"ren" }}
+                        </span>
+                        <span class="badge bg-white text-primary">
+                            <i class="bi bi-graph-up me-1"></i>
+                            Active Learning
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Children Overview -->
+    {% if children_progress %}
+        {% for child_data in children_progress %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person-circle"></i> {{ child_data.child.first_name }} {{ child_data.child.last_name }}
+                                <small class="text-muted">({{ child_data.child.username }})</small>
+                            </h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- Progress Overview -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 mb-3">
+                                    <div class="text-center">
+                                        <div class="position-relative d-inline-block mb-3">
+                                            <svg width="80" height="80" class="progress-ring">
+                                                <circle cx="40" cy="40" r="30" stroke="#e9ecef" stroke-width="8" fill="transparent"/>
+                                                <circle cx="40" cy="40" r="30" stroke="#0d6efd" stroke-width="8" fill="transparent"
+                                                        stroke-dasharray="{{ child_data.progress_percentage|floatformat:0 }}, 100"
+                                                        stroke-linecap="round"/>
+                                            </svg>
+                                            <div class="position-absolute top-50 start-50 translate-middle">
+                                                <strong>{{ child_data.progress_percentage|floatformat:0 }}%</strong>
+                                            </div>
+                                        </div>
+                                        <h6>Overall Progress</h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="text-center">
+                                        <i class="bi bi-book-check text-success" style="font-size: 3rem;"></i>
+                                        <h4 class="text-success mt-2">{{ child_data.completed_lessons }}</h4>
+                                        <h6>Completed Lessons</h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="text-center">
+                                        <i class="bi bi-book text-primary" style="font-size: 3rem;"></i>
+                                        <h4 class="text-primary mt-2">{{ child_data.total_lessons }}</h4>
+                                        <h6>Total Lessons</h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="text-center">
+                                        <i class="bi bi-trophy text-warning" style="font-size: 3rem;"></i>
+                                        <h4 class="text-warning mt-2">{{ child_data.avg_score|floatformat:0 }}%</h4>
+                                        <h6>Average Score</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Child Info -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span><strong>Preferred Language:</strong></span>
+                                        <span class="badge bg-primary">{{ child_data.profile.get_language_preference_display }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span><strong>Account Created:</strong></span>
+                                        <span>{{ child_data.profile.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>Last Login:</strong></span>
+                                        <span>{{ child_data.child.last_login|date:"M d, Y H:i"|default:"Never" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <h6><i class="bi bi-lightbulb"></i> Learning Status</h6>
+                                        {% if child_data.progress_percentage >= 80 %}
+                                            <p class="mb-0">Excellent progress! {{ child_data.child.first_name }} is doing great.</p>
+                                        {% elif child_data.progress_percentage >= 50 %}
+                                            <p class="mb-0">Good progress. Encourage {{ child_data.child.first_name }} to continue learning.</p>
+                                        {% elif child_data.progress_percentage > 0 %}
+                                            <p class="mb-0">{{ child_data.child.first_name }} has started learning. Provide support and encouragement.</p>
+                                        {% else %}
+                                            <p class="mb-0">{{ child_data.child.first_name }} hasn't started any lessons yet. Encourage them to begin!</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Activity -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6><i class="bi bi-clock-history"></i> Recent Activity</h6>
+                                    {% if child_data.recent_progress %}
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Lesson</th>
+                                                        <th>Status</th>
+                                                        <th>Score</th>
+                                                        <th>Started</th>
+                                                        <th>Completed</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for progress in child_data.recent_progress %}
+                                                        <tr>
+                                                            <td>{{ progress.lesson.title }}</td>
+                                                            <td>
+                                                                <span class="badge {% if progress.completed %}bg-success{% else %}bg-warning{% endif %}">
+                                                                    {% if progress.completed %}Completed{% else %}In Progress{% endif %}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                {% if progress.score %}
+                                                                    <span class="badge {% if progress.score >= 80 %}bg-success{% elif progress.score >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                                        {{ progress.score }}%
+                                                                    </span>
+                                                                {% else %}
+                                                                    <span class="text-muted">No quiz</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>{{ progress.started_at|date:"M d, Y" }}</td>
+                                                            <td>
+                                                                {% if progress.completed_at %}
+                                                                    {{ progress.completed_at|date:"M d, Y" }}
+                                                                {% else %}
+                                                                    <span class="text-muted">-</span>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center py-3">
+                                            <i class="bi bi-clock text-muted" style="font-size: 2rem;"></i>
+                                            <p class="text-muted mt-2">No recent activity</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <!-- No Children Linked -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-people text-muted" style="font-size: 5rem;"></i>
+                        <h4 class="text-muted mt-3">No Children Linked</h4>
+                        <p class="text-muted mb-4">
+                            You don't have any children linked to your parent account yet.
+                        </p>
+                        
+                        <div class="alert alert-info text-start">
+                            <h6><i class="bi bi-info-circle"></i> How to link your child's account:</h6>
+                            <ol class="mb-0">
+                                <li>Ask your child to create a student account</li>
+                                <li>During signup, they should select you as their parent</li>
+                                <li>Or contact a teacher/administrator to link existing accounts</li>
+                            </ol>
+                        </div>
+                        
+                        <a href="{% url 'signup' %}" class="btn btn-primary">
+                            <i class="bi bi-person-plus"></i> Help Child Create Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Learning Tips for Parents -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb"></i> Tips for Supporting Your Child's Learning
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-clock text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>Set Regular Learning Time</h6>
+                                    <p class="text-muted mb-0">
+                                        Encourage your child to spend 30-45 minutes daily on digital learning.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-wifi text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>Download for Offline Use</h6>
+                                    <p class="text-muted mb-0">
+                                        Help your child download lessons when internet is available.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-chat-dots text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>Discuss What They Learn</h6>
+                                    <p class="text-muted mb-0">
+                                        Ask your child to explain what they learned in their own words.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-trophy text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>Celebrate Progress</h6>
+                                    <p class="text-muted mb-0">
+                                        Acknowledge and celebrate each lesson completion and good quiz scores.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
