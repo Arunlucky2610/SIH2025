@@ -1,0 +1,333 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}{{ lesson.title }} - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Lesson Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'student_dashboard' %}">
+                            <i class="bi bi-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ lesson.title }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h2">{{ lesson.title }}</h1>
+                    <p class="text-muted">{{ lesson.description }}</p>
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="badge bg-primary">{{ lesson.get_lesson_type_display }}</span>
+                        <span class="badge bg-secondary">{{ lesson.get_language_display }}</span>
+                        {% if progress.completed %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check"></i> Completed
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-column gap-2">
+                    {% if lesson.file %}
+                        <a href="{% url 'download_lesson' lesson.id %}" 
+                           class="btn btn-outline-success">
+                            <i class="bi bi-download"></i> Download
+                        </a>
+                    {% endif %}
+                    
+                    {% if not progress.completed %}
+                        <button class="btn btn-success" onclick="markComplete()">
+                            <i class="bi bi-check"></i> Mark Complete
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lesson Content -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    {% if lesson.content %}
+                        <div class="lesson-content">
+                            {{ lesson.content|linebreaks }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if lesson.video_url %}
+                        <div class="ratio ratio-16x9 mb-4">
+                            <iframe src="{{ lesson.video_url }}" 
+                                    title="{{ lesson.title }}" 
+                                    allowfullscreen></iframe>
+                        </div>
+                    {% endif %}
+                    
+                    {% if lesson.file %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-file-earmark"></i>
+                            <strong>Downloadable Content Available</strong>
+                            <p class="mb-0">Click the download button above to save this lesson for offline viewing.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quiz Section -->
+            {% if quizzes %}
+                <div class="card dashboard-card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-question-circle"></i> Quiz
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="quiz-container">
+                            {% for quiz in quizzes %}
+                                <div class="quiz-question mb-4" data-quiz-id="{{ quiz.id }}">
+                                    <h6 class="fw-bold">Question {{ forloop.counter }}</h6>
+                                    <p>{{ quiz.question }}</p>
+                                    
+                                    <div class="quiz-options">
+                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="A">
+                                            <strong>A.</strong> {{ quiz.option_a }}
+                                        </div>
+                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="B">
+                                            <strong>B.</strong> {{ quiz.option_b }}
+                                        </div>
+                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="C">
+                                            <strong>C.</strong> {{ quiz.option_c }}
+                                        </div>
+                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="D">
+                                            <strong>D.</strong> {{ quiz.option_d }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="quiz-result mt-3" style="display: none;">
+                                        <div class="alert quiz-feedback">
+                                            <div class="quiz-explanation"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% with attempt=quiz_attempts|default_if_none:quiz.id %}
+                                        {% if attempt %}
+                                            <div class="alert alert-info">
+                                                <small>
+                                                    <i class="bi bi-info-circle"></i>
+                                                    You answered: <strong>{{ attempt.selected_answer }}</strong>
+                                                    ({{ attempt.is_correct|yesno:"Correct,Incorrect" }})
+                                                </small>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                {% if not forloop.last %}<hr>{% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary" onclick="submitQuiz()">
+                                <i class="bi bi-check-circle"></i> Submit Quiz
+                            </button>
+                        </div>
+                        
+                        <div id="quiz-score" class="mt-3" style="display: none;">
+                            <div class="alert alert-success text-center">
+                                <h5>Quiz Score: <span id="score-percentage"></span>%</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Progress Card -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Your Progress
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Status:</span>
+                        <span class="badge {% if progress.completed %}bg-success{% else %}bg-warning{% endif %}">
+                            {% if progress.completed %}Completed{% else %}In Progress{% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if progress.score %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Quiz Score:</span>
+                            <span class="fw-bold text-primary">{{ progress.score }}%</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Started:</span>
+                        <span>{{ progress.started_at|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    {% if progress.completed_at %}
+                        <div class="d-flex justify-content-between">
+                            <span>Completed:</span>
+                            <span>{{ progress.completed_at|date:"M d, Y" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list"></i> Lesson Navigation
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'student_dashboard' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                        
+                        {% comment %}
+                        <!-- Previous/Next lesson navigation could be added here -->
+                        <button class="btn btn-outline-secondary btn-sm" disabled>
+                            <i class="bi bi-skip-backward"></i> Previous Lesson
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-skip-forward"></i> Next Lesson
+                        </button>
+                        {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedAnswers = {};
+    
+    // Quiz option selection
+    document.querySelectorAll('.quiz-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const questionDiv = this.closest('.quiz-question');
+            const quizId = questionDiv.getAttribute('data-quiz-id');
+            const answer = this.getAttribute('data-answer');
+            
+            // Remove previous selection
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Mark current selection
+            this.classList.add('selected');
+            selectedAnswers[quizId] = answer;
+        });
+    });
+    
+    // Submit quiz
+    function submitQuiz() {
+        const quizQuestions = document.querySelectorAll('.quiz-question');
+        let totalQuestions = quizQuestions.length;
+        let correctAnswers = 0;
+        
+        quizQuestions.forEach(questionDiv => {
+            const quizId = questionDiv.getAttribute('data-quiz-id');
+            const selectedAnswer = selectedAnswers[quizId];
+            
+            if (!selectedAnswer) {
+                alert('Please answer all questions before submitting.');
+                return;
+            }
+            
+            // Submit individual quiz answer
+            fetch(`/quiz/${quizId}/submit/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ answer: selectedAnswer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show result
+                const resultDiv = questionDiv.querySelector('.quiz-result');
+                const feedbackDiv = questionDiv.querySelector('.quiz-feedback');
+                const explanationDiv = questionDiv.querySelector('.quiz-explanation');
+                
+                resultDiv.style.display = 'block';
+                
+                if (data.correct) {
+                    feedbackDiv.className = 'alert alert-success quiz-feedback';
+                    feedbackDiv.innerHTML = '<i class="bi bi-check-circle"></i> Correct!';
+                    correctAnswers++;
+                } else {
+                    feedbackDiv.className = 'alert alert-danger quiz-feedback';
+                    feedbackDiv.innerHTML = `<i class="bi bi-x-circle"></i> Incorrect. The correct answer is ${data.correct_answer}.`;
+                }
+                
+                if (data.explanation) {
+                    explanationDiv.innerHTML = `<hr><small><strong>Explanation:</strong> ${data.explanation}</small>`;
+                }
+                
+                // Highlight correct/incorrect options
+                const selectedOption = questionDiv.querySelector(`[data-answer="${selectedAnswer}"]`);
+                const correctOption = questionDiv.querySelector(`[data-answer="${data.correct_answer}"]`);
+                
+                if (data.correct) {
+                    selectedOption.classList.add('correct');
+                } else {
+                    selectedOption.classList.add('incorrect');
+                    correctOption.classList.add('correct');
+                }
+                
+                // Show overall score when all questions are processed
+                const completedQuestions = document.querySelectorAll('.quiz-result[style*="block"]').length;
+                if (completedQuestions === totalQuestions) {
+                    const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+                    document.getElementById('score-percentage').textContent = scorePercentage;
+                    document.getElementById('quiz-score').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting quiz. Please try again.');
+            });
+        });
+    }
+    
+    // Mark lesson as complete
+    function markComplete() {
+        fetch(`/lesson/{{ lesson.id }}/complete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error marking lesson as complete. Please try again.');
+        });
+    }
+</script>
+{% endblock %}

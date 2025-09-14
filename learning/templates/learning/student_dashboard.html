@@ -1,0 +1,610 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}Student Dashboard - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Enhanced Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
+                <!-- Background decoration -->
+                <div class="position-absolute" style="top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                <div class="position-absolute" style="bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                
+                <div class="row align-items-center position-relative">
+                    <div class="col-lg-8">
+                        <div class="text-white">
+                            <h1 class="display-5 fw-bold mb-3 fade-in-up">
+                                Welcome back, 
+                                <span class="text-warning">{{ user.first_name|default:user.username }}!</span>
+                            </h1>
+                            <p class="lead mb-4 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
+                                Continue your digital learning journey and master new skills today.
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 fade-in-up" style="animation-delay: 0.2s;">
+                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                    <i class="bi bi-calendar me-1"></i> 
+                                    {{ today|date:"F d, Y" }}
+                                </div>
+                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                    <i class="bi bi-fire me-1"></i> 
+                                    {{ streak|default:0 }} day streak
+                                </div>
+                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                    <i class="bi bi-trophy me-1"></i> 
+                                    Level {{ level|default:1 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-end">
+                        <div class="position-relative">
+                            <i class="bi bi-mortarboard-fill text-white opacity-25" style="font-size: 8rem;"></i>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <div class="bg-white rounded-circle p-3 shadow-lg">
+                                    <i class="bi bi-person-fill text-primary fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Progress Overview -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="position-relative d-inline-block mb-4">
+                        <svg width="100" height="100" class="progress-ring">
+                            <circle cx="50" cy="50" r="40" stroke="#e9ecef" stroke-width="8" fill="transparent"/>
+                            <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="8" fill="transparent"
+                                    stroke-dasharray="{{ progress_percentage|floatformat:0 }}, 100"
+                                    stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="position-absolute top-50 start-50 translate-middle text-center">
+                            <div class="fw-bold fs-4 text-primary">{{ progress_percentage|floatformat:0 }}%</div>
+                        </div>
+                    </div>
+                    <h5 class="card-title fw-bold text-primary">Overall Progress</h5>
+                    <p class="card-text text-muted mb-0">
+                        <strong>{{ completed_lessons }}</strong> of <strong>{{ total_lessons }}</strong> lessons completed
+                    </p>
+                    <div class="mt-3">
+                        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                            <i class="bi bi-graph-up me-1"></i>
+                            Keep going!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-book-fill text-success" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-success">Available Lessons</h5>
+                    <div class="display-4 fw-bold text-success mb-2">{{ total_lessons }}</div>
+                    <p class="card-text text-muted mb-3">Ready to explore</p>
+                    <a href="#lessons" class="btn btn-success btn-sm rounded-pill px-3">
+                        <i class="bi bi-arrow-down me-1"></i>
+                        View All
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-trophy-fill text-warning" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-warning">Completed</h5>
+                    <div class="display-4 fw-bold text-warning mb-2">{{ completed_lessons }}</div>
+                    <p class="card-text text-muted mb-3">Lessons mastered</p>
+                    {% if completed_lessons > 0 %}
+                        <div class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                            <i class="bi bi-star-fill me-1"></i>
+                            Great job!
+                        </div>
+                    {% else %}
+                        <div class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">
+                            <i class="bi bi-play me-1"></i>
+                            Start learning
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-cloud-download-fill text-info" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-info">Offline Ready</h5>
+                    <div class="display-4 fw-bold text-info mb-2">{{ recent_downloads|length }}</div>
+                    <p class="card-text text-muted mb-3">Downloads available</p>
+                    <div class="badge bg-info bg-opacity-10 text-info rounded-pill">
+                        <i class="bi bi-wifi-off me-1"></i>
+                        Learn anywhere
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Lessons Section -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-card border-0 shadow-lg" id="lessons">
+                <div class="card-header bg-white border-0 p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                        <div>
+                            <h4 class="mb-1 fw-bold text-primary">
+                                <i class="bi bi-book-fill me-2"></i> 
+                                Available Lessons
+                            </h4>
+                            <p class="text-muted mb-0">Continue your learning journey</p>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-primary active rounded-pill me-1" data-filter="all">All</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill me-1" data-filter="basic">Basic</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill me-1" data-filter="computer">Computer</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill me-1" data-filter="internet">Internet</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" data-filter="mobile">Mobile</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        {% for lesson in lessons %}
+                            <div class="col-12 lesson-item" data-type="{{ lesson.lesson_type }}">
+                                <div class="card lesson-card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1 me-3">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="bi bi-book text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="mb-1 fw-bold">{{ lesson.title }}</h5>
+                                                        <div class="d-flex gap-2">
+                                                            <span class="badge bg-primary rounded-pill">{{ lesson.get_language_display }}</span>
+                                                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">{{ lesson.lesson_type|title }}</span>
+                                                            {% if lesson.id in progress_dict %}
+                                                                <span class="badge bg-success rounded-pill">
+                                                                    <i class="bi bi-check-circle me-1"></i> Completed
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                                                                    <i class="bi bi-clock me-1"></i> New
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <p class="text-muted mb-3">{{ lesson.description }}</p>
+                                                
+                                                {% if lesson.id in progress_dict %}
+                                                    <div class="mb-3">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <small class="text-muted fw-semibold">Quiz Score</small>
+                                                            <small class="text-success fw-bold">{{ progress_dict.lesson.id.score|default:0|floatformat:0 }}%</small>
+                                                        </div>
+                                                        <div class="progress" style="height: 8px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                                 data-score="{{ progress_dict.lesson.id.score|default:0|floatformat:0 }}"
+                                                                 aria-valuenow="{{ progress_dict.lesson.id.score|default:0 }}" 
+                                                                 aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <div class="d-flex align-items-center text-muted small">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    <span class="me-3">Est. 15-20 min</span>
+                                                    {% if lesson.file %}
+                                                        <i class="bi bi-download me-1"></i>
+                                                        <span>Downloadable</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex flex-column gap-2">
+                                                <a href="{% url 'lesson_detail' lesson.id %}" 
+                                                   class="btn btn-primary rounded-pill px-4 shadow-sm">
+                                                    {% if lesson.id in progress_dict %}
+                                                        <i class="bi bi-arrow-clockwise me-1"></i> Review
+                                                    {% else %}
+                                                        <i class="bi bi-play-fill me-1"></i> Start
+                                                    {% endif %}
+                                                </a>
+                                                
+                                                {% if lesson.file %}
+                                                    <a href="{% url 'download_lesson' lesson.id %}" 
+                                                       class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm">
+                                                        <i class="bi bi-download me-1"></i> Download
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <div class="mb-4">
+                                        <i class="bi bi-book text-muted" style="font-size: 5rem; opacity: 0.5;"></i>
+                                    </div>
+                                    <h4 class="text-muted mb-3">No lessons available yet</h4>
+                                    <p class="text-muted mb-4">Check back later for new learning content</p>
+                                    <button class="btn btn-primary rounded-pill px-4" onclick="location.reload()">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>
+                                        Refresh Page
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Sidebar -->
+        <div class="col-lg-4">
+            <!-- Recent Downloads -->
+            <div class="card dashboard-card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient text-white border-0" style="background: linear-gradient(135deg, #17a2b8, #20c997);">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-cloud-download-fill me-2"></i> 
+                        Recent Downloads
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if recent_downloads %}
+                        {% for download in recent_downloads %}
+                            <div class="d-flex align-items-center p-3 mb-3 bg-light rounded-3">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">{{ download.lesson.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        {{ download.downloaded_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                                <div class="badge bg-success bg-opacity-10 text-success rounded-pill">
+                                    <i class="bi bi-download"></i>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Downloads are available offline
+                            </small>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-cloud-download text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <h6 class="text-muted mb-2">No downloads yet</h6>
+                            <p class="text-muted small mb-3">Download lessons to access them offline</p>
+                            <a href="#lessons" class="btn btn-outline-primary btn-sm rounded-pill">
+                                <i class="bi bi-download me-1"></i>
+                                Browse Lessons
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Learning Progress -->
+            <div class="card dashboard-card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient text-white border-0" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-graph-up-arrow me-2"></i> 
+                        Learning Progress
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold">This Week</span>
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">{{ completed_lessons }} completed</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" data-score="{{ progress_percentage|floatformat:0 }}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-fire text-primary fs-4 mb-2 d-block"></i>
+                                <div class="fw-bold text-primary">{{ streak|default:0 }}</div>
+                                <small class="text-muted">Day Streak</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-trophy text-success fs-4 mb-2 d-block"></i>
+                                <div class="fw-bold text-success">{{ level|default:1 }}</div>
+                                <small class="text-muted">Level</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Learning Tips -->
+            <div class="card dashboard-card border-0 shadow-lg">
+                <div class="card-header bg-gradient text-white border-0" style="background: linear-gradient(135deg, #6f42c1, #e83e8c);">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-lightbulb-fill me-2"></i> 
+                        Learning Tips
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3 flex-shrink-0">
+                                <i class="bi bi-wifi-off text-info"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1">Offline Learning</h6>
+                                <p class="small text-muted mb-0">Download lessons when you have good internet to learn anywhere, anytime.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3 flex-shrink-0">
+                                <i class="bi bi-arrow-clockwise text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1">Practice Makes Perfect</h6>
+                                <p class="small text-muted mb-0">Retake quizzes to improve your understanding and scores.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3 flex-shrink-0">
+                                <i class="bi bi-clock text-warning"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1">Daily Learning</h6>
+                                <p class="small text-muted mb-0">Spend 15-20 minutes daily to build a consistent learning habit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bars
+    function animateProgressBars() {
+        document.querySelectorAll('.progress-bar[data-score]').forEach(bar => {
+            const score = parseInt(bar.getAttribute('data-score')) || 0;
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 1.5s ease-in-out';
+                bar.style.width = score + '%';
+            }, 100);
+        });
+    }
+    
+    // Lesson filtering with smooth transitions
+    document.querySelectorAll('[data-filter]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button with smooth transition
+            document.querySelectorAll('[data-filter]').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('btn-outline-primary');
+                btn.classList.remove('btn-primary');
+            });
+            
+            this.classList.add('active');
+            this.classList.add('btn-primary');
+            this.classList.remove('btn-outline-primary');
+            
+            const filter = this.getAttribute('data-filter');
+            
+            // Animate lesson items
+            document.querySelectorAll('.lesson-item').forEach((item, index) => {
+                const shouldShow = filter === 'all' || item.getAttribute('data-type') === filter;
+                
+                if (shouldShow) {
+                    item.style.display = 'block';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.4s ease';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    }, index * 100);
+                } else {
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(-20px)';
+                    
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+    
+    // Add hover effects to lesson cards
+    document.querySelectorAll('.lesson-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        });
+    });
+    
+    // Animate dashboard cards on load
+    function animateDashboardCards() {
+        document.querySelectorAll('.dashboard-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
+    
+    // Count up animation for numbers
+    function countUpAnimation() {
+        document.querySelectorAll('.display-4').forEach(element => {
+            const target = parseInt(element.textContent);
+            if (target && !isNaN(target)) {
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current);
+                }, 40);
+            }
+        });
+    }
+    
+    // Add loading states to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.href && !this.href.includes('#') && !this.hasAttribute('data-filter')) {
+                const originalContent = this.innerHTML;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+                this.disabled = true;
+                
+                // Reset after 3 seconds if navigation doesn't occur
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                    this.disabled = false;
+                }, 3000);
+            }
+        });
+    });
+    
+    // Initialize animations
+    animateProgressBars();
+    animateDashboardCards();
+    countUpAnimation();
+    
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+
+<!-- Custom CSS for enhanced animations -->
+<style>
+    .lesson-card {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-left: 4px solid transparent;
+    }
+    
+    .lesson-card:hover {
+        border-left-color: var(--primary-color);
+    }
+    
+    .badge {
+        transition: all 0.3s ease;
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+        left: 100%;
+    }
+    
+    .progress-bar {
+        transition: width 1.5s ease-in-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+</style>
+{% endblock %}

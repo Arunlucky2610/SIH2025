@@ -1,0 +1,561 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Student Monitoring - Rural Digital Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f8fafc;
+    }
+    
+    .admin-container {
+        max-width: 1200px;
+        margin: 100px auto 0;
+        padding: 20px;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #9f7aea 0%, #667eea 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(159, 122, 234, 0.3);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .stat-icon.active {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+    }
+    
+    .stat-icon.total {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        color: white;
+    }
+    
+    .stat-icon.progress {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        color: white;
+    }
+    
+    .stat-icon.inactive {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        color: white;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-weight: 500;
+        margin-top: 5px;
+    }
+    
+    .filters-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filters-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-group label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+    }
+    
+    .form-control {
+        padding: 12px 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .students-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .students-header {
+        padding: 25px;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    }
+    
+    .students-header h3 {
+        margin: 0;
+        color: #2d3748;
+        font-weight: 700;
+    }
+    
+    .students-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .students-table th {
+        background: #f7fafc;
+        padding: 20px;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .students-table td {
+        padding: 20px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    
+    .students-table tr:hover {
+        background: #f8fafc;
+    }
+    
+    .student-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .student-details h4 {
+        margin: 0;
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .student-details p {
+        margin: 5px 0 0 0;
+        color: #718096;
+        font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        transition: width 0.3s ease;
+    }
+    
+    .status-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .status-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+    
+    .status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+    
+    .status-progress {
+        background: #fbd38d;
+        color: #744210;
+    }
+    
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-sm {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #cbd5e0;
+    }
+    
+    .back-btn {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border: 1px solid #667eea;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .back-btn:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .admin-container {
+            margin-top: 80px;
+            padding: 15px;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .filters-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .students-table {
+            font-size: 0.9rem;
+        }
+        
+        .students-table th,
+        .students-table td {
+            padding: 15px 10px;
+        }
+        
+        .action-btns {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <a href="{% url 'custom_admin_dashboard' %}" class="back-btn">
+        <i class="bi bi-arrow-left"></i>
+        Back to Dashboard
+    </a>
+
+    <div class="page-header">
+        <div>
+            <h1><i class="bi bi-people me-3"></i>Student Monitoring</h1>
+            <p class="mb-0 opacity-75">Track student progress and engagement</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="exportReport()">
+                <i class="bi bi-download"></i>
+                Export Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h3 class="stat-number">{{ total_students|default:0 }}</h3>
+            <p class="stat-label">Total Students</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+            <h3 class="stat-number">{{ active_students|default:0 }}</h3>
+            <p class="stat-label">Active This Month</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon progress">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <h3 class="stat-number">{{ avg_progress|default:0 }}%</h3>
+            <p class="stat-label">Avg. Progress</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon inactive">
+                <i class="bi bi-person-x-fill"></i>
+            </div>
+            <h3 class="stat-number">{{ inactive_students|default:0 }}</h3>
+            <p class="stat-label">Need Attention</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+        <form method="get" id="filterForm">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="search">Search Students</label>
+                    <input type="text" 
+                           id="search" 
+                           name="search" 
+                           class="form-control" 
+                           placeholder="Search by name or ID..."
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="filter-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="progress" {% if request.GET.status == 'progress' %}selected{% endif %}>In Progress</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="grade">Grade Level</label>
+                    <select id="grade" name="grade" class="form-control">
+                        <option value="">All Grades</option>
+                        <option value="1" {% if request.GET.grade == '1' %}selected{% endif %}>Grade 1</option>
+                        <option value="2" {% if request.GET.grade == '2' %}selected{% endif %}>Grade 2</option>
+                        <option value="3" {% if request.GET.grade == '3' %}selected{% endif %}>Grade 3</option>
+                        <option value="4" {% if request.GET.grade == '4' %}selected{% endif %}>Grade 4</option>
+                        <option value="5" {% if request.GET.grade == '5' %}selected{% endif %}>Grade 5</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Students Table -->
+    <div class="students-card">
+        <div class="students-header">
+            <h3>Students Overview</h3>
+        </div>
+        
+        {% if students %}
+        <table class="students-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Progress</th>
+                    <th>Lessons Completed</th>
+                    <th>Last Activity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>
+                        <div class="student-info">
+                            <div class="student-avatar">
+                                {{ student.first_name|first|upper }}{{ student.last_name|first|upper }}
+                            </div>
+                            <div class="student-details">
+                                <h4>{{ student.first_name }} {{ student.last_name }}</h4>
+                                <p>ID: {{ student.id }} • Grade {{ student.userprofile.grade_level|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ student.progress_percentage|default:0 }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ student.progress_percentage|default:0 }}% Complete</small>
+                    </td>
+                    <td>
+                        <strong>{{ student.completed_lessons|default:0 }}</strong> / {{ total_lessons|default:0 }}
+                    </td>
+                    <td>
+                        {% if student.last_login %}
+                            {{ student.last_login|date:"M d, Y" }}
+                        {% else %}
+                            <span class="text-muted">Never</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if student.is_active_this_month %}
+                            <span class="status-badge status-active">Active</span>
+                        {% elif student.progress_percentage > 0 %}
+                            <span class="status-badge status-progress">In Progress</span>
+                        {% else %}
+                            <span class="status-badge status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn btn-primary btn-sm" onclick="viewStudent({{ student.id }})">
+                                <i class="bi bi-eye"></i>
+                                View
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="messageStudent({{ student.id }})">
+                                <i class="bi bi-chat-dots"></i>
+                                Message
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-people"></i>
+            <h3>No Students Found</h3>
+            <p>No students match your current filters. Try adjusting your search criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function viewStudent(studentId) {
+        // Redirect to student detail page
+        window.location.href = `/panel/student/${studentId}/`;
+    }
+    
+    function messageStudent(studentId) {
+        // Open messaging modal or redirect to messaging page
+        alert('Messaging feature coming soon!');
+    }
+    
+    function exportReport() {
+        // Export functionality
+        alert('Exporting student report...');
+    }
+    
+    // Auto-submit form on filter change
+    document.getElementById('status').addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+    
+    document.getElementById('grade').addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+    
+    // Search with delay
+    let searchTimeout;
+    document.getElementById('search').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            document.getElementById('filterForm').submit();
+        }, 500);
+    });
+</script>
+{% endblock %}

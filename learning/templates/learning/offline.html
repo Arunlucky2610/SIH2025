@@ -1,0 +1,97 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}You're Offline - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-lg-6 col-md-8">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-wifi-off text-muted" style="font-size: 6rem; opacity: 0.5;"></i>
+                </div>
+                
+                <h1 class="display-4 fw-bold text-primary mb-4">You're Offline</h1>
+                
+                <p class="lead text-muted mb-4">
+                    Don't worry! You can still access your downloaded lessons and continue learning.
+                </p>
+                
+                <div class="row g-3 mb-5">
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-download text-primary fs-2 mb-3"></i>
+                                <h6>Downloaded Lessons</h6>
+                                <p class="small text-muted mb-0">Access your offline content</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-bookmark text-success fs-2 mb-3"></i>
+                                <h6>Saved Progress</h6>
+                                <p class="small text-muted mb-0">Your progress is saved locally</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-arrow-clockwise text-info fs-2 mb-3"></i>
+                                <h6>Auto Sync</h6>
+                                <p class="small text-muted mb-0">Syncs when you're back online</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                    <button class="btn btn-primary rounded-pill px-4" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+                        Try Again
+                    </button>
+                    <a href="/" class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="bi bi-house me-2"></i>
+                        Go Home
+                    </a>
+                </div>
+                
+                <div class="mt-4">
+                    <div id="networkStatus" class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span>You're currently offline. Check your internet connection.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Network status monitoring
+function updateNetworkStatus() {
+    const statusElement = document.getElementById('networkStatus');
+    
+    if (navigator.onLine) {
+        statusElement.className = 'alert alert-success';
+        statusElement.innerHTML = '<i class="bi bi-check-circle me-2"></i><span>You\'re back online! The page will refresh shortly.</span>';
+        
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+    } else {
+        statusElement.className = 'alert alert-warning';
+        statusElement.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i><span>You\'re currently offline. Check your internet connection.</span>';
+    }
+}
+
+// Listen for online/offline events
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
+// Initial status check
+updateNetworkStatus();
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="24" fill="url(#grad)"/>
+  <g fill="white">
+    <!-- Graduation cap -->
+    <path d="M96 60L40 80l56 20 56-20L96 60z"/>
+    <path d="M60 90v20c0 16 16 24 36 24s36-8 36-24V90"/>
+    <rect x="140" y="85" width="8" height="30" rx="4"/>
+    <circle cx="144" cy="118" r="6"/>
+  </g>
+  <text x="96" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">Rural Edu</text>
+</svg>

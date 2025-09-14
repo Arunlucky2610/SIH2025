@@ -1,0 +1,352 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --accent-color: #667eea;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --bg-light: #f8f9fa;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+        }
+
+        /* Header styling */
+        #header {
+            background: var(--primary-gradient) !important;
+            color: var(--text-light) !important;
+            box-shadow: var(--shadow);
+            border-bottom: none !important;
+        }
+
+        #branding h1, #branding h1 a:link, #branding h1 a:visited {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #user-tools {
+            color: var(--text-light) !important;
+        }
+
+        #user-tools a {
+            color: var(--text-light) !important;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            margin-left: 5px;
+        }
+
+        #user-tools a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Navigation styling */
+        .breadcrumbs {
+            background: var(--bg-light) !important;
+            border: none !important;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .breadcrumbs a {
+            color: var(--accent-color) !important;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumbs a:hover {
+            color: #764ba2 !important;
+        }
+
+        /* Main content area */
+        #content {
+            background: var(--bg-light) !important;
+            margin: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        /* Module styling */
+        .module {
+            background: white !important;
+            border: none !important;
+            border-radius: var(--border-radius) !important;
+            box-shadow: var(--shadow) !important;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .module h2 {
+            background: var(--secondary-gradient) !important;
+            color: var(--text-light) !important;
+            padding: 15px 20px !important;
+            margin: 0 !important;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .module caption {
+            background: var(--secondary-gradient) !important;
+            color: var(--text-light) !important;
+            padding: 15px 20px !important;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Table styling */
+        table {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th {
+            background: var(--primary-gradient) !important;
+            color: var(--text-light) !important;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        th a {
+            color: var(--text-light) !important;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa !important;
+        }
+
+        tr:hover {
+            background: #e3f2fd !important;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        /* Button styling */
+        .button, input[type=submit], input[type=button], .submit-row input, button {
+            background: var(--success-gradient) !important;
+            color: var(--text-light) !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 25px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: var(--shadow) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+            filter: brightness(1.1) !important;
+        }
+
+        .default {
+            background: var(--primary-gradient) !important;
+        }
+
+        /* Form styling */
+        .form-row {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-row label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        input[type=text], input[type=password], input[type=email], input[type=url], 
+        input[type=number], select, textarea {
+            border: 2px solid #e0e0e0 !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, 
+        input[type=url]:focus, input[type=number]:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            outline: none !important;
+        }
+
+        /* Login form styling */
+        .login {
+            background: var(--primary-gradient) !important;
+            min-height: 100vh;
+        }
+
+        .login #container {
+            background: none !important;
+        }
+
+        .login #content {
+            background: white !important;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin: 50px auto;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .login #header {
+            background: transparent !important;
+            box-shadow: none !important;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login #branding h1 {
+            color: var(--accent-color) !important;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Sidebar styling */
+        #changelist-filter {
+            background: white !important;
+            border: none !important;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        #changelist-filter h2 {
+            background: var(--secondary-gradient) !important;
+            color: var(--text-light) !important;
+            margin: -20px -20px 15px -20px !important;
+            padding: 15px 20px !important;
+            font-weight: 600;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        #changelist-filter h3 {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Actions */
+        .actions {
+            background: var(--bg-light) !important;
+            border: none !important;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .actions select {
+            border-radius: 8px;
+        }
+
+        /* Messages */
+        .messagelist {
+            margin: 10px;
+        }
+
+        .messagelist li {
+            border-radius: var(--border-radius) !important;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border: none !important;
+        }
+
+        .messagelist .success {
+            background: var(--success-gradient) !important;
+            color: var(--text-light) !important;
+        }
+
+        .messagelist .error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+            color: var(--text-light) !important;
+        }
+
+        /* Dashboard styling */
+        .dashboard .module table th {
+            text-align: left;
+            padding: 15px;
+        }
+
+        .dashboard .module table td {
+            padding: 15px;
+        }
+
+        .dashboard .module table td a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .dashboard .module table td a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #content {
+                margin: 5px;
+                padding: 15px;
+            }
+            
+            .login #content {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+        }
+
+        /* Custom animations */
+        .module, .form-row, .button {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        #footer {
+            background: var(--primary-gradient) !important;
+            color: var(--text-light) !important;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        Rural Digital Learning - Admin Panel 🎓
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

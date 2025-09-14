@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Generate PWA Icons</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512" style="border: 1px solid #000;"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+        gradient.addColorStop(0, '#4F46E5');
+        gradient.addColorStop(1, '#7C3AED');
+        
+        // Fill background
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Add rounded corners effect
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, 50);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // Draw graduation cap icon
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 300px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎓', 256, 256);
+        
+        // Create download link for 192x192
+        const canvas192 = document.createElement('canvas');
+        canvas192.width = 192;
+        canvas192.height = 192;
+        const ctx192 = canvas192.getContext2d();
+        ctx192.drawImage(canvas, 0, 0, 512, 512, 0, 0, 192, 192);
+        
+        // Download the 512x512 icon
+        const link = document.createElement('a');
+        link.download = 'icon-512x512.png';
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        // Create and download 192x192 icon
+        setTimeout(() => {
+            const link192 = document.createElement('a');
+            link192.download = 'icon-192x192.png';
+            link192.href = canvas192.toDataURL();
+            link192.click();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <style>
+        body.login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login #container {
+            background: none !important;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login #content {
+            background: white !important;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login #header {
+            background: none !important;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: none !important;
+        }
+
+        .login #branding h1 {
+            color: #667eea !important;
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            margin: 0 0 10px 0 !important;
+            text-shadow: none !important;
+        }
+
+        .login #branding h1:after {
+            content: "🎓";
+            margin-left: 10px;
+        }
+
+        .login form {
+            margin-top: 20px;
+        }
+
+        .login .form-row {
+            background: none !important;
+            box-shadow: none !important;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        .login .form-row label {
+            color: #333 !important;
+            font-weight: 600 !important;
+            margin-bottom: 8px !important;
+            display: block !important;
+            font-size: 14px;
+        }
+
+        .login input[type=text], .login input[type=password] {
+            width: 100% !important;
+            padding: 15px !important;
+            border: 2px solid #e0e0e0 !important;
+            border-radius: 10px !important;
+            font-size: 16px !important;
+            transition: all 0.3s ease !important;
+            background: #f8f9fa !important;
+            box-sizing: border-box;
+        }
+
+        .login input[type=text]:focus, .login input[type=password]:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            outline: none !important;
+            background: white !important;
+        }
+
+        .login .submit-row {
+            text-align: center;
+            margin-top: 30px;
+            border-top: none !important;
+            padding-top: 20px;
+        }
+
+        .login input[type=submit] {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 15px 40px !important;
+            border-radius: 25px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+
+        .login input[type=submit]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4) !important;
+            filter: brightness(1.1) !important;
+        }
+
+        .login .errornote {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 15px !important;
+            margin-bottom: 20px !important;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .login .help {
+            color: #666 !important;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        /* Success message styling */
+        .messagelist {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .messagelist .success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+            color: white !important;
+            padding: 15px !important;
+            border-radius: 10px !important;
+            margin-bottom: 15px !important;
+            text-align: center;
+            font-weight: 500;
+            border: none !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .login #content {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .login #branding h1 {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        /* Animation */
+        .login #content {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Additional styling for better UX */
+        .login input[type=text]::placeholder, 
+        .login input[type=password]::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .login #content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+            border-radius: 17px;
+            z-index: -1;
+            animation: gradientRotate 3s ease infinite;
+        }
+
+        @keyframes gradientRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login #content {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        {% if form.errors and not form.non_field_errors %}
+            <p class="errornote">
+                Please correct the error{{ form.errors|pluralize }} below.
+            </p>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <p class="errornote">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">
+            {% csrf_token %}
+            <div class="form-row">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+            </div>
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+                <div class="password-reset-link">
+                    <a href="{{ password_reset_url }}">Forgot your password?</a>
+                </div>
+            {% endif %}
+            <div class="submit-row">
+                <input type="submit" value="Log in" />
+                <input type="hidden" name="next" value="{{ next }}" />
+            </div>
+        </form>
+
+        <div class="help">
+            <p><strong>Rural Digital Learning Platform</strong></p>
+            <p>Access the admin panel to manage lessons, users, and track progress.</p>
+        </div>
+    </div>
+{% endblock %}
