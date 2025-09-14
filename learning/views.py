@@ -209,6 +209,7 @@ def teacher_dashboard(request):
         'progress_summary': progress_summary,
         'recent_attempts': recent_attempts,
         'profile': profile,
+        'today': timezone.now().date(),
     }
     
     return render(request, 'learning/teacher_dashboard.html', context)
@@ -533,20 +534,59 @@ def custom_admin_dashboard(request):
         'total_lessons': Lesson.objects.filter(is_active=True).count(),
         'completed_lessons': 0,
         'recent_activities': [],
+        'students': [],
     }
     
     if profile.role == 'teacher':
         # Teacher-specific data
+        students = User.objects.filter(userprofile__role='student').select_related('userprofile')
+        
+        # Calculate student progress statistics
+        total_progress = 0
+        active_students = 0
+        for student in students:
+            progress_records = ModuleProgress.objects.filter(student=student)
+            completed_count = progress_records.filter(completed=True).count()
+            total_count = progress_records.count()
+            if total_count > 0:
+                total_progress += (completed_count / total_count * 100)
+            if student.last_login:
+                active_students += 1
+        
+        avg_progress = total_progress / students.count() if students.count() > 0 else 0
+        
         context.update({
-            'total_students': User.objects.filter(userprofile__role='student').count(),
+            'total_students': students.count(),
+            'active_students': active_students,
+            'avg_progress': round(avg_progress, 1),
+            'students': students[:10],  # Show first 10 students
             'my_lessons': Lesson.objects.filter(created_by=request.user),
             'recent_progress': ModuleProgress.objects.select_related('student', 'lesson').order_by('-started_at')[:10]
         })
     elif profile.role == 'parent':
         # Parent-specific data
-        children = User.objects.filter(userprofile__parent__user=request.user)
+        children = User.objects.filter(userprofile__parent=profile).select_related('userprofile')
+        
+        # Calculate children progress
+        children_progress_data = []
+        for child in children:
+            progress_records = ModuleProgress.objects.filter(student=child)
+            completed_count = progress_records.filter(completed=True).count()
+            total_count = progress_records.count()
+            avg_score = progress_records.filter(score__isnull=False).aggregate(Avg('score'))['score__avg'] or 0
+            
+            children_progress_data.append({
+                'child': child,
+                'completed_lessons': completed_count,
+                'total_lessons': total_count,
+                'avg_score': round(avg_score, 1),
+                'progress_percentage': (completed_count / total_count * 100) if total_count > 0 else 0
+            })
+        
         context.update({
+            'total_students': children.count(),
             'children': children,
+            'children_detailed_progress': children_progress_data,
             'children_progress': ModuleProgress.objects.filter(student__in=children).select_related('student', 'lesson').order_by('-started_at')[:10]
         })
     

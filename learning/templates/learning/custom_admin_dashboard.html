@@ -323,6 +323,101 @@
         </a>
     </div>
 
+    <!-- Student Overview Section -->
+    {% if user_profile.role == 'teacher' and students %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <i class="bi bi-people me-2"></i>Recent Students Overview
+                </div>
+                <div class="content-card-body">
+                    <div class="row">
+                        {% for student in students %}
+                        <div class="col-lg-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    {{ student.first_name|first }}{{ student.last_name|first }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ student.first_name }} {{ student.last_name }}</h6>
+                                    <small class="text-muted">
+                                        {% if student.last_login %}
+                                            Last active: {{ student.last_login|timesince }} ago
+                                        {% else %}
+                                            Never logged in
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    {% if student.last_login %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'custom_admin_students' %}" class="btn btn-primary">
+                            <i class="bi bi-eye me-2"></i>View All Students
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif user_profile.role == 'parent' and children_detailed_progress %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <i class="bi bi-heart me-2"></i>Your Children's Progress
+                </div>
+                <div class="content-card-body">
+                    <div class="row">
+                        {% for child_data in children_detailed_progress %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                        {{ child_data.child.first_name|first }}{{ child_data.child.last_name|first }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ child_data.child.first_name }} {{ child_data.child.last_name }}</h6>
+                                        <small class="text-muted">Progress: {{ child_data.progress_percentage|floatformat:0 }}%</small>
+                                    </div>
+                                </div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ child_data.progress_percentage }}%"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted">Completed:</small>
+                                        <div class="fw-bold">{{ child_data.completed_lessons }}/{{ child_data.total_lessons }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Avg Score:</small>
+                                        <div class="fw-bold">{{ child_data.avg_score }}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'custom_admin_students' %}" class="btn btn-success">
+                            <i class="bi bi-eye me-2"></i>View Detailed Progress
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Content Grid -->
     <div class="content-grid">
         <!-- Recent Activity -->
