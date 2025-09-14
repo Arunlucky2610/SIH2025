@@ -391,7 +391,7 @@
                                     </div>
                                 </div>
                                 <div class="progress mb-2" style="height: 8px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ child_data.progress_percentage }}%"></div>
+                                    <div class="progress-bar bg-success" role="progressbar" data-progress="{{ child_data.progress_percentage|default:'0' }}"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">
@@ -509,4 +509,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Set progress bar widths dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar[data-progress]');
+        progressBars.forEach(function(bar) {
+            const progress = bar.getAttribute('data-progress');
+            bar.style.width = progress + '%';
+        });
+    });
+</script>
 {% endblock %}

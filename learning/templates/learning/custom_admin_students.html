@@ -474,15 +474,15 @@
                         </div>
                     </td>
                     <td>
-                        {% with progress=75 %}
+                        {% with progress=student.userprofile.progress_percentage|default:0 %}
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: {{ progress }}%;"></div>
+                            <div class="progress-fill" data-progress="{{ progress }}"></div>
                         </div>
                         <small class="text-muted">{{ progress }}% Complete</small>
                         {% endwith %}
                     </td>
                     <td>
-                        <strong>{% cycle "3" "5" "2" "7" %}</strong> / 8
+                        <strong>{{ student.userprofile.completed_lessons|default:0 }}</strong> / {{ student.userprofile.total_lessons|default:0 }}
                     </td>
                     <td>
                         {% if student.last_login %}
@@ -556,6 +556,26 @@
         searchTimeout = setTimeout(() => {
             document.getElementById('filterForm').submit();
         }, 500);
+    });
+    
+    // Set progress bar widths dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-fill[data-progress]');
+        progressBars.forEach(function(bar) {
+            const progress = bar.getAttribute('data-progress');
+            bar.style.width = progress + '%';
+            
+            // Add color based on progress
+            if (progress >= 80) {
+                bar.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+            } else if (progress >= 50) {
+                bar.style.background = 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)';
+            } else if (progress > 0) {
+                bar.style.background = 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)';
+            } else {
+                bar.style.background = 'linear-gradient(135deg, #a0aec0 0%, #718096 100%)';
+            }
+        });
     });
 </script>
 {% endblock %}

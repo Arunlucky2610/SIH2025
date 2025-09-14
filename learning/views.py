@@ -643,18 +643,36 @@ def custom_admin_students(request):
     elif status_filter == 'inactive':
         students = students.filter(last_login__isnull=True)
     
-    # Calculate statistics
-    total_students = students.count()
+    # Calculate statistics and add progress data to each student
+    students_with_progress = []
+    total_progress = 0
+    
+    for student in students:
+        progress_records = ModuleProgress.objects.filter(student=student)
+        completed_count = progress_records.filter(completed=True).count()
+        total_count = progress_records.count()
+        progress_percentage = (completed_count / total_count * 100) if total_count > 0 else 0
+        
+        # Add progress percentage to student's userprofile temporarily
+        student.userprofile.progress_percentage = round(progress_percentage, 1)
+        student.userprofile.completed_lessons = completed_count
+        student.userprofile.total_lessons = total_count
+        
+        students_with_progress.append(student)
+        total_progress += progress_percentage
+    
+    total_students = len(students_with_progress)
     active_students = students.filter(last_login__isnull=False).count()
     inactive_students = total_students - active_students
+    avg_progress = total_progress / total_students if total_students > 0 else 0
     
     context = {
-        'students': students.order_by('first_name', 'last_name'),
+        'students': students_with_progress,
         'user_profile': profile,
         'total_students': total_students,
         'active_students': active_students,
         'inactive_students': inactive_students,
-        'avg_progress': 75,  # Placeholder
+        'avg_progress': round(avg_progress, 1),
     }
     
     return render(request, 'learning/custom_admin_students.html', context)
