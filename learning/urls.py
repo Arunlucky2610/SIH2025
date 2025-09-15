@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import teacher_communication_views
 
 urlpatterns = [
     # Authentication
@@ -12,6 +13,24 @@ urlpatterns = [
     path('student/', views.student_dashboard, name='student_dashboard'),
     path('teacher/', views.teacher_dashboard, name='teacher_dashboard'),
     path('parent/', views.parent_dashboard, name='parent_dashboard'),
+    path('parents/parent-dashboard-test/', views.parent_dashboard, name='parent_dashboard_test'),
+    path('parents/ultra-dashboard/', views.parent_dashboard, name='parent_dashboard_ultra'),
+    path('parents/analytics/', views.parent_analytics, name='parent_analytics'),
+    
+    # Notifications (for parents)
+    path('notifications/', views.notifications_view, name='notifications'),
+    path('notification-settings/', views.notification_settings, name='notification_settings'),
+    
+    # Teacher Communication
+    path('teacher-communication/', teacher_communication_views.teacher_communication_dashboard, name='teacher_communication_dashboard'),
+    path('teacher-communication/child/<int:child_id>/select-teacher/', teacher_communication_views.select_teacher, name='select_teacher'),
+    path('teacher-communication/child/<int:child_id>/teacher/<int:teacher_id>/compose/', teacher_communication_views.compose_message, name='compose_message'),
+    path('teacher-communication/conversations/', teacher_communication_views.conversation_list, name='conversation_list'),
+    path('teacher-communication/conversation/<int:thread_id>/', teacher_communication_views.conversation_detail, name='conversation_detail'),
+    path('teacher-communication/mark-message-read/', teacher_communication_views.mark_message_read, name='mark_message_read'),
+    path('teacher-communication/child/<int:child_id>/teachers/', teacher_communication_views.get_child_teachers, name='get_child_teachers'),
+    path('teacher-communication/teacher/<int:teacher_id>/availability/', teacher_communication_views.teacher_availability, name='teacher_availability'),
+    path('teacher-communication/search-teachers/', teacher_communication_views.search_teachers, name='search_teachers'),
     
     # Lessons
     path('lesson/<int:lesson_id>/', views.lesson_detail, name='lesson_detail'),

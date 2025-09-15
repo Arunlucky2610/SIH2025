@@ -1,0 +1,152 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Rural Digital Learning{% endblock %}
+
+{% block extra_head %}
+<style>
+    .notification-card {
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+    .notification-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .notification-card.lesson-complete {
+        border-left-color: #28a745;
+    }
+    .notification-card.quiz-passed {
+        border-left-color: #ffc107;
+    }
+    .notification-card.streak-milestone {
+        border-left-color: #dc3545;
+    }
+    .notification-card.weekly-summary {
+        border-left-color: #6f42c1;
+    }
+    .notification-card.inactivity-alert {
+        border-left-color: #fd7e14;
+    }
+    .notification-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .notification-time {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-bell me-2"></i>
+                    Notifications
+                    {% if notification_count > 0 %}
+                        <span class="badge bg-primary">{{ notification_count }}</span>
+                    {% endif %}
+                </h2>
+                
+                <div class="btn-group">
+                    <a href="{% url 'parent_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Back to Dashboard
+                    </a>
+                    {% if notification_count > 0 %}
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="mark_all_read" value="1">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="fas fa-check-double me-1"></i>
+                                Mark All as Read
+                            </button>
+                        </form>
+                    {% endif %}
+                    <a href="{% url 'notification_settings' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-cog me-1"></i>
+                        Settings
+                    </a>
+                </div>
+            </div>
+
+            {% if notifications %}
+                <div class="row">
+                    {% for notification in notifications %}
+                        <div class="col-12 mb-3">
+                            <div class="card notification-card {{ notification.notification_type }}">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="notification-icon text-center">
+                                                {% if notification.notification_type == 'lesson_complete' %}
+                                                    🎉
+                                                {% elif notification.notification_type == 'quiz_passed' %}
+                                                    🏆
+                                                {% elif notification.notification_type == 'streak_milestone' %}
+                                                    🔥
+                                                {% elif notification.notification_type == 'weekly_summary' %}
+                                                    📊
+                                                {% elif notification.notification_type == 'inactivity_alert' %}
+                                                    ⏰
+                                                {% else %}
+                                                    📚
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <h5 class="card-title mb-1">{{ notification.title }}</h5>
+                                            <p class="card-text mb-2">{{ notification.message }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="notification-time">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ notification.created_at|timesince }} ago
+                                                </small>
+                                                <div class="d-flex align-items-center">
+                                                    <small class="text-muted me-2">
+                                                        <i class="fas fa-user me-1"></i>
+                                                        {{ notification.child.first_name|default:notification.child.username }}
+                                                    </small>
+                                                    {% if notification.lesson %}
+                                                        <span class="badge bg-info">
+                                                            {{ notification.lesson.title|truncatechars:20 }}
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <span class="badge bg-{{ notification.get_status_color }}">
+                                                {{ notification.get_status_display }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-bell-slash" style="font-size: 4rem; color: #dee2e6;"></i>
+                    </div>
+                    <h4 class="text-muted">No Notifications Yet</h4>
+                    <p class="text-muted">
+                        You'll receive notifications here when your children complete lessons, 
+                        achieve milestones, or need encouragement.
+                    </p>
+                    <a href="{% url 'parent_dashboard' %}" class="btn btn-primary">
+                        <i class="fas fa-chart-line me-1"></i>
+                        View Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

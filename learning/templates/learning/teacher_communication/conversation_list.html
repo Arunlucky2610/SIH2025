@@ -1,0 +1,357 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Conversation History{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+<style>
+.conversation-list-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.conversation-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.conversation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.conversation-title {
+    font-weight: 600;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.conversation-participants {
+    color: #667eea;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.conversation-student {
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+}
+
+.conversation-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.last-message-time {
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0.8rem;
+}
+
+.unread-badge {
+    background: #ff4757;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.message-count {
+    background: #667eea;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.no-conversations {
+    text-align: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 20px;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+}
+
+.filter-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.conversation-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-active { background: #28a745; }
+.status-waiting { background: #ffc107; }
+.status-resolved { background: #6c757d; }
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="conversation-list-header">
+        <h1>💬 Your Conversations</h1>
+        <p>All your conversations with teachers</p>
+        <a href="{% url 'teacher_communication_dashboard' %}" class="btn btn-outline-light">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'teacher_communication_dashboard' %}" class="action-btn">
+            <i class="fas fa-plus"></i> Start New Conversation
+        </a>
+        <button class="action-btn" onclick="markAllRead()">
+            <i class="fas fa-check-double"></i> Mark All as Read
+        </button>
+        <button class="action-btn" onclick="showFilters()">
+            <i class="fas fa-filter"></i> Filter Conversations
+        </button>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterConversations('all')">
+            All Conversations
+        </button>
+        <button class="filter-tab" onclick="filterConversations('unread')">
+            Unread Messages
+        </button>
+        <button class="filter-tab" onclick="filterConversations('recent')">
+            Recent Activity
+        </button>
+        <button class="filter-tab" onclick="filterConversations('resolved')">
+            Resolved
+        </button>
+    </div>
+
+    <!-- Conversations List -->
+    {% if conversations %}
+        <div id="conversations-container">
+            {% for conversation in conversations %}
+                <div class="conversation-card" onclick="openConversation({{ conversation.id }})" data-filter="all {% if conversation.unread_count > 0 %}unread{% endif %}">
+                    <div class="conversation-header">
+                        <div class="flex-grow-1">
+                            <div class="conversation-title">
+                                {{ conversation.subject }}
+                            </div>
+                            <div class="conversation-participants">
+                                <i class="fas fa-users"></i>
+                                {% for participant in conversation.participants.all %}
+                                    {{ participant.get_full_name|default:participant.username }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="conversation-student">
+                                <i class="fas fa-user-graduate"></i>
+                                About: {{ conversation.student.get_full_name|default:conversation.student.username }}
+                            </div>
+                            <div class="conversation-status">
+                                <div class="status-indicator {% if conversation.is_active %}status-active{% else %}status-resolved{% endif %}"></div>
+                                <span class="small">{{ conversation.is_active|yesno:"Active,Resolved" }}</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            {% if conversation.unread_count > 0 %}
+                                <div class="unread-badge">{{ conversation.unread_count }} new</div>
+                            {% endif %}
+                            <div class="message-count mt-2">{{ conversation.message_count }} messages</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-meta">
+                        <div class="last-message-time">
+                            <i class="fas fa-clock"></i>
+                            Last activity: {{ conversation.last_message_at|timesince }} ago
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); openConversation({{ conversation.id }})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Load More Button (for pagination) -->
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary" onclick="loadMoreConversations()">
+                <i class="fas fa-arrow-down"></i> Load More Conversations
+            </button>
+        </div>
+
+    {% else %}
+        <div class="no-conversations">
+            <i class="fas fa-comments fa-3x mb-3"></i>
+            <h3>No Conversations Yet</h3>
+            <p>You haven't started any conversations with teachers yet.</p>
+            <p>Start communicating with your child's teachers to stay involved in their learning journey!</p>
+            <a href="{% url 'teacher_communication_dashboard' %}" class="btn btn-light btn-lg mt-3">
+                <i class="fas fa-plus"></i> Start Your First Conversation
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function openConversation(conversationId) {
+    window.location.href = `/teacher-communication/conversation/${conversationId}/`;
+}
+
+function filterConversations(filter) {
+    // Update active tab
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Filter conversations
+    const conversations = document.querySelectorAll('.conversation-card');
+    conversations.forEach(card => {
+        if (filter === 'all') {
+            card.style.display = 'block';
+        } else if (filter === 'unread') {
+            if (card.dataset.filter.includes('unread')) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        } else if (filter === 'recent') {
+            // Show conversations from last 7 days
+            card.style.display = 'block'; // Simplified for now
+        } else if (filter === 'resolved') {
+            // Show resolved conversations
+            card.style.display = 'none'; // Most conversations are active for now
+        }
+    });
+}
+
+function markAllRead() {
+    if (confirm('Mark all conversations as read?')) {
+        fetch('/teacher-communication/mark-all-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Remove unread badges
+                document.querySelectorAll('.unread-badge').forEach(badge => {
+                    badge.remove();
+                });
+                alert('All messages marked as read!');
+            } else {
+                alert('Error marking messages as read.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error marking messages as read.');
+        });
+    }
+}
+
+function showFilters() {
+    alert('Advanced filters coming soon! You can use the tabs above for basic filtering.');
+}
+
+function loadMoreConversations() {
+    // Implement pagination
+    alert('Load more functionality coming soon!');
+}
+
+// Auto-refresh every 30 seconds to check for new messages
+setInterval(function() {
+    // You can implement AJAX call to check for new messages
+    // and update the conversation list without full page reload
+}, 30000);
+</script>
+{% endblock %}

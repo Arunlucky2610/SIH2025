@@ -254,3 +254,13 @@ class LearningActivity(models.Model):
     
     def __str__(self):
         return f"{self.student.username} - {self.get_activity_type_display()}"
+
+
+# Import notification models
+from .notification_models import NotificationSettings, ParentNotification, NotificationTemplate
+
+# Import teacher communication models
+from .teacher_communication_models import (
+    TeacherAssignment, TeacherMessage, TeacherAvailability,
+    ConversationThread, TeacherProfile
+)

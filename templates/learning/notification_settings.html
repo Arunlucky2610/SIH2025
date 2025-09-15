@@ -1,0 +1,256 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Notification Settings - Rural Digital Learning{% endblock %}
+
+{% block extra_head %}
+<style>
+    .settings-card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    .settings-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .notification-type-card {
+        border-left: 4px solid #007bff;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-cog me-2"></i>
+                    Notification Settings
+                </h2>
+                <a href="{% url 'notifications' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Notifications
+                </a>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- General Settings -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card settings-card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-toggle-on me-2"></i>
+                                    General Settings
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="in_app_notifications" name="in_app_notifications"
+                                           {% if settings.in_app_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="in_app_notifications">
+                                        <strong>In-App Notifications</strong>
+                                        <br><small class="text-muted">Show notifications in the dashboard</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="email_notifications" name="email_notifications"
+                                           {% if settings.email_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_notifications">
+                                        <strong>Email Notifications</strong>
+                                        <br><small class="text-muted">Send notifications to your email</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="sms_notifications" name="sms_notifications"
+                                           {% if settings.sms_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_notifications">
+                                        <strong>SMS Notifications</strong>
+                                        <br><small class="text-muted">Send notifications via SMS</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiet Hours -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card settings-card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-moon me-2"></i>
+                                    Quiet Hours
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">
+                                    Set times when you don't want to receive notifications
+                                </p>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="quiet_hours_start" class="form-label">
+                                            <strong>Start Time</strong>
+                                        </label>
+                                        <input type="time" class="form-control" 
+                                               id="quiet_hours_start" name="quiet_hours_start"
+                                               value="{{ settings.quiet_hours_start|time:'H:i' }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="quiet_hours_end" class="form-label">
+                                            <strong>End Time</strong>
+                                        </label>
+                                        <input type="time" class="form-control" 
+                                               id="quiet_hours_end" name="quiet_hours_end"
+                                               value="{{ settings.quiet_hours_end|time:'H:i' }}">
+                                    </div>
+                                </div>
+                                
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Current setting: {{ settings.quiet_hours_start|time:'g:i A' }} - {{ settings.quiet_hours_end|time:'g:i A' }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Types -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card settings-card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-bell me-2"></i>
+                                    Notification Types
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Lesson Complete -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card notification-type-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    🎉 Lesson Completed
+                                                </h6>
+                                                <p class="card-text small text-muted">
+                                                    When your child finishes a lesson
+                                                </p>
+                                                <select class="form-select form-select-sm" name="lesson_complete">
+                                                    <option value="immediate" {% if settings.lesson_complete == 'immediate' %}selected{% endif %}>Immediate</option>
+                                                    <option value="daily" {% if settings.lesson_complete == 'daily' %}selected{% endif %}>Daily Summary</option>
+                                                    <option value="weekly" {% if settings.lesson_complete == 'weekly' %}selected{% endif %}>Weekly Summary</option>
+                                                    <option value="never" {% if settings.lesson_complete == 'never' %}selected{% endif %}>Never</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quiz Passed -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card notification-type-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    🏆 Quiz Passed
+                                                </h6>
+                                                <p class="card-text small text-muted">
+                                                    When your child passes a quiz
+                                                </p>
+                                                <select class="form-select form-select-sm" name="quiz_passed">
+                                                    <option value="immediate" {% if settings.quiz_passed == 'immediate' %}selected{% endif %}>Immediate</option>
+                                                    <option value="daily" {% if settings.quiz_passed == 'daily' %}selected{% endif %}>Daily Summary</option>
+                                                    <option value="weekly" {% if settings.quiz_passed == 'weekly' %}selected{% endif %}>Weekly Summary</option>
+                                                    <option value="never" {% if settings.quiz_passed == 'never' %}selected{% endif %}>Never</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Learning Streak -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card notification-type-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    🔥 Learning Streak
+                                                </h6>
+                                                <p class="card-text small text-muted">
+                                                    When your child achieves streak milestones
+                                                </p>
+                                                <select class="form-select form-select-sm" name="streak_milestone">
+                                                    <option value="immediate" {% if settings.streak_milestone == 'immediate' %}selected{% endif %}>Immediate</option>
+                                                    <option value="daily" {% if settings.streak_milestone == 'daily' %}selected{% endif %}>Daily Summary</option>
+                                                    <option value="weekly" {% if settings.streak_milestone == 'weekly' %}selected{% endif %}>Weekly Summary</option>
+                                                    <option value="never" {% if settings.streak_milestone == 'never' %}selected{% endif %}>Never</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Weekly Summary -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card notification-type-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    📊 Weekly Summary
+                                                </h6>
+                                                <p class="card-text small text-muted">
+                                                    Weekly progress reports
+                                                </p>
+                                                <select class="form-select form-select-sm" name="weekly_summary">
+                                                    <option value="weekly" {% if settings.weekly_summary == 'weekly' %}selected{% endif %}>Weekly</option>
+                                                    <option value="never" {% if settings.weekly_summary == 'never' %}selected{% endif %}>Never</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Inactivity Alert -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card notification-type-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    ⏰ Inactivity Alert
+                                                </h6>
+                                                <p class="card-text small text-muted">
+                                                    When your child hasn't been active
+                                                </p>
+                                                <select class="form-select form-select-sm" name="inactivity_alert">
+                                                    <option value="daily" {% if settings.inactivity_alert == 'daily' %}selected{% endif %}>Daily Check</option>
+                                                    <option value="weekly" {% if settings.inactivity_alert == 'weekly' %}selected{% endif %}>Weekly Check</option>
+                                                    <option value="never" {% if settings.inactivity_alert == 'never' %}selected{% endif %}>Never</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

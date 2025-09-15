@@ -10,6 +10,7 @@ from .analytics import (
     update_learning_streak, update_weekly_progress, update_monthly_progress,
     update_subject_performance, log_learning_activity
 )
+from .notifications import NotificationService
 
 
 @receiver(post_save, sender=ModuleProgress)
@@ -35,6 +36,13 @@ def update_analytics_on_progress(sender, instance, created, **kwargs):
             description=f"Completed lesson: {instance.lesson.title}"
         )
         
+        # Send notification to parent
+        NotificationService.notify_lesson_completion(
+            child=instance.student,
+            lesson=instance.lesson,
+            time_spent=instance.time_spent
+        )
+        
         # Update learning streak (lesson completed today)
         update_learning_streak(instance.student, lesson_completed_today=True)
         
@@ -46,6 +54,12 @@ def update_analytics_on_progress(sender, instance, created, **kwargs):
                 student=instance.student,
                 activity_type='streak_milestone',
                 description=f"Achieved {current_streak} day learning streak!"
+            )
+            
+            # Send streak milestone notification
+            NotificationService.notify_streak_milestone(
+                child=instance.student,
+                streak_count=current_streak
             )
     
     # Update weekly and monthly progress
@@ -89,6 +103,13 @@ def update_analytics_on_quiz(sender, instance, created, **kwargs):
                 activity_type='quiz_passed',
                 lesson=instance.quiz.lesson,
                 description=f"Passed quiz for: {instance.quiz.lesson.title}"
+            )
+            
+            # Send quiz passed notification
+            NotificationService.notify_quiz_passed(
+                child=instance.student,
+                lesson=instance.quiz.lesson,
+                score=85  # Default score for passing (can be calculated)
             )
     
     # Update analytics

@@ -1,0 +1,312 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Select Teacher - {{ child.get_full_name|default:child.username }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+<style>
+.teacher-selection-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.teacher-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.teacher-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+.teacher-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.teacher-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin-right: 1.5rem;
+    font-weight: bold;
+}
+
+.teacher-info h4 {
+    margin: 0;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
+}
+
+.teacher-role {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+}
+
+.teacher-experience {
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+}
+
+.subjects-taught {
+    margin: 1rem 0;
+}
+
+.subject-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin: 0.25rem;
+    font-weight: 500;
+}
+
+.teacher-bio {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    border-left: 4px solid #667eea;
+}
+
+.contact-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.response-time {
+    color: #28a745;
+    font-size: 0.9rem;
+}
+
+.message-teacher-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.message-teacher-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: white;
+    color: #667eea;
+    text-decoration: none;
+}
+
+.no-teachers-card {
+    text-align: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="teacher-selection-header">
+        <h1>👨‍🏫 Select Teacher for {{ child.get_full_name|default:child.username }}</h1>
+        <p>Choose which teacher you'd like to communicate with</p>
+        <a href="{% url 'teacher_communication_dashboard' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% if teachers_data %}
+        <!-- Class Teachers Section -->
+        {% for teacher_data in teachers_data %}
+            {% if teacher_data.type == "Class Teacher" %}
+                <div class="teacher-card">
+                    <div class="teacher-header">
+                        <div class="teacher-avatar">
+                            {{ teacher_data.teacher.first_name.0|default:teacher_data.teacher.username.0|upper }}
+                        </div>
+                        <div class="teacher-info">
+                            <h4>{{ teacher_data.teacher.get_full_name|default:teacher_data.teacher.username }}</h4>
+                            <div class="teacher-role">
+                                <i class="fas fa-star text-warning"></i> {{ teacher_data.type }}
+                            </div>
+                            {% if teacher_data.profile.years_experience %}
+                            <div class="teacher-experience">
+                                {{ teacher_data.profile.years_experience }} years of experience
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if teacher_data.profile.bio %}
+                    <div class="teacher-bio">
+                        <strong>About:</strong> {{ teacher_data.profile.bio }}
+                    </div>
+                    {% endif %}
+
+                    <div class="subjects-taught">
+                        <strong>Subjects:</strong>
+                        {% for subject in teacher_data.subjects %}
+                            <span class="subject-tag">{{ subject|title }}</span>
+                        {% endfor %}
+                    </div>
+
+                    {% if teacher_data.profile.specialization %}
+                    <div class="mb-2">
+                        <strong>Specialization:</strong> {{ teacher_data.profile.specialization }}
+                    </div>
+                    {% endif %}
+
+                    <div class="contact-info">
+                        <div class="response-time">
+                            <i class="fas fa-clock"></i>
+                            Usually responds within {{ teacher_data.profile.response_time_hours|default:24 }} hours
+                        </div>
+                        <a href="{% url 'compose_message' child_id=child.id teacher_id=teacher_data.teacher.id %}" 
+                           class="message-teacher-btn">
+                            <i class="fas fa-envelope"></i> Send Message
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Subject Teachers Section -->
+        <h3 class="mt-4 mb-3">Subject Teachers</h3>
+        {% for teacher_data in teachers_data %}
+            {% if teacher_data.type == "Subject Teacher" %}
+                <div class="teacher-card">
+                    <div class="teacher-header">
+                        <div class="teacher-avatar">
+                            {{ teacher_data.teacher.first_name.0|default:teacher_data.teacher.username.0|upper }}
+                        </div>
+                        <div class="teacher-info">
+                            <h4>{{ teacher_data.teacher.get_full_name|default:teacher_data.teacher.username }}</h4>
+                            <div class="teacher-role">
+                                <i class="fas fa-book"></i> {{ teacher_data.assignment.get_subject_display }} Teacher
+                            </div>
+                            {% if teacher_data.profile.years_experience %}
+                            <div class="teacher-experience">
+                                {{ teacher_data.profile.years_experience }} years of experience
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if teacher_data.profile.bio %}
+                    <div class="teacher-bio">
+                        <strong>About:</strong> {{ teacher_data.profile.bio }}
+                    </div>
+                    {% endif %}
+
+                    {% if teacher_data.profile.specialization %}
+                    <div class="mb-2">
+                        <strong>Specialization:</strong> {{ teacher_data.profile.specialization }}
+                    </div>
+                    {% endif %}
+
+                    <div class="contact-info">
+                        <div class="response-time">
+                            <i class="fas fa-clock"></i>
+                            Usually responds within {{ teacher_data.profile.response_time_hours|default:24 }} hours
+                        </div>
+                        <a href="{% url 'compose_message' child_id=child.id teacher_id=teacher_data.teacher.id %}" 
+                           class="message-teacher-btn">
+                            <i class="fas fa-envelope"></i> Send Message
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    {% else %}
+        <div class="no-teachers-card">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h3>No Teachers Available</h3>
+            <p>No teachers have been assigned yet for {{ child.get_full_name|default:child.username }}.</p>
+            <p>Please contact the school administrator to set up teacher assignments.</p>
+            <a href="{% url 'teacher_communication_dashboard' %}" class="btn btn-light mt-3">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="teacher-card">
+                <h5><i class="fas fa-search"></i> Can't find the right teacher?</h5>
+                <p>Use our teacher search to find specific teachers by name or subject.</p>
+                <button class="btn btn-outline-primary" onclick="searchTeacher()">
+                    <i class="fas fa-search"></i> Search Teachers
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="teacher-card">
+                <h5><i class="fas fa-calendar-alt"></i> Need immediate assistance?</h5>
+                <p>For urgent matters, you can also contact the school office directly.</p>
+                <button class="btn btn-outline-danger" onclick="showEmergencyContact()">
+                    <i class="fas fa-phone"></i> Emergency Contact
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function searchTeacher() {
+    // Implement teacher search functionality
+    alert('Teacher search feature coming soon!');
+}
+
+function showEmergencyContact() {
+    alert('Emergency Contact:\nSchool Office: +91-XXXX-XXXXX\nEmail: office@school.edu\n\nFor urgent matters only.');
+}
+</script>
+{% endblock %}

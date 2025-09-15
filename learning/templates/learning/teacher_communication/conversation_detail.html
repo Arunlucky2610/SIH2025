@@ -1,0 +1,539 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Conversation: {{ thread.subject }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+<style>
+.conversation-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.conversation-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-height: 600px;
+    overflow-y: auto;
+    margin-bottom: 2rem;
+}
+
+.message {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.message.sent {
+    flex-direction: row-reverse;
+}
+
+.message.sent .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-left: 3rem;
+    margin-right: 0;
+}
+
+.message.received .message-content {
+    background: #f8f9fa;
+    color: #333;
+    margin-right: 3rem;
+    margin-left: 0;
+}
+
+.message-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    font-weight: bold;
+    margin: 0 1rem;
+    flex-shrink: 0;
+}
+
+.message.sent .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.message-content {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    position: relative;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.message-sender {
+    font-weight: 600;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message-text {
+    line-height: 1.6;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message-priority {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.priority-high {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.priority-urgent {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.reply-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+}
+
+.reply-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.reply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.conversation-info {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 1rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 2rem;
+}
+
+.participant-list {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.participant {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.participant-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.typing-indicator {
+    display: none;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 20px;
+    margin: 1rem 0;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.quick-replies {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.quick-reply-btn {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid #667eea;
+    color: #667eea;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quick-reply-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.conversation-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.resolve-btn {
+    background: #28a745;
+    color: white;
+}
+
+.archive-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.priority-btn {
+    background: #ffc107;
+    color: #212529;
+}
+
+.character-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="conversation-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>💬 {{ thread.subject }}</h1>
+                <p class="mb-0">Conversation about {{ thread.student.get_full_name|default:thread.student.username }}</p>
+            </div>
+            <a href="{% url 'conversation_list' %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left"></i> Back to Conversations
+            </a>
+        </div>
+    </div>
+
+    <!-- Conversation Info -->
+    <div class="conversation-info">
+        <h6><i class="fas fa-info-circle"></i> Conversation Details</h6>
+        <div class="participant-list">
+            <span>Participants:</span>
+            {% for participant in thread.participants.all %}
+                <div class="participant">
+                    <div class="participant-avatar">
+                        {{ participant.first_name.0|default:participant.username.0|upper }}
+                    </div>
+                    <span>{{ participant.get_full_name|default:participant.username }}</span>
+                    <small class="text-muted">({{ participant.userprofile.get_role_display }})</small>
+                </div>
+            {% endfor %}
+        </div>
+        <small class="text-muted">Started {{ thread.created_at|timesince }} ago</small>
+    </div>
+
+    <!-- Conversation Actions -->
+    <div class="conversation-actions">
+        <button class="action-btn resolve-btn" onclick="resolveConversation()">
+            <i class="fas fa-check"></i> Mark as Resolved
+        </button>
+        <button class="action-btn archive-btn" onclick="archiveConversation()">
+            <i class="fas fa-archive"></i> Archive
+        </button>
+        <button class="action-btn priority-btn" onclick="changePriority()">
+            <i class="fas fa-flag"></i> Change Priority
+        </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="conversation-container" id="messagesContainer">
+        {% for message in messages %}
+            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <div class="message-avatar">
+                    {{ message.sender.first_name.0|default:message.sender.username.0|upper }}
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">
+                            {{ message.sender.get_full_name|default:message.sender.username }}
+                        </span>
+                        <span class="message-time">
+                            {{ message.created_at|timesince }} ago
+                        </span>
+                    </div>
+                    
+                    {% if message.priority == 'high' or message.priority == 'urgent' %}
+                        <div class="message-priority priority-{{ message.priority }}">
+                            {% if message.priority == 'high' %}⚠️ High Priority{% else %}🚨 Urgent{% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="message-text">
+                        {{ message.content|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <i class="fas fa-ellipsis-h"></i> Someone is typing...
+        </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-form">
+        <h5><i class="fas fa-reply"></i> Reply to this conversation</h5>
+        
+        <!-- Quick Replies -->
+        <div class="quick-replies">
+            <button class="quick-reply-btn" onclick="insertQuickReply('Thank you for the update!')">
+                Thank you for the update!
+            </button>
+            <button class="quick-reply-btn" onclick="insertQuickReply('Could we schedule a meeting to discuss this further?')">
+                Schedule a meeting
+            </button>
+            <button class="quick-reply-btn" onclick="insertQuickReply('I understand. Please keep me informed.')">
+                Understood
+            </button>
+            <button class="quick-reply-btn" onclick="insertQuickReply('What can I do to help with this at home?')">
+                How can I help?
+            </button>
+        </div>
+        
+        <form method="post" id="replyForm">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <textarea class="form-control" 
+                          id="replyContent" 
+                          name="content" 
+                          placeholder="Type your reply here..."
+                          maxlength="2000"
+                          required></textarea>
+                <div class="character-counter">
+                    <span id="content-count">0</span>/2000 characters
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Your reply will be sent to all participants in this conversation
+                    </small>
+                </div>
+                <button type="submit" class="reply-btn">
+                    <i class="fas fa-paper-plane"></i> Send Reply
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Character counter
+document.getElementById('replyContent').addEventListener('input', function() {
+    const count = this.value.length;
+    document.getElementById('content-count').textContent = count;
+    
+    if (count > 1800) {
+        document.getElementById('content-count').style.color = '#dc3545';
+    } else {
+        document.getElementById('content-count').style.color = 'rgba(255, 255, 255, 0.8)';
+    }
+});
+
+// Quick reply insertion
+function insertQuickReply(text) {
+    const textarea = document.getElementById('replyContent');
+    const currentText = textarea.value;
+    
+    if (currentText.trim() === '') {
+        textarea.value = text;
+    } else {
+        textarea.value = currentText + '\n\n' + text;
+    }
+    
+    // Update character counter
+    textarea.dispatchEvent(new Event('input'));
+    textarea.focus();
+}
+
+// Auto-scroll to bottom of conversation
+function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    container.scrollTop = container.scrollHeight;
+}
+
+// Call on page load
+window.addEventListener('load', function() {
+    scrollToBottom();
+});
+
+// Form submission handling
+document.getElementById('replyForm').addEventListener('submit', function(e) {
+    const content = document.getElementById('replyContent').value.trim();
+    
+    if (!content) {
+        e.preventDefault();
+        alert('Please type a message before sending.');
+        return;
+    }
+    
+    if (content.length < 5) {
+        e.preventDefault();
+        alert('Message should be at least 5 characters long.');
+        return;
+    }
+});
+
+// Conversation actions
+function resolveConversation() {
+    if (confirm('Mark this conversation as resolved? You can still send messages, but it will be moved to resolved conversations.')) {
+        // Implement resolve functionality
+        alert('Conversation marked as resolved!');
+    }
+}
+
+function archiveConversation() {
+    if (confirm('Archive this conversation? It will be moved to archived conversations.')) {
+        // Implement archive functionality
+        alert('Conversation archived!');
+    }
+}
+
+function changePriority() {
+    const priority = prompt('Set conversation priority:\n1. Low\n2. Normal\n3. High\n4. Urgent\n\nEnter number (1-4):');
+    
+    if (priority && priority >= 1 && priority <= 4) {
+        const priorities = ['low', 'normal', 'high', 'urgent'];
+        const priorityNames = ['Low', 'Normal', 'High', 'Urgent'];
+        alert(`Conversation priority changed to: ${priorityNames[priority - 1]}`);
+    }
+}
+
+// Typing indicator (simulated)
+let typingTimer;
+document.getElementById('replyContent').addEventListener('input', function() {
+    // Show typing indicator to other participants (in real implementation)
+    clearTimeout(typingTimer);
+    
+    typingTimer = setTimeout(function() {
+        // Hide typing indicator after 3 seconds of no typing
+    }, 3000);
+});
+
+// Auto-refresh to check for new messages (every 10 seconds)
+setInterval(function() {
+    // In real implementation, you would make an AJAX call to check for new messages
+    // and append them to the conversation without full page reload
+}, 10000);
+
+// Mark messages as read when page loads
+window.addEventListener('load', function() {
+    // All messages are automatically marked as read when viewing the conversation
+    // This is handled in the Django view
+});
+
+// Auto-save draft
+let draftTimer;
+document.getElementById('replyContent').addEventListener('input', function() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(function() {
+        const content = document.getElementById('replyContent').value;
+        if (content.trim()) {
+            localStorage.setItem('conversation_draft_{{ thread.id }}', content);
+        }
+    }, 2000);
+});
+
+// Load draft on page load
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('conversation_draft_{{ thread.id }}');
+    if (draft && confirm('A draft reply was found. Would you like to restore it?')) {
+        document.getElementById('replyContent').value = draft;
+        document.getElementById('replyContent').dispatchEvent(new Event('input'));
+    }
+});
+
+// Clear draft when form is submitted
+document.getElementById('replyForm').addEventListener('submit', function() {
+    localStorage.removeItem('conversation_draft_{{ thread.id }}');
+});
+</script>
+{% endblock %}

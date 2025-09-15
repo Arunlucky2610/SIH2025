@@ -1,0 +1,738 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Parent Dashboard - Ultra Modern{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- MEGA HERO WELCOME SECTION -->
+    <div class="hero-welcome cosmic-fade-in">
+        <div class="hero-content">
+            <div class="greeting-emoji" id="greeting-emoji">👋</div>
+            <h1 class="mega-greeting" id="dynamic-greeting">
+                <span id="greeting-text">Good Day, {{ user.first_name|default:user.username }}!</span>
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">
+                Welcome back to your command center! Monitor your children's learning journey with our advanced analytics and real-time insights.
+            </p>
+            <div class="time-display">
+                <span class="time-icon" id="time-icon">⭐</span>
+                <span id="current-time">{% now "l, F j, Y \a\t g:i A" %}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENHANCED ANALYTICS SECTION -->
+    <div class="mega-stats">
+        <div class="mega-stat-card cosmic-fade-in analytics-overview-card">
+            <div class="analytics-header">
+                <div class="mega-stat-icon">👪</div>
+                <div class="analytics-badge">Overview</div>
+            </div>
+            <div class="mega-stat-number">{{ children_count|default:0 }}</div>
+            <div class="mega-stat-label">Active Children</div>
+            <div class="analytics-subtitle">Enrolled in learning programs</div>
+            <div class="progress-indicator">
+                <div class="progress-bar" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <div class="mega-stat-card cosmic-fade-in analytics-lessons-card">
+            <div class="analytics-header">
+                <div class="mega-stat-icon">📖</div>
+                <div class="analytics-badge">Lessons</div>
+            </div>
+            <div class="mega-stat-number">{{ total_assignments|default:0 }}</div>
+            <div class="mega-stat-label">Total Lessons</div>
+            <div class="analytics-subtitle">Across all subjects</div>
+            <div class="progress-indicator">
+                <div class="progress-bar" style="width: 85%"></div>
+            </div>
+        </div>
+        
+        <div class="mega-stat-card cosmic-fade-in analytics-progress-card">
+            <div class="analytics-header">
+                <div class="mega-stat-icon">🎯</div>
+                <div class="analytics-badge">Progress</div>
+            </div>
+            <div class="mega-stat-number">{{ completed_assignments|default:0 }}</div>
+            <div class="mega-stat-label">Completed Lessons</div>
+            <div class="analytics-subtitle">
+                {% if total_assignments > 0 %}
+                    {{ completed_assignments|floatformat:0 }}/{{ total_assignments }} lessons done
+                {% else %}
+                    Ready to start learning
+                {% endif %}
+            </div>
+            <div class="progress-indicator">
+                {% if total_assignments > 0 %}
+                    <div class="progress-bar" style="width: 75%"></div>
+                {% else %}
+                    <div class="progress-bar" style="width: 0%"></div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mega-stat-card cosmic-fade-in analytics-detailed-card" onclick="window.location.href='/parents/analytics/'">
+            <div class="analytics-header">
+                <div class="mega-stat-icon">📊</div>
+                <div class="analytics-badge">Detailed</div>
+            </div>
+            <div class="mega-stat-number">📈</div>
+            <div class="mega-stat-label">View Analytics</div>
+            <div class="analytics-subtitle">Detailed progress & time tracking</div>
+            <div class="analytics-cta">
+                <span>Click to explore</span>
+                <span>→</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS SECTION -->
+    {% if notification_count > 0 %}
+    <div class="notification-bar cosmic-fade-in">
+        <div class="notification-content">
+            <div class="notification-icon">🔔</div>
+            <div class="notification-text">
+                <strong>You have {{ notification_count }} new notification{{ notification_count|pluralize }}</strong>
+                <p>Stay updated with your children's learning progress and school announcements.</p>
+            </div>
+            <a href="{% url 'notifications' %}" class="quantum-btn">
+                <span>View All</span>
+                <span>👁️</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ULTRA ACTION CARDS SECTION -->
+    <div class="ultra-actions">
+        <div class="ultra-action-card cosmic-fade-in">
+            <div class="ultra-action-icon">🎯</div>
+            <h3 class="ultra-action-title">Set Learning Goals</h3>
+            <p class="ultra-action-desc">Create personalized learning objectives and track milestone achievements</p>
+            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
+                <span>Set Goals</span>
+                <span>🚀</span>
+            </a>
+        </div>
+
+        <div class="ultra-action-card cosmic-fade-in">
+            <div class="ultra-action-icon">💬</div>
+            <h3 class="ultra-action-title">Teacher Communication</h3>
+            <p class="ultra-action-desc">Connect with educators and get real-time updates on your child's progress</p>
+            <a href="{% url 'teacher_communication_dashboard' %}" class="quantum-btn" style="margin-top: 1rem;">
+                <span>Message</span>
+                <span>✉️</span>
+            </a>
+        </div>
+
+        <div class="ultra-action-card cosmic-fade-in">
+            <div class="ultra-action-icon">📱</div>
+            <h3 class="ultra-action-title">Mobile App</h3>
+            <p class="ultra-action-desc">Download our mobile app for on-the-go monitoring and instant notifications</p>
+            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
+                <span>Download</span>
+                <span>📲</span>
+            </a>
+        </div>
+
+        <div class="ultra-action-card cosmic-fade-in">
+            <div class="ultra-action-icon">⚙️</div>
+            <h3 class="ultra-action-title">Notification Settings</h3>
+            <p class="ultra-action-desc">Customize your notification preferences and alert frequencies</p>
+            <a href="{% url 'notification_settings' %}" class="quantum-btn" style="margin-top: 1rem;">
+                <span>Configure</span>
+                <span>🔧</span>
+            </a>
+        </div>
+
+        <div class="ultra-action-card cosmic-fade-in">
+            <div class="ultra-action-icon">📅</div>
+            <h3 class="ultra-action-title">Study Schedule</h3>
+            <p class="ultra-action-desc">Plan and organize study sessions with our intelligent scheduling system</p>
+            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
+                <span>Schedule</span>
+                <span>📋</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ENHANCED CHILDREN PROGRESS SECTION -->
+    {% if children_progress %}
+    <div class="children-section cosmic-fade-in">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="title-icon">🎓</span>
+                Children's Learning Journey
+            </h2>
+            <p class="section-subtitle">Track your children's academic progress and achievements</p>
+        </div>
+        
+        <div class="children-grid">
+            {% for child in children_progress %}
+            <div class="enhanced-child-card cosmic-fade-in">
+                <!-- Child Profile Header -->
+                <div class="child-profile-header">
+                    <div class="profile-avatar">
+                        <div class="avatar-image">{{ child.child.first_name|first|upper }}{{ child.child.last_name|first|upper }}</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="profile-info">
+                        <h3 class="student-name">{{ child.child.first_name }} {{ child.child.last_name }}</h3>
+                        <p class="student-grade">{{ child.profile.grade|default:"Grade Not Set" }}</p>
+                        <div class="student-status">
+                            {% if child.progress_percentage >= 80 %}
+                                <span class="status-badge excellent">🌟 Excellent Progress</span>
+                            {% elif child.progress_percentage >= 60 %}
+                                <span class="status-badge good">📈 Good Progress</span>
+                            {% elif child.progress_percentage >= 40 %}
+                                <span class="status-badge average">⚡ Making Progress</span>
+                            {% else %}
+                                <span class="status-badge needs-attention">🎯 Needs Attention</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="progress-overview">
+                    <div class="progress-circle-container">
+                        <div class="circular-progress" data-percentage="{{ child.progress_percentage }}">
+                            <div class="circle-bg">
+                                <div class="circle-fill" style="--percentage: {{ child.progress_percentage }}%"></div>
+                                <div class="circle-inner">
+                                    <span class="percentage-text">{{ child.progress_percentage|floatformat:0 }}%</span>
+                                    <span class="percentage-label">Complete</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-stats">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ child.completed_lessons }}</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-divider">of</div>
+                        <div class="stat-box">
+                            <div class="stat-number">{{ child.total_lessons }}</div>
+                            <div class="stat-label">Total Lessons</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="performance-metrics">
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-details">
+                            <span class="metric-value">{{ child.avg_score|floatformat:1 }}</span>
+                            <span class="metric-label">Average Score</span>
+                        </div>
+                        <div class="metric-trend">
+                            {% if child.avg_score >= 80 %}
+                                <span class="trend-up">📈</span>
+                            {% elif child.avg_score >= 60 %}
+                                <span class="trend-stable">➡️</span>
+                            {% else %}
+                                <span class="trend-down">📉</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🔥</div>
+                        <div class="metric-details">
+                            <span class="metric-value">{{ child.current_streak|default:0 }}</span>
+                            <span class="metric-label">Day Streak</span>
+                        </div>
+                        <div class="streak-indicator">
+                            {% if child.current_streak >= 7 %}
+                                <span class="streak-fire">🔥🔥🔥</span>
+                            {% elif child.current_streak >= 3 %}
+                                <span class="streak-fire">🔥🔥</span>
+                            {% elif child.current_streak >= 1 %}
+                                <span class="streak-fire">🔥</span>
+                            {% else %}
+                                <span class="streak-none">⭐</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">⏱️</div>
+                        <div class="metric-details">
+                            <span class="metric-value">{{ child.weekly_time_hours }}h</span>
+                            <span class="metric-label">This Week</span>
+                        </div>
+                        <div class="time-badge">
+                            {% if child.weekly_time_hours >= 10 %}
+                                <span class="time-excellent">💪</span>
+                            {% elif child.weekly_time_hours >= 5 %}
+                                <span class="time-good">👍</span>
+                            {% else %}
+                                <span class="time-low">🎯</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Summary -->
+                <div class="activity-summary">
+                    <h4 class="activity-title">📚 Recent Activity</h4>
+                    <div class="activity-stats">
+                        <div class="activity-item">
+                            <span class="activity-icon">✅</span>
+                            <span class="activity-text">{{ child.weekly_lessons }} lessons completed this week</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-icon">📖</span>
+                            <span class="activity-text">
+                                {% if child.recent_progress %}
+                                    Last activity: {{ child.recent_progress.0.started_at|timesince }} ago
+                                {% else %}
+                                    No recent activity
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="child-actions">
+                    <button class="action-btn primary" onclick="viewChildDetails('{{ child.child.id }}')">
+                        <span class="btn-icon">�️</span>
+                        <span class="btn-text">View Details</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="messageTeacher('{{ child.child.id }}')">
+                        <span class="btn-icon">💬</span>
+                        <span class="btn-text">Message Teacher</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state cosmic-fade-in">
+        <div class="empty-illustration">
+            <div class="empty-icon">�‍👩‍👧‍👦</div>
+            <div class="empty-sparkles">✨</div>
+        </div>
+        <h3 class="empty-title">No Children Linked</h3>
+        <p class="empty-description">You haven't added any children to your account yet. Contact your school administrator to link your children's accounts and start tracking their learning journey.</p>
+        <button class="empty-action-btn" onclick="contactSupport()">
+            <span>📞 Contact Support</span>
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- QUICK ACTIONS FOOTER -->
+    <div class="quick-actions cosmic-fade-in">
+        <a href="{% url 'notifications' %}" class="quick-action">
+            <span class="action-icon">🔔</span>
+            <span class="action-text">Notifications</span>
+        </a>
+        <a href="{% url 'notification_settings' %}" class="quick-action">
+            <span class="action-icon">⚙️</span>
+            <span class="action-text">Settings</span>
+        </a>
+        <a href="/parents/analytics/" class="quick-action">
+            <span class="action-icon">📊</span>
+            <span class="action-text">Analytics</span>
+        </a>
+        <a href="{% url 'logout' %}" class="quick-action">
+            <span class="action-icon">🚪</span>
+            <span class="action-text">Logout</span>
+        </a>
+    </div>
+
+    <!-- AI CHAT ASSISTANT -->
+    <div id="chatAssistant" class="chat-assistant">
+        <div id="chatToggle" class="chat-toggle" onclick="toggleChat()">
+            <div class="teacher-avatar">
+                <div class="avatar-img">👩‍🏫</div>
+                <div class="status-dot"></div>
+            </div>
+            <div class="chat-notification" id="chatNotification">1</div>
+        </div>
+        
+        <div id="chatWindow" class="chat-window">
+            <div class="chat-header">
+                <div class="teacher-info">
+                    <div class="teacher-avatar-small">👩‍🏫</div>
+                    <div class="teacher-details">
+                        <h4>Ms. Sarah</h4>
+                        <p>AI Learning Assistant</p>
+                    </div>
+                </div>
+                <button class="chat-minimize" onclick="toggleChat()">−</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-avatar">👩‍🏫</div>
+                    <div class="message-content">
+                        <p>Hello! I'm Ms. Sarah, your AI learning assistant. I'm here to help you with your children's education. How can I assist you today?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-suggestions">
+                <button class="suggestion-btn" onclick="sendSuggestion('How is my child performing?')">
+                    📊 Check Performance
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Study tips for better grades')">
+                    💡 Study Tips
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Homework help strategies')">
+                    📚 Homework Help
+                </button>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about your child's learning..." maxlength="200">
+                <button id="sendButton" class="send-button" onclick="sendMessage()">
+                    <span class="send-icon">📤</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update time and greeting every second
+function updateTimeAndGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    const userName = '{{ user.first_name|default:user.username }}';
+    
+    // Update time display
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    };
+    const timeString = now.toLocaleDateString('en-US', options).replace(/,(\s\d{4})/, ',$1 at');
+    document.getElementById('current-time').textContent = timeString;
+    
+    // Update greeting based on time
+    let greeting, emoji, timeIcon, subtitle;
+    
+    if (hour >= 5 && hour < 12) {
+        greeting = `Good Morning, ${userName}!`;
+        emoji = '🌅';
+        timeIcon = '☀️';
+        subtitle = 'Start your day by checking your children\'s learning progress. A new day of discoveries awaits!';
+    } else if (hour >= 12 && hour < 17) {
+        greeting = `Good Afternoon, ${userName}!`;
+        emoji = '🌞';
+        timeIcon = '🌤️';
+        subtitle = 'Hope your day is going well! Time to check in on your children\'s educational journey.';
+    } else if (hour >= 17 && hour < 21) {
+        greeting = `Good Evening, ${userName}!`;
+        emoji = '🌇';
+        timeIcon = '🌆';
+        subtitle = 'Evening check-in time! See how your children performed in their studies today.';
+    } else {
+        greeting = `Good Night, ${userName}!`;
+        emoji = '🌙';
+        timeIcon = '✨';
+        subtitle = 'Thank you for being an engaged parent. Rest well knowing your children are learning and growing!';
+    }
+    
+    // Check if greeting has changed and add smooth transition
+    const greetingElement = document.getElementById('greeting-text');
+    const emojiElement = document.getElementById('greeting-emoji');
+    const timeIconElement = document.getElementById('time-icon');
+    const subtitleElement = document.getElementById('hero-subtitle');
+    
+    if (greetingElement.textContent !== greeting) {
+        // Add animation class
+        greetingElement.parentElement.classList.add('updating');
+        
+        // Update content with slight delay for smooth effect
+        setTimeout(() => {
+            greetingElement.textContent = greeting;
+            emojiElement.textContent = emoji;
+            timeIconElement.textContent = timeIcon;
+            subtitleElement.textContent = subtitle;
+            
+            // Remove animation class
+            greetingElement.parentElement.classList.remove('updating');
+        }, 200);
+    }
+}
+
+// Update time and greeting immediately and then every minute
+updateTimeAndGreeting();
+setInterval(updateTimeAndGreeting, 60000);
+
+// Add sparkle effects to cards
+const cards = document.querySelectorAll('.mega-stat-card, .ultra-action-card, .enhanced-child-card');
+cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+});
+
+// Add click animation to quantum buttons
+const buttons = document.querySelectorAll('.quantum-btn, .action-btn');
+buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    });
+});
+
+// Child action functions
+function viewChildDetails(childId) {
+    // Create a modal or navigate to detailed view
+    showNotification('👁️ Opening detailed view for student...', 'info');
+    // You can implement navigation to a detailed analytics page
+    window.location.href = `/parents/analytics/?child=${childId}`;
+}
+
+function messageTeacher(childId) {
+    // Open messaging interface
+    showNotification('💬 Opening teacher communication...', 'info');
+    // Redirect to teacher selection page for the child
+    window.location.href = `/teacher-communication/child/${childId}/select-teacher/`;
+}
+
+function contactSupport() {
+    // Open contact form or support chat
+    showNotification('📞 Connecting you to support...', 'info');
+    // You can implement support contact functionality
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span>${message}</span>
+            <button class="notification-close" onclick="closeNotification(this.parentElement.parentElement)">×</button>
+        </div>
+    `;
+    
+    // Add notification styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 1rem 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        border-left: 4px solid var(--accent-color);
+        color: var(--text-primary);
+        max-width: 300px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        closeNotification(notification);
+    }, 3000);
+}
+
+function closeNotification(element) {
+    element.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => {
+        element.remove();
+    }, 300);
+}
+
+// Add CSS for notifications
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+    
+    .notification-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: var(--text-primary);
+    }
+`;
+document.head.appendChild(notificationStyles);
+
+// Initialize circular progress animations
+document.addEventListener('DOMContentLoaded', function() {
+    const progressCircles = document.querySelectorAll('.circular-progress');
+    progressCircles.forEach(circle => {
+        const percentage = circle.dataset.percentage;
+        const circleBg = circle.querySelector('.circle-bg');
+        if (circleBg) {
+            circleBg.style.setProperty('--percentage', percentage);
+        }
+    });
+});
+
+// Chat Assistant Functions
+let isChatOpen = false;
+let chatMessages = [];
+
+function toggleChat() {
+    const chatWindow = document.getElementById('chatWindow');
+    const chatNotification = document.getElementById('chatNotification');
+    
+    isChatOpen = !isChatOpen;
+    
+    if (isChatOpen) {
+        chatWindow.classList.add('active');
+        chatNotification.style.display = 'none';
+    } else {
+        chatWindow.classList.remove('active');
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    addUserMessage(message);
+    input.value = '';
+    
+    // Simulate AI response
+    setTimeout(() => {
+        generateAIResponse(message);
+    }, 1000);
+}
+
+function sendSuggestion(message) {
+    addUserMessage(message);
+    
+    // Simulate AI response
+    setTimeout(() => {
+        generateAIResponse(message);
+    }, 1000);
+}
+
+function addUserMessage(message) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message user-message';
+    
+    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    messageElement.innerHTML = `
+        <div class="message-avatar">👤</div>
+        <div class="message-content">
+            <p>${message}</p>
+            <span class="message-time">${currentTime}</span>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addBotMessage(message) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message bot-message';
+    
+    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    messageElement.innerHTML = `
+        <div class="message-avatar">👩‍🏫</div>
+        <div class="message-content">
+            <p>${message}</p>
+            <span class="message-time">${currentTime}</span>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function generateAIResponse(userMessage) {
+    const responses = {
+        'How is my child performing?': "Based on the latest data, your children are doing wonderfully! Aarav has completed 78% of his lessons with excellent scores, while Priya is at 65% completion with consistent improvement. Both are spending quality time on their studies and showing great progress in their respective subjects.",
+        
+        'Study tips for better grades': "Here are some proven study tips: 1) Create a consistent study schedule, 2) Use active learning techniques like flashcards and practice problems, 3) Take regular breaks using the Pomodoro technique, 4) Find a quiet, dedicated study space, and 5) Review material regularly instead of cramming. Would you like specific tips for any subject?",
+        
+        'Homework help strategies': "Great question! Here are effective homework strategies: 1) Break large assignments into smaller tasks, 2) Set up a homework routine at the same time daily, 3) Remove distractions like phones and TV, 4) Use timers to stay focused, and 5) Celebrate completed tasks. I can also help connect you with subject-specific tutors if needed.",
+        
+        'default': "I understand you're asking about your child's education. As an AI learning assistant, I can help with study strategies, performance analysis, homework guidance, and connecting you with teachers. Could you be more specific about what you'd like to know?"
+    };
+    
+    const response = responses[userMessage] || responses['default'];
+    
+    // Simulate typing delay
+    setTimeout(() => {
+        addBotMessage(response);
+    }, 800);
+}
+
+// Enter key support for chat
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

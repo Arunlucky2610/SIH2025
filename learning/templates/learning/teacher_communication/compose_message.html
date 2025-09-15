@@ -1,0 +1,431 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Message {{ teacher.get_full_name|default:teacher.username }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+<style>
+.compose-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.teacher-info-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.message-form-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+}
+
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.priority-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.priority-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.priority-low { background: #d4edda; color: #155724; }
+.priority-normal { background: #d1ecf1; color: #0c5460; }
+.priority-high { background: #fff3cd; color: #856404; }
+.priority-urgent { background: #f8d7da; color: #721c24; }
+
+.teacher-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+.teacher-details {
+    flex: 1;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.message-tips {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 1rem;
+    border-radius: 0 10px 10px 0;
+    margin-top: 1rem;
+}
+
+.subject-tags {
+    margin-top: 0.5rem;
+}
+
+.subject-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+}
+
+.character-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="compose-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>✉️ Compose Message</h1>
+                <p class="mb-0">Send a message to {{ teacher.get_full_name|default:teacher.username }} about {{ child.get_full_name|default:child.username }}</p>
+            </div>
+            <a href="{% url 'select_teacher' child_id=child.id %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Teacher Information -->
+        <div class="col-lg-4">
+            <div class="teacher-info-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="teacher-avatar">
+                        {{ teacher.first_name.0|default:teacher.username.0|upper }}
+                    </div>
+                    <div class="teacher-details">
+                        <h5 class="mb-1">{{ teacher.get_full_name|default:teacher.username }}</h5>
+                        <p class="text-muted mb-0">{{ teacher.email|default:"No email available" }}</p>
+                    </div>
+                </div>
+
+                {% if teacher_profile.bio %}
+                <div class="mb-3">
+                    <h6>About:</h6>
+                    <p class="text-muted small">{{ teacher_profile.bio }}</p>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <h6>Subjects:</h6>
+                    <div class="subject-tags">
+                        {% for assignment in teacher_assignments %}
+                            <span class="subject-tag">{{ assignment.get_subject_display }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if teacher_profile.response_time_hours %}
+                <div class="mb-3">
+                    <h6>Response Time:</h6>
+                    <p class="text-muted small">
+                        <i class="fas fa-clock"></i> Usually responds within {{ teacher_profile.response_time_hours }} hours
+                    </p>
+                </div>
+                {% endif %}
+
+                {% if teacher_profile.preferred_contact_time %}
+                <div class="mb-3">
+                    <h6>Best Time to Contact:</h6>
+                    <p class="text-muted small">{{ teacher_profile.preferred_contact_time }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Message Form -->
+        <div class="col-lg-8">
+            <div class="message-form-card">
+                <form method="post" id="messageForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="subject" 
+                               name="subject" 
+                               placeholder="Brief description of your message"
+                               maxlength="200"
+                               required>
+                        <div class="character-counter">
+                            <span id="subject-count">0</span>/200 characters
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="message_type" class="form-label">Message Type</label>
+                                <select class="form-select" id="message_type" name="message_type">
+                                    {% for value, label in message_types %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    {% for value, label in priority_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="priority-badges">
+                                    <span class="priority-badge priority-low">Low: General questions</span>
+                                    <span class="priority-badge priority-normal">Normal: Regular updates</span>
+                                    <span class="priority-badge priority-high">High: Important matters</span>
+                                    <span class="priority-badge priority-urgent">Urgent: Immediate attention</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content" class="form-label">Message *</label>
+                        <textarea class="form-control" 
+                                  id="content" 
+                                  name="content" 
+                                  placeholder="Type your message here..."
+                                  maxlength="2000"
+                                  required></textarea>
+                        <div class="character-counter">
+                            <span id="content-count">0</span>/2000 characters
+                        </div>
+                    </div>
+
+                    <div class="message-tips">
+                        <h6><i class="fas fa-lightbulb"></i> Message Tips:</h6>
+                        <ul class="mb-0 small">
+                            <li>Be specific about your concerns or questions</li>
+                            <li>Include relevant details about your child's situation</li>
+                            <li>Be respectful and professional in your tone</li>
+                            <li>Use appropriate priority levels - urgent should be for immediate attention only</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a href="{% url 'select_teacher' child_id=child.id %}" class="cancel-btn">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Character counters
+document.getElementById('subject').addEventListener('input', function() {
+    const count = this.value.length;
+    document.getElementById('subject-count').textContent = count;
+    
+    if (count > 180) {
+        document.getElementById('subject-count').style.color = '#dc3545';
+    } else {
+        document.getElementById('subject-count').style.color = 'rgba(255, 255, 255, 0.8)';
+    }
+});
+
+document.getElementById('content').addEventListener('input', function() {
+    const count = this.value.length;
+    document.getElementById('content-count').textContent = count;
+    
+    if (count > 1800) {
+        document.getElementById('content-count').style.color = '#dc3545';
+    } else {
+        document.getElementById('content-count').style.color = 'rgba(255, 255, 255, 0.8)';
+    }
+    }
+});
+
+// Form validation
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    const subject = document.getElementById('subject').value.trim();
+    const content = document.getElementById('content').value.trim();
+    
+    if (!subject || !content) {
+        e.preventDefault();
+        alert('Please fill in both subject and message content.');
+        return;
+    }
+    
+    if (subject.length < 5) {
+        e.preventDefault();
+        alert('Subject should be at least 5 characters long.');
+        return;
+    }
+    
+    if (content.length < 10) {
+        e.preventDefault();
+        alert('Message should be at least 10 characters long.');
+        return;
+    }
+});
+
+// Auto-save draft (optional feature)
+let autoSaveTimer;
+function autoSaveDraft() {
+    const subject = document.getElementById('subject').value;
+    const content = document.getElementById('content').value;
+    
+    if (subject || content) {
+        localStorage.setItem('message_draft_{{ child.id }}_{{ teacher.id }}', JSON.stringify({
+            subject: subject,
+            content: content,
+            timestamp: new Date().getTime()
+        }));
+    }
+}
+
+// Load draft on page load
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('message_draft_{{ child.id }}_{{ teacher.id }}');
+    if (draft) {
+        const draftData = JSON.parse(draft);
+        const now = new Date().getTime();
+        
+        // Only load draft if it's less than 24 hours old
+        if (now - draftData.timestamp < 24 * 60 * 60 * 1000) {
+            if (confirm('A draft message was found. Would you like to restore it?')) {
+                document.getElementById('subject').value = draftData.subject;
+                document.getElementById('content').value = draftData.content;
+                
+                // Update character counters
+                document.getElementById('subject').dispatchEvent(new Event('input'));
+                document.getElementById('content').dispatchEvent(new Event('input'));
+            }
+        }
+    }
+});
+
+// Set up auto-save
+document.getElementById('subject').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(autoSaveDraft, 2000);
+});
+
+document.getElementById('content').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(autoSaveDraft, 2000);
+});
+
+// Clear draft when form is submitted
+document.getElementById('messageForm').addEventListener('submit', function() {
+    localStorage.removeItem('message_draft_{{ child.id }}_{{ teacher.id }}');
+});
+</script>
+{% endblock %}

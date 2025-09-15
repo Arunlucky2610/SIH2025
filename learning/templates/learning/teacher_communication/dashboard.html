@@ -1,0 +1,298 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Teacher Communication - Rural Digital Learning{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
+<style>
+.communication-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.communication-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.communication-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+.child-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.child-card:hover {
+    transform: scale(1.02);
+}
+
+.child-info h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.child-info p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+}
+
+.contact-teacher-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.contact-teacher-btn:hover {
+    background: white;
+    color: #f5576c;
+    text-decoration: none;
+}
+
+.conversation-preview {
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.conversation-title {
+    font-weight: 600;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0.5rem;
+}
+
+.conversation-meta {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unread-badge {
+    background: #ff4757;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="communication-header">
+        <h1>👩‍🏫 Teacher Communication</h1>
+        <p>Connect with your child's teachers and stay involved in their learning journey</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ children.count }}</div>
+            <div class="stat-label">Your Children</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ recent_conversations.count }}</div>
+            <div class="stat-label">Active Conversations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ unread_count }}</div>
+            <div class="stat-label">Unread Messages</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Children List -->
+        <div class="col-lg-6">
+            <div class="communication-card">
+                <h3>👶 Your Children</h3>
+                <p class="text-muted mb-4">Select a child to communicate with their teachers</p>
+                
+                {% if children %}
+                    {% for child in children %}
+                    <div class="child-card">
+                        <div class="child-info">
+                            <h4>{{ child.user.get_full_name|default:child.user.username }}</h4>
+                            <p>{{ child.user.email|default:"No email provided" }}</p>
+                        </div>
+                        <a href="{% url 'select_teacher' child_id=child.user.id %}" class="contact-teacher-btn">
+                            Contact Teachers
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        No children found in your account. Please contact the administrator to link your children's accounts.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Conversations -->
+        <div class="col-lg-6">
+            <div class="communication-card">
+                <h3>💬 Recent Conversations</h3>
+                <p class="text-muted mb-4">Your latest conversations with teachers</p>
+                
+                {% if recent_conversations %}
+                    {% for conversation in recent_conversations %}
+                    <div class="conversation-preview">
+                        <div class="conversation-title">
+                            <a href="{% url 'conversation_detail' thread_id=conversation.id %}" style="text-decoration: none; color: inherit;">
+                                {{ conversation.subject }}
+                            </a>
+                        </div>
+                        <div class="conversation-meta">
+                            <span>About: {{ conversation.student.get_full_name|default:conversation.student.username }}</span>
+                            {% if conversation.unread_count > 0 %}
+                            <span class="unread-badge">{{ conversation.unread_count }} new</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Last message: {{ conversation.last_message_at|timesince }} ago</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-comments"></i>
+                        No conversations yet. Start communicating with your child's teachers!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'conversation_list' %}" class="action-btn">
+            <i class="fas fa-list"></i> View All Conversations
+        </a>
+        <a href="#" onclick="showComingSoon()" class="action-btn">
+            <i class="fas fa-calendar"></i> Schedule Meeting
+        </a>
+        <a href="#" onclick="showComingSoon()" class="action-btn">
+            <i class="fas fa-bell"></i> Notification Settings
+        </a>
+    </div>
+
+    <!-- Quick Help -->
+    <div class="communication-card mt-4">
+        <h4>📋 How to Use Teacher Communication</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>🎯 What you can do:</h6>
+                <ul>
+                    <li>Send messages to class teachers and subject teachers</li>
+                    <li>Discuss your child's progress and performance</li>
+                    <li>Ask questions about homework and assignments</li>
+                    <li>Request parent-teacher meetings</li>
+                    <li>Get updates on classroom activities</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>💡 Tips for effective communication:</h6>
+                <ul>
+                    <li>Be specific about your concerns or questions</li>
+                    <li>Include your child's name in the subject line</li>
+                    <li>Be respectful and professional in your messages</li>
+                    <li>Allow 24-48 hours for teacher responses</li>
+                    <li>Use appropriate priority levels for urgent matters</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showComingSoon() {
+    alert('This feature is coming soon! Stay tuned for updates.');
+}
+
+// Auto-refresh unread count every 30 seconds
+setInterval(function() {
+    // You can implement AJAX call to update unread count
+}, 30000);
+</script>
+{% endblock %}

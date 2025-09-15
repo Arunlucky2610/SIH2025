@@ -1,14 +1,276 @@
 {% extends 'learning/base.html' %}
 
-{% block title %}Enhanced Parent Dashboard - Test{% endblock %}
+{% block title %}Enhanced Parent Dashboard - Rural Digital Learning{% endblock %}
+
+{% block extra_head %}
+<style>
+    .welcome-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
+        color: #1e293b !important;
+        border: 1px solid rgba(226, 232, 240, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+    
+    .welcome-section h2 {
+        color: #1e293b !important;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-section p {
+        color: #475569 !important;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .welcome-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: wave 2s ease-in-out infinite;
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
+    }
+    
+    .time-greeting {
+        font-size: 1.1rem;
+        color: #64748b !important;
+        font-weight: 500;
+    }
+    
+    .notification-badge {
+        position: relative;
+        top: -8px;
+        left: -8px;
+        animation: pulse 2s infinite;
+    }
+    
+    .quick-action-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        position: relative;
+        overflow: hidden;
+        background: white;
+    }
+    
+    .quick-action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        transition: left 0.6s;
+    }
+    
+    .quick-action-card:hover::before {
+        left: 100%;
+    }
+    
+    .quick-action-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .quick-action-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .quick-action-card:hover .quick-action-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .badge.bg-light {
+        background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+        color: #ffffff !important;
+        border: none;
+        padding: 8px 16px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #f59e0b, #f97316) !important;
+        color: #ffffff !important;
+        padding: 8px 16px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+    
+    .btn-light {
+        background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-light:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-outline-light {
+        background: transparent !important;
+        color: #3b82f6 !important;
+        border: 2px solid #3b82f6 !important;
+        border-radius: 12px;
+        padding: 8px 18px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-light:hover {
+        background: #3b82f6 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Animation for dashboard load */
+    .dashboard-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+    
+    .dashboard-item:nth-child(1) { animation-delay: 0.1s; }
+    .dashboard-item:nth-child(2) { animation-delay: 0.2s; }
+    .dashboard-item:nth-child(3) { animation-delay: 0.3s; }
+    .dashboard-item:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes slideInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        .welcome-section h2 {
+            font-size: 1.5rem;
+        }
+        
+        .welcome-icon {
+            font-size: 3rem;
+        }
+        
+        .quick-action-card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %>
 
 {% block content %}
 <div class="container-fluid">
+    <!-- Welcome Section -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="bg-primary text-white rounded p-4">
-                <h2>📊 Enhanced Parent Dashboard - Test Mode</h2>
-                <p>Testing new analytics features</p>
+        <div class="col-12 dashboard-item">
+            <div class="welcome-section p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="welcome-icon">👋</div>
+                        <h2 class="mb-2">
+                            {% now "H" as current_hour %}
+                            {% if current_hour < "12" %}
+                                Good Morning, {{ user.first_name|default:user.username }}! ☀️
+                            {% elif current_hour < "17" %}
+                                Good Afternoon, {{ user.first_name|default:user.username }}! 🌤️
+                            {% else %}
+                                Good Evening, {{ user.first_name|default:user.username }}! 🌙
+                            {% endif %}
+                        </h2>
+                        <p class="time-greeting mb-3">
+                            Welcome back to your child's learning journey. Here's how they're doing today!
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-calendar-day me-1"></i>
+                                {% now "l, F j, Y" %}
+                            </span>
+                            {% if notification_count > 0 %}
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    <i class="fas fa-bell me-1"></i>
+                                    {{ notification_count }} New Notification{{ notification_count|pluralize }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'notifications' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-bell me-1"></i>
+                                Notifications
+                                {% if notification_count > 0 %}
+                                    <span class="badge bg-danger notification-badge">{{ notification_count }}</span>
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'notification_settings' %}" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-cog me-1"></i>
+                                Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3 dashboard-item">
+            <div class="card quick-action-card text-center p-3">
+                <div class="quick-action-icon" style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                <h6>View Progress</h6>
+                <p class="text-muted small">Track learning milestones</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 dashboard-item">
+            <div class="card quick-action-card text-center p-3">
+                <div class="quick-action-icon" style="font-size: 2rem; margin-bottom: 1rem;">🎯</div>
+                <h6>Set Goals</h6>
+                <p class="text-muted small">Create learning targets</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 dashboard-item">
+            <div class="card quick-action-card text-center p-3">
+                <div class="quick-action-icon" style="font-size: 2rem; margin-bottom: 1rem;">💬</div>
+                <h6>Contact Teacher</h6>
+                <p class="text-muted small">Communicate with educators</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 dashboard-item">
+            <div class="card quick-action-card text-center p-3">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📈</div>
+                <h6>Reports</h6>
+                <p class="text-muted small">Detailed analytics</p>
             </div>
         </div>
     </div>
@@ -152,4 +414,6 @@
     });
 {% endfor %}
 </script>
+{% endblock %}
+
 {% endblock %}

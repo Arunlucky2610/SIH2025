@@ -18,6 +18,7 @@ from .analytics import (
     get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
     get_current_streak, update_all_analytics_for_student
 )
+from .notifications import NotificationService
 
 def home(request):
     """Landing page - redirect based on user role"""
@@ -307,9 +308,249 @@ def parent_dashboard(request):
         'profile': profile,
         'current_year': timezone.now().year,
         'current_month': timezone.now().month,
+        # Summary statistics
+        'children_count': len(children),
+        'total_assignments': sum(child['total_lessons'] for child in children_progress),
+        'completed_assignments': sum(child['completed_lessons'] for child in children_progress),
+        'pending_assignments': sum(child['total_lessons'] - child['completed_lessons'] for child in children_progress),
+        # Notification data
+        'unread_notifications': NotificationService.get_unread_notifications(request.user)[:10],  # Latest 10
+        'notification_count': NotificationService.get_unread_notifications(request.user).count(),
     }
     
-    return render(request, 'learning/parent_dashboard_test.html', context)
+    return render(request, 'learning/parent_dashboard_ultra.html', context)
+
+
+@login_required
+def parent_analytics(request):
+    """Detailed analytics page for parents"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'parent':
+        messages.error(request, 'Access denied')
+        return redirect('home')
+    
+    # Get children (students linked to this parent)
+    children = UserProfile.objects.filter(parent=profile)
+    
+    # Aggregate analytics data for all children
+    total_lessons = 0
+    completed_lessons = 0
+    in_progress_lessons = 0
+    pending_lessons = 0
+    total_time_spent = 0
+    
+    # Subject-wise analytics
+    subjects_data = {}
+    detailed_children_data = []
+    
+    for child_profile in children:
+        child = child_profile.user
+        
+        # Update analytics for this child
+        update_all_analytics_for_student(child)
+        
+        # Progress data
+        progress = ModuleProgress.objects.filter(student=child)
+        completed_count = progress.filter(completed=True).count()
+        total_count = progress.count()
+        in_progress_count = progress.filter(completed=False, started_at__isnull=False).count()
+        pending_count = total_count - completed_count - in_progress_count
+        
+        # Subject-wise progress
+        from .models import Module
+        modules_by_subject = Module.objects.values('subject').distinct()
+        
+        for subject_data in modules_by_subject:
+            subject = subject_data['subject']
+            if subject not in subjects_data:
+                subjects_data[subject] = {
+                    'total_lessons': 0,
+                    'completed_lessons': 0,
+                    'in_progress_lessons': 0,
+                    'pending_lessons': 0,
+                    'total_time_spent': 0,
+                    'avg_score': 0,
+                    'performance_trend': [],
+                    'children_progress': []
+                }
+            
+            # Get subject-specific progress for this child
+            subject_modules = Module.objects.filter(subject=subject)
+            subject_progress = progress.filter(module__in=subject_modules)
+            
+            subject_completed = subject_progress.filter(completed=True).count()
+            subject_total = subject_progress.count()
+            subject_in_progress = subject_progress.filter(completed=False, started_at__isnull=False).count()
+            subject_pending = subject_total - subject_completed - subject_in_progress
+            
+            # Calculate time spent on this subject
+            subject_time = 0
+            for prog in subject_progress:
+                if prog.time_spent:
+                    subject_time += prog.time_spent.total_seconds() / 3600
+            
+            # Calculate average score for this subject
+            completed_progress = subject_progress.filter(completed=True)
+            if completed_progress.exists():
+                avg_score = sum([p.score for p in completed_progress if p.score]) / completed_progress.count()
+            else:
+                avg_score = 0
+            
+            # Add to subject data
+            subjects_data[subject]['total_lessons'] += subject_total
+            subjects_data[subject]['completed_lessons'] += subject_completed
+            subjects_data[subject]['in_progress_lessons'] += subject_in_progress
+            subjects_data[subject]['pending_lessons'] += subject_pending
+            subjects_data[subject]['total_time_spent'] += subject_time
+            
+            # Add child's progress for this subject
+            completion_rate = (subject_completed / subject_total * 100) if subject_total > 0 else 0
+            subjects_data[subject]['children_progress'].append({
+                'child_name': f"{child.first_name} {child.last_name}",
+                'completion_rate': round(completion_rate, 1),
+                'completed': subject_completed,
+                'total': subject_total,
+                'time_spent': round(subject_time, 1),
+                'avg_score': round(avg_score, 1)
+            })
+        
+        # Time tracking
+        from .models import WeeklyProgress
+        from datetime import timedelta
+        today = timezone.now().date()
+        week_start = today - timedelta(days=today.weekday())
+        
+        try:
+            weekly_progress = WeeklyProgress.objects.get(student=child, week_start=week_start)
+            weekly_time = weekly_progress.total_time_spent.total_seconds() / 3600  # hours
+        except WeeklyProgress.DoesNotExist:
+            weekly_time = 0
+        
+        # Add to totals
+        total_lessons += total_count
+        completed_lessons += completed_count
+        in_progress_lessons += in_progress_count
+        pending_lessons += pending_count
+        total_time_spent += weekly_time
+        
+        detailed_children_data.append({
+            'child': child,
+            'profile': child_profile,
+            'completed_lessons': completed_count,
+            'total_lessons': total_count,
+            'in_progress_lessons': in_progress_count,
+            'pending_lessons': pending_count,
+            'weekly_time_hours': round(weekly_time, 1),
+        })
+    
+    # Calculate subject averages and completion rates
+    for subject, data in subjects_data.items():
+        if data['total_lessons'] > 0:
+            data['completion_rate'] = round((data['completed_lessons'] / data['total_lessons']) * 100, 1)
+        else:
+            data['completion_rate'] = 0
+        
+        data['total_time_spent'] = round(data['total_time_spent'], 1)
+        
+        # Calculate average performance for the subject
+        if data['children_progress']:
+            data['avg_performance'] = round(
+                sum([child['avg_score'] for child in data['children_progress']]) / len(data['children_progress']), 1
+            )
+        else:
+            data['avg_performance'] = 0
+    
+    # Format total time spent
+    if total_time_spent < 1:
+        time_display = f"{int(total_time_spent * 60)}m"
+    else:
+        time_display = f"{int(total_time_spent)}h {int((total_time_spent % 1) * 60)}m"
+    
+    # Calculate completion rate
+    if total_lessons > 0:
+        completion_rate = round((completed_lessons / total_lessons) * 100, 1)
+    else:
+        completion_rate = 0
+    
+    context = {
+        'children_data': detailed_children_data,
+        'subjects_data': subjects_data,
+        'profile': profile,
+        'total_lessons': total_lessons,
+        'completed_lessons': completed_lessons,
+        'in_progress_lessons': in_progress_lessons,
+        'pending_lessons': pending_lessons,
+        'total_time_spent': time_display,
+        'completion_rate': completion_rate,
+        'children_count': len(children),
+    }
+    
+    return render(request, 'learning/parent_analytics.html', context)
+
+
+@login_required
+def notifications_view(request):
+    """View all notifications for parent"""
+    if request.user.userprofile.role != 'parent':
+        return redirect('dashboard')
+    
+    notifications = NotificationService.get_unread_notifications(request.user)
+    
+    # Mark as read if requested
+    if request.method == 'POST' and request.POST.get('mark_all_read'):
+        NotificationService.mark_all_as_read(request.user)
+        messages.success(request, "All notifications marked as read!")
+        return redirect('notifications')
+    
+    context = {
+        'notifications': notifications,
+        'notification_count': notifications.count(),
+    }
+    
+    return render(request, 'learning/notifications.html', context)
+
+
+@login_required
+def notification_settings(request):
+    """Manage notification settings"""
+    if request.user.userprofile.role != 'parent':
+        return redirect('dashboard')
+    
+    from .notification_models import NotificationSettings
+    
+    # Get or create settings
+    settings, created = NotificationSettings.objects.get_or_create(parent=request.user)
+    
+    if request.method == 'POST':
+        # Update settings
+        settings.in_app_notifications = request.POST.get('in_app_notifications') == 'on'
+        settings.email_notifications = request.POST.get('email_notifications') == 'on'
+        settings.sms_notifications = request.POST.get('sms_notifications') == 'on'
+        
+        # Quiet hours
+        quiet_start = request.POST.get('quiet_hours_start')
+        quiet_end = request.POST.get('quiet_hours_end')
+        if quiet_start:
+            settings.quiet_hours_start = quiet_start
+        if quiet_end:
+            settings.quiet_hours_end = quiet_end
+        
+        # Notification types
+        settings.lesson_complete = request.POST.get('lesson_complete', 'immediate')
+        settings.quiz_passed = request.POST.get('quiz_passed', 'immediate')
+        settings.streak_milestone = request.POST.get('streak_milestone', 'immediate')
+        settings.weekly_summary = request.POST.get('weekly_summary', 'weekly')
+        settings.inactivity_alert = request.POST.get('inactivity_alert', 'daily')
+        
+        settings.save()
+        messages.success(request, "Notification settings updated!")
+        return redirect('notification_settings')
+    
+    context = {
+        'settings': settings,
+    }
+    
+    return render(request, 'learning/notification_settings.html', context)
 
 @login_required
 def lesson_detail(request, lesson_id):

@@ -9,6 +9,10 @@ from datetime import timedelta
 from .models import (UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, 
                      LessonDownload, LoginSession, LearningStreak, WeeklyProgress, 
                      MonthlyProgress, SubjectPerformance, LearningActivity)
+from .teacher_communication_models import (
+    TeacherAssignment, TeacherMessage, TeacherAvailability,
+    ConversationThread, TeacherProfile
+)
 
 # Customize admin site header and title
 admin.site.site_header = "Rural Digital Learning - Admin Panel"
@@ -383,6 +387,97 @@ class LearningActivityAdmin(admin.ModelAdmin):
     search_fields = ['student__username', 'student__first_name', 'student__last_name', 'description']
     date_hierarchy = 'created_at'
     readonly_fields = ['created_at']
+
+# Teacher Communication Admin
+
+@admin.register(TeacherProfile)
+class TeacherProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'specialization', 'years_experience', 'allow_parent_messages', 'response_time_hours']
+    list_filter = ['allow_parent_messages', 'years_experience', 'created_at']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'specialization']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Teacher Information', {
+            'fields': ('user', 'bio', 'specialization', 'years_experience')
+        }),
+        ('Communication Preferences', {
+            'fields': ('allow_parent_messages', 'response_time_hours', 'preferred_contact_time')
+        }),
+        ('Contact Information', {
+            'fields': ('office_location', 'office_hours')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(TeacherAssignment)
+class TeacherAssignmentAdmin(admin.ModelAdmin):
+    list_display = ['teacher', 'subject', 'class_name', 'is_class_teacher', 'is_active']
+    list_filter = ['subject', 'is_class_teacher', 'is_active', 'created_at']
+    search_fields = ['teacher__username', 'teacher__first_name', 'teacher__last_name', 'class_name']
+    list_editable = ['is_active']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('teacher')
+
+@admin.register(TeacherMessage)
+class TeacherMessageAdmin(admin.ModelAdmin):
+    list_display = ['sender', 'recipient', 'student', 'subject', 'message_type', 'priority', 'status', 'created_at']
+    list_filter = ['message_type', 'priority', 'status', 'is_read', 'created_at']
+    search_fields = ['sender__username', 'recipient__username', 'student__username', 'subject', 'content']
+    readonly_fields = ['created_at', 'updated_at', 'read_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Message Details', {
+            'fields': ('sender', 'recipient', 'student', 'subject', 'message_type', 'priority')
+        }),
+        ('Content', {
+            'fields': ('content',)
+        }),
+        ('Status', {
+            'fields': ('status', 'is_read', 'read_at')
+        }),
+        ('Threading', {
+            'fields': ('parent_message',),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('sender', 'recipient', 'student')
+
+@admin.register(ConversationThread)
+class ConversationThreadAdmin(admin.ModelAdmin):
+    list_display = ['subject', 'student', 'participant_count', 'is_active', 'last_message_at', 'created_at']
+    list_filter = ['is_active', 'created_at', 'last_message_at']
+    search_fields = ['subject', 'student__username', 'student__first_name', 'student__last_name']
+    filter_horizontal = ['participants']
+    readonly_fields = ['created_at']
+    
+    def participant_count(self, obj):
+        return obj.participants.count()
+    participant_count.short_description = 'Participants'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('student').prefetch_related('participants')
+
+@admin.register(TeacherAvailability)
+class TeacherAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ['teacher', 'day_of_week', 'start_time', 'end_time', 'is_available']
+    list_filter = ['day_of_week', 'is_available']
+    search_fields = ['teacher__username', 'teacher__first_name', 'teacher__last_name']
+    list_editable = ['is_available']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('teacher')
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user__userprofile')
