@@ -45,6 +45,15 @@ class UserProfile(models.Model):
     subject = models.CharField(max_length=100, blank=True, null=True,
                              help_text="Subject taught for teachers")
     
+    # Additional fields for comprehensive user data
+    school_name = models.CharField(max_length=200, blank=True, null=True)
+    school_type = models.CharField(max_length=50, blank=True, null=True)
+    parent_name = models.CharField(max_length=100, blank=True, null=True)
+    parent_phone = models.CharField(max_length=15, blank=True, null=True)
+    mobile = models.CharField(max_length=15, blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, 
                               related_name='children', limit_choices_to={'role': 'parent'})
     created_at = models.DateTimeField(default=timezone.now)

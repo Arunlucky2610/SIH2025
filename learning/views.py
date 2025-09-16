@@ -73,17 +73,13 @@ def user_login(request):
     return render(request, 'learning/login.html')
 
 def user_signup(request):
-    """Enhanced user signup view with MongoDB integration and role-specific collections"""
-    print(f"=== SIGNUP DEBUG: Method = {request.method} ===")
+    """User signup view with proper validation and role-based user creation"""
     
     if request.method == 'POST':
-        print(f"POST data received: {dict(request.POST)}")
         role = request.POST.get('role', '').strip()
-        print(f"Selected role: '{role}'")
         
         # Get form data based on role
         if role == 'student':
-            print("Processing student signup...")
             username = request.POST.get('student_username', '').strip()
             first_name = request.POST.get('student_first_name', '').strip()
             last_name = request.POST.get('student_last_name', '').strip()
@@ -93,9 +89,8 @@ def user_signup(request):
             class_level = request.POST.get('student_class_level', '').strip()
             date_of_birth = request.POST.get('student_date_of_birth', '').strip()
             school_name = request.POST.get('student_school_name', '').strip()
-            
-            print(f"Student data: username={username}, first_name={first_name}, last_name={last_name}")
-            print(f"Student extra: school_type={school_type}, class_level={class_level}")
+            email = f"{username}@student.rural-learning.com"
+            password = 'student123'  # Default password for students
             
         elif role == 'parent':
             username = request.POST.get('parent_username', '').strip()
@@ -118,26 +113,35 @@ def user_signup(request):
         
         # Validation
         errors = []
-        print(f"Starting validation for role: {role}")
         
         # Validate role
         if not role or role not in ['student', 'teacher', 'parent']:
             errors.append('Please select a valid role')
-            print(f"Invalid role error: {role}")
             return render(request, 'learning/signup.html', {'errors': errors})
         
-        # Validate username (check both Django and MongoDB)
+        # Validate username
         if not username:
             errors.append('Username is required')
         elif len(username) < 3:
             errors.append('Username must be at least 3 characters long')
         elif User.objects.filter(username=username).exists():
-            errors.append('Username already exists')
-        else:
-            # Check MongoDB collections
-            from .mongodb_utils import check_username_exists_in_collections
-            if check_username_exists_in_collections(username):
-                errors.append('Username already exists')
+            errors.append('User already exists')
+            
+        # Validate email for parent and teacher roles
+        if role in ['parent', 'teacher']:
+            if not email:
+                errors.append('Email is required')
+            elif '@' not in email or '.' not in email.split('@')[-1]:
+                errors.append('Please enter a valid email address')
+            elif User.objects.filter(email=email).exists():
+                errors.append('User already exists')
+                
+        # Validate password for parent and teacher roles
+        if role in ['parent', 'teacher']:
+            if not password:
+                errors.append('Password is required')
+            elif len(password) < 6:
+                errors.append('Password must be at least 6 characters long')
             
         # Role-specific validation
         if role == 'student':
@@ -172,12 +176,7 @@ def user_signup(request):
             elif '@' not in email or '.' not in email.split('@')[-1]:
                 errors.append('Please enter a valid email address')
             elif User.objects.filter(email=email).exists():
-                errors.append('Email already exists')
-            else:
-                # Check MongoDB collections
-                from .mongodb_utils import check_email_exists_in_collections
-                if check_email_exists_in_collections(email):
-                    errors.append('Email already exists')
+                errors.append('User already exists')
             if not password:
                 errors.append('Password is required')
             elif len(password) < 6:
@@ -193,12 +192,7 @@ def user_signup(request):
             elif '@' not in email or '.' not in email.split('@')[-1]:
                 errors.append('Please enter a valid email address')
             elif User.objects.filter(email=email).exists():
-                errors.append('Email already exists')
-            else:
-                # Check MongoDB collections
-                from .mongodb_utils import check_email_exists_in_collections
-                if check_email_exists_in_collections(email):
-                    errors.append('Email already exists')
+                errors.append('User already exists')
             if not password:
                 errors.append('Password is required')
             elif len(password) < 6:
@@ -212,80 +206,19 @@ def user_signup(request):
         
         # If there are validation errors, return to form with errors
         if errors:
-            print(f"Validation errors found: {errors}")
             return render(request, 'learning/signup.html', {'errors': errors})
         
-        print("Validation passed, proceeding to save data...")
-        
         try:
-            # Prepare data for MongoDB storage
-            mongodb_data = {
-                'username': username,
-                'role': role
-            }
-            
-            if role == 'student':
-                mongodb_data.update({
-                    'firstName': first_name,
-                    'lastName': last_name,
-                    'schoolType': school_type,
-                    'fatherMotherName': father_mother_name,
-                    'parentPhone': parent_phone,
-                    'class': class_level,
-                    'dateOfBirth': date_of_birth,
-                    'schoolName': school_name,
-                    'password': 'student123'  # Default password for students
-                })
-                collection_name = 'students'
-                email = f"{username}@student.rural-learning.com"  # Generate email for students
-                
-            elif role == 'parent':
-                mongodb_data.update({
-                    'name': name,
-                    'mobile': mobile,
-                    'childrenName': children_name,
-                    'gender': gender,
-                    'email': email,
-                    'password': password
-                })
-                collection_name = 'parents'
-                
-            elif role == 'teacher':
-                mongodb_data.update({
-                    'name': name,
-                    'mobile': mobile,
-                    'email': email,
-                    'password': password,
-                    'teachingClass': teaching_class,
-                    'schoolName': school_name,
-                    'schoolType': school_type
-                })
-                collection_name = 'teachers'
-            
-            # Save to MongoDB
-            from .mongodb_utils import save_to_role_collection
-            print(f"Saving to MongoDB collection: {collection_name}")
-            print(f"MongoDB data: {mongodb_data}")
-            
-            mongodb_result = save_to_role_collection(collection_name, mongodb_data)
-            print(f"MongoDB save result: {mongodb_result}")
-            
-            if not mongodb_result:
-                errors.append('Failed to save data. Please try again.')
-                print("MongoDB save failed!")
-                return render(request, 'learning/signup.html', {'errors': errors})
-            
-            print("MongoDB save successful, creating Django user...")
-            
             # Create Django User for authentication
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                password=mongodb_data['password']
+                password=password,
+                first_name=first_name if role == 'student' else (name if role in ['parent', 'teacher'] else ''),
+                last_name=last_name if role == 'student' else '',
             )
-            print(f"Django user created: {user}")
             
-            # Create UserProfile
+            # Create UserProfile with role-specific data
             profile_data = {
                 'user': user,
                 'role': role,
@@ -293,36 +226,29 @@ def user_signup(request):
             }
             
             if role == 'student':
-                profile_data['grade'] = class_level
+                profile_data.update({
+                    'grade': class_level,
+                    'school_name': school_name,
+                    'school_type': school_type,
+                    'parent_name': father_mother_name,
+                    'parent_phone': parent_phone,
+                    'date_of_birth': date_of_birth
+                })
             elif role == 'teacher':
-                profile_data['subject'] = teaching_class
+                profile_data.update({
+                    'subject': teaching_class,
+                    'school_name': school_name,
+                    'school_type': school_type,
+                    'mobile': mobile
+                })
             elif role == 'parent':
-                profile_data['child_name'] = children_name
-            
-            print(f"Creating UserProfile with data: {profile_data}")
+                profile_data.update({
+                    'child_name': children_name,
+                    'mobile': mobile,
+                    'gender': gender
+                })
             
             UserProfile.objects.create(**profile_data)
-            print("UserProfile created successfully!")
-            
-            # Log the user in automatically
-            login(request, user)
-            print(f"User logged in: {user.is_authenticated}")
-            
-            # Create login session record
-            def get_client_ip(request):
-                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-                if x_forwarded_for:
-                    ip = x_forwarded_for.split(',')[0]
-                else:
-                    ip = request.META.get('REMOTE_ADDR')
-                return ip
-            
-            LoginSession.objects.create(
-                user=user,
-                ip_address=get_client_ip(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                session_key=request.session.session_key
-            )
             
             # Success message
             role_display = {
@@ -331,30 +257,13 @@ def user_signup(request):
                 'parent': 'Parent'
             }.get(role, 'User')
             
-            messages.success(request, f'Welcome to Rural Learning Platform, {username}! Your {role_display} account has been created successfully.')
+            messages.success(request, f'Account created successfully! Welcome, {username}!')
             
-            print(f"About to redirect for role: {role}")
-            
-            # Redirect based on role
-            if role == 'student':
-                print("Redirecting to student_dashboard...")
-                return redirect('student_dashboard')
-            elif role == 'teacher':
-                print("Redirecting to teacher_dashboard...")
-                return redirect('teacher_dashboard')
-            elif role == 'parent':
-                print("Redirecting to parent_dashboard...")
-                return redirect('parent_dashboard')
-            else:
-                print("Redirecting to home...")
-                return redirect('home')
+            # Redirect to login page with success message
+            return redirect('login')
                 
         except Exception as e:
-            import traceback
-            error_details = traceback.format_exc()
             errors.append(f'An error occurred while creating your account: {str(e)}')
-            print(f"Signup error: {str(e)}")  # For debugging
-            print(f"Full traceback: {error_details}")  # For debugging
             return render(request, 'learning/signup.html', {'errors': errors})
     
     return render(request, 'learning/signup.html')
