@@ -643,28 +643,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Form validation
+    // Notification functions
+    function showSuccessMessage(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-success border-0';
+        toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1055;';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    }
+
+    function showErrorMessage(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-danger border-0';
+        toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1055;';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    }
+
+    // Form validation with fetch API
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const spinner = document.getElementById('loginSpinner');
     
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Always prevent default form submission
+            
             const selectedRole = document.querySelector('input[name="role"]:checked');
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             
             // Validate role selection
             if (!selectedRole) {
-                e.preventDefault();
-                alert('Please select your role first');
+                showErrorMessage('Please select your role first');
                 return;
             }
             
             // Validate credentials
             if (!username || !password) {
-                e.preventDefault();
-                alert('Please fill in all fields');
+                showErrorMessage('Please fill in all fields');
                 return;
             }
             
@@ -672,6 +711,45 @@ document.addEventListener('DOMContentLoaded', function() {
             loginBtn.disabled = true;
             spinner.classList.remove('d-none');
             loginBtn.querySelector('span').textContent = 'Signing In...';
+            
+            try {
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // Make fetch request to login endpoint
+                const response = await fetch('{% url "login" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        role: selectedRole.value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showSuccessMessage('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1500);
+                } else {
+                    showErrorMessage(data.message || 'Login failed. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showErrorMessage('An error occurred. Please try again.');
+            } finally {
+                // Reset loading state
+                loginBtn.disabled = false;
+                spinner.classList.add('d-none');
+                loginBtn.querySelector('span').textContent = 'Sign In';
+            }
         });
     }
 });

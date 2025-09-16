@@ -12,6 +12,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from datetime import timedelta
 import json
 import os
+import bcrypt
 
 from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher
 from .analytics import (
@@ -19,7 +20,11 @@ from .analytics import (
     get_current_streak, update_all_analytics_for_student
 )
 from .notifications import NotificationService
-from .mongodb_utils import create_user_in_mongodb, get_user_by_username, update_user_login_session
+from .mongodb_utils import (
+    create_user_in_mongodb, get_user_by_username, update_user_login_session, 
+    save_to_role_collection, check_username_exists_in_collections,
+    authenticate_user_mongodb, get_user_from_role_collection
+)
 
 def home(request):
     """Landing page - redirect based on user role"""
@@ -40,232 +45,262 @@ def home(request):
     return render(request, 'learning/landing.html')
 
 def user_login(request):
-    """User login view"""
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            
-            # Create login session record
-            def get_client_ip(request):
-                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-                if x_forwarded_for:
-                    ip = x_forwarded_for.split(',')[0]
-                else:
-                    ip = request.META.get('REMOTE_ADDR')
-                return ip
-            
-            LoginSession.objects.create(
-                user=user,
-                ip_address=get_client_ip(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                session_key=request.session.session_key
-            )
-            
-            messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-            return redirect('home')
-        else:
-            messages.error(request, 'Invalid username or password')
+    """Clean login API that works for all real users"""
     
+    if request.method == 'POST':
+        from django.http import JsonResponse
+        from django.contrib.auth import authenticate, login
+        import json
+        
+        try:
+            # Handle both JSON and form data
+            if request.content_type == 'application/json':
+                # Parse JSON data
+                data = json.loads(request.body)
+                username_or_email = data.get('username', '').strip()
+                password = data.get('password', '').strip()
+                role = data.get('role', '').strip()
+            else:
+                # Handle form data
+                username_or_email = request.POST.get('username', '').strip()
+                password = request.POST.get('password', '').strip()
+                role = request.POST.get('role', '').strip()
+            
+            # Validation
+            if not username_or_email:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Username or email is required'
+                })
+                
+            if not password:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Password is required'
+                })
+                
+            if not role or role not in ['student', 'parent', 'teacher', 'admin']:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please select a valid role'
+                })
+            
+            # Try to find user by username or email
+            user = None
+            try:
+                # Check if input is email
+                if '@' in username_or_email:
+                    user = User.objects.get(email=username_or_email)
+                else:
+                    user = User.objects.get(username=username_or_email)
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Wrong username or password'
+                })
+            
+            # Authenticate user with password
+            authenticated_user = authenticate(request, username=user.username, password=password)
+            
+            if authenticated_user:
+                # Check if user has correct role
+                try:
+                    profile = UserProfile.objects.get(user=authenticated_user)
+                    if profile.role != role:
+                        return JsonResponse({
+                            'status': 'error',
+                            'message': 'Wrong username or password'
+                        })
+                except UserProfile.DoesNotExist:
+                    # Create profile if missing
+                    UserProfile.objects.create(
+                        user=authenticated_user,
+                        role=role,
+                        language_preference='en'
+                    )
+                
+                # Log in the user
+                login(request, authenticated_user)
+                
+                # Create login session record
+                def get_client_ip(request):
+                    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                    if x_forwarded_for:
+                        ip = x_forwarded_for.split(',')[0]
+                    else:
+                        ip = request.META.get('REMOTE_ADDR')
+                    return ip
+                
+                try:
+                    LoginSession.objects.create(
+                        user=authenticated_user,
+                        ip_address=get_client_ip(request),
+                        user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                        session_key=request.session.session_key
+                    )
+                except Exception as e:
+                    pass  # Don't let session tracking errors break login
+                
+                # Return success with dashboard URL
+                dashboard_urls = {
+                    'student': '/student/',
+                    'parent': '/parent/',
+                    'teacher': '/teacher/',
+                    'admin': '/admin/'
+                }
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': f'Welcome back, {authenticated_user.first_name or authenticated_user.username}!',
+                    'redirect_url': dashboard_urls.get(role, '/')
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Wrong username or password'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An error occurred during login'
+            })
+    
+    # GET request - render login form
     return render(request, 'learning/login.html')
 
 def user_signup(request):
-    """User signup view with proper validation and role-based user creation"""
+    """Clean signup API that works for all real users and roles"""
     
     if request.method == 'POST':
-        role = request.POST.get('role', '').strip()
-        
-        # Get form data based on role
-        if role == 'student':
-            username = request.POST.get('student_username', '').strip()
-            first_name = request.POST.get('student_first_name', '').strip()
-            last_name = request.POST.get('student_last_name', '').strip()
-            school_type = request.POST.get('student_school_type', '').strip()
-            father_mother_name = request.POST.get('student_parent_name', '').strip()
-            parent_phone = request.POST.get('student_parent_phone', '').strip()
-            class_level = request.POST.get('student_class_level', '').strip()
-            date_of_birth = request.POST.get('student_date_of_birth', '').strip()
-            school_name = request.POST.get('student_school_name', '').strip()
-            email = f"{username}@student.rural-learning.com"
-            password = 'student123'  # Default password for students
-            
-        elif role == 'parent':
-            username = request.POST.get('parent_username', '').strip()
-            name = request.POST.get('parent_full_name', '').strip()
-            mobile = request.POST.get('parent_mobile_number', '').strip()
-            children_name = request.POST.get('parent_children_name', '').strip()
-            gender = request.POST.get('parent_gender', '').strip()
-            email = request.POST.get('parent_email', '').strip()
-            password = request.POST.get('parent_password', '').strip()
-            
-        elif role == 'teacher':
-            username = request.POST.get('teacher_username', '').strip()
-            name = request.POST.get('teacher_name', '').strip()
-            mobile = request.POST.get('teacher_mobile', '').strip()
-            email = request.POST.get('teacher_email', '').strip()
-            password = request.POST.get('teacher_password', '').strip()
-            teaching_class = request.POST.get('teacher_teaching_class', '').strip()
-            school_name = request.POST.get('teacher_school_name', '').strip()
-            school_type = request.POST.get('teacher_school_type', '').strip()
-        
-        # Validation
-        errors = []
-        
-        # Validate role
-        if not role or role not in ['student', 'teacher', 'parent']:
-            errors.append('Please select a valid role')
-            return render(request, 'learning/signup.html', {'errors': errors})
-        
-        # Validate username
-        if not username:
-            errors.append('Username is required')
-        elif len(username) < 3:
-            errors.append('Username must be at least 3 characters long')
-        elif User.objects.filter(username=username).exists():
-            errors.append('User already exists')
-            
-        # Validate email for parent and teacher roles
-        if role in ['parent', 'teacher']:
-            if not email:
-                errors.append('Email is required')
-            elif '@' not in email or '.' not in email.split('@')[-1]:
-                errors.append('Please enter a valid email address')
-            elif User.objects.filter(email=email).exists():
-                errors.append('User already exists')
-                
-        # Validate password for parent and teacher roles
-        if role in ['parent', 'teacher']:
-            if not password:
-                errors.append('Password is required')
-            elif len(password) < 6:
-                errors.append('Password must be at least 6 characters long')
-            
-        # Role-specific validation
-        if role == 'student':
-            if not first_name:
-                errors.append('First name is required')
-            if not last_name:
-                errors.append('Last name is required')
-            if not school_type:
-                errors.append('School type is required')
-            if not father_mother_name:
-                errors.append('Father/Mother name is required')
-            if not parent_phone:
-                errors.append('Parent phone number is required')
-            if not class_level:
-                errors.append('Class is required')
-            if not date_of_birth:
-                errors.append('Date of birth is required')
-            if not school_name:
-                errors.append('School name is required')
-                
-        elif role == 'parent':
-            if not name:
-                errors.append('Parent name is required')
-            if not mobile:
-                errors.append('Mobile number is required')
-            if not children_name:
-                errors.append('Children name is required')
-            if not gender:
-                errors.append('Gender is required')
-            if not email:
-                errors.append('Email is required')
-            elif '@' not in email or '.' not in email.split('@')[-1]:
-                errors.append('Please enter a valid email address')
-            elif User.objects.filter(email=email).exists():
-                errors.append('User already exists')
-            if not password:
-                errors.append('Password is required')
-            elif len(password) < 6:
-                errors.append('Password must be at least 6 characters long')
-                
-        elif role == 'teacher':
-            if not name:
-                errors.append('Teacher name is required')
-            if not mobile:
-                errors.append('Mobile number is required')
-            if not email:
-                errors.append('Email is required')
-            elif '@' not in email or '.' not in email.split('@')[-1]:
-                errors.append('Please enter a valid email address')
-            elif User.objects.filter(email=email).exists():
-                errors.append('User already exists')
-            if not password:
-                errors.append('Password is required')
-            elif len(password) < 6:
-                errors.append('Password must be at least 6 characters long')
-            if not teaching_class:
-                errors.append('Teaching class is required')
-            if not school_name:
-                errors.append('School name is required')
-            if not school_type:
-                errors.append('School type is required')
-        
-        # If there are validation errors, return to form with errors
-        if errors:
-            return render(request, 'learning/signup.html', {'errors': errors})
+        from django.http import JsonResponse
+        import json
         
         try:
-            # Create Django User for authentication
+            # Handle both JSON and form data
+            if request.content_type == 'application/json':
+                # Parse JSON data
+                data = json.loads(request.body)
+                role = data.get('role', '').strip().lower()
+            else:
+                # Handle form data
+                data = request.POST
+                role = data.get('role', '').strip().lower()
+            
+            # Extract role-specific data
+            if role == 'student':
+                username = data.get('student_username', '').strip()
+                password = data.get('student_password', '').strip()
+                email = data.get('student_email', '').strip() or f"{username}@student.rural-learning.com"
+                first_name = data.get('student_first_name', '').strip()
+                last_name = data.get('student_last_name', '').strip()
+                
+            elif role == 'parent':
+                username = data.get('parent_username', '').strip()
+                password = data.get('parent_password', '').strip()
+                email = data.get('parent_email', '').strip()
+                first_name = data.get('parent_full_name', '').strip()
+                last_name = ''
+                
+            elif role == 'teacher':
+                username = data.get('teacher_username', '').strip()
+                password = data.get('teacher_password', '').strip()
+                email = data.get('teacher_email', '').strip()
+                first_name = data.get('teacher_name', '').strip()
+                last_name = ''
+                
+            elif role == 'admin':
+                username = data.get('admin_username', '').strip()
+                password = data.get('admin_password', '').strip()
+                email = data.get('admin_email', '').strip()
+                first_name = data.get('admin_name', '').strip()
+                last_name = ''
+                
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please select a valid role'
+                })
+            
+            # Validation
+            if not username:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Username is required'
+                })
+                
+            if len(username) < 3:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Username must be at least 3 characters long'
+                })
+                
+            if not email:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Email is required'
+                })
+                
+            if '@' not in email or '.' not in email.split('@')[-1]:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please enter a valid email address'
+                })
+                
+            if not password:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Password is required'
+                })
+                
+            if len(password) < 6:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Password must be at least 6 characters long'
+                })
+            
+            # Check if user already exists
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Username already exists'
+                })
+                
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Email already exists'
+                })
+            
+            # Create user
             user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
-                first_name=first_name if role == 'student' else (name if role in ['parent', 'teacher'] else ''),
-                last_name=last_name if role == 'student' else '',
+                first_name=first_name,
+                last_name=last_name
             )
             
-            # Create UserProfile with role-specific data
-            profile_data = {
-                'user': user,
-                'role': role,
-                'language_preference': 'en'
-            }
+            # Create UserProfile with role
+            UserProfile.objects.create(
+                user=user,
+                role=role,
+                language_preference='en'
+            )
             
-            if role == 'student':
-                profile_data.update({
-                    'grade': class_level,
-                    'school_name': school_name,
-                    'school_type': school_type,
-                    'parent_name': father_mother_name,
-                    'parent_phone': parent_phone,
-                    'date_of_birth': date_of_birth
-                })
-            elif role == 'teacher':
-                profile_data.update({
-                    'subject': teaching_class,
-                    'school_name': school_name,
-                    'school_type': school_type,
-                    'mobile': mobile
-                })
-            elif role == 'parent':
-                profile_data.update({
-                    'child_name': children_name,
-                    'mobile': mobile,
-                    'gender': gender
-                })
+            # Return success response
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Account created successfully'
+            })
             
-            UserProfile.objects.create(**profile_data)
-            
-            # Success message
-            role_display = {
-                'student': 'Student',
-                'teacher': 'Teacher', 
-                'parent': 'Parent'
-            }.get(role, 'User')
-            
-            messages.success(request, f'Account created successfully! Welcome, {username}!')
-            
-            # Redirect to login page with success message
-            return redirect('login')
-                
         except Exception as e:
-            errors.append(f'An error occurred while creating your account: {str(e)}')
-            return render(request, 'learning/signup.html', {'errors': errors})
+            return JsonResponse({
+                'status': 'error',
+                'message': f'An error occurred: {str(e)}'
+            })
     
+    # GET request - render signup form
     return render(request, 'learning/signup.html')
 
 def user_logout(request):

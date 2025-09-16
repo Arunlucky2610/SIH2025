@@ -229,6 +229,61 @@ def check_email_exists_in_collections(email):
         logger.error(f"Error checking email existence: {str(e)}")
         return False
 
+def get_user_from_role_collection(username_or_email, role):
+    """
+    Get user from role-specific MongoDB collection by username or email
+    
+    Args:
+        username_or_email (str): Username or email to search for
+        role (str): Role (student, parent, teacher)
+    
+    Returns:
+        dict: User document or None if not found
+    """
+    try:
+        db = get_mongodb_connection()
+        collection_name = f"{role}s"  # students, parents, teachers
+        collection = db[collection_name]
+        
+        # Search by username first, then by email (if applicable)
+        user = collection.find_one({"username": username_or_email})
+        
+        if not user and role in ['parent', 'teacher']:
+            # Try searching by email for parents and teachers
+            user = collection.find_one({"email": username_or_email})
+        
+        return user
+        
+    except Exception as e:
+        logger.error(f"Error retrieving user from {role}s collection: {str(e)}")
+        return None
+
+def authenticate_user_mongodb(username_or_email, password, role):
+    """
+    Authenticate user against MongoDB role collection
+    
+    Args:
+        username_or_email (str): Username or email
+        password (str): Plain text password
+        role (str): User role (student, parent, teacher)
+    
+    Returns:
+        dict: User document if authenticated, None otherwise
+    """
+    try:
+        user = get_user_from_role_collection(username_or_email, role)
+        
+        if user and verify_password(password, user.get('password', '')):
+            # Remove password from returned user data
+            user.pop('password', None)
+            return user
+        
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error authenticating user: {str(e)}")
+        return None
+
 def update_user_login_session(username, session_data):
     """
     Update user's last login session information
