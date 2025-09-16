@@ -11,6 +11,23 @@ class UserProfile(models.Model):
         ('parent', 'Parent'),
     ]
     
+    GRADE_CHOICES = [
+        ('nursery', 'Nursery'),
+        ('kg', 'KG'),
+        ('1', '1st Grade'),
+        ('2', '2nd Grade'),
+        ('3', '3rd Grade'),
+        ('4', '4th Grade'),
+        ('5', '5th Grade'),
+        ('6', '6th Grade'),
+        ('7', '7th Grade'),
+        ('8', '8th Grade'),
+        ('9', '9th Grade'),
+        ('10', '10th Grade'),
+        ('11', '11th Grade'),
+        ('12', '12th Grade'),
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -19,6 +36,15 @@ class UserProfile(models.Model):
         ('hi', 'Hindi'),
         ('pa', 'Punjabi'),
     ])
+    
+    # Role-specific fields
+    grade = models.CharField(max_length=10, choices=GRADE_CHOICES, blank=True, null=True, 
+                           help_text="Grade/Class for students")
+    child_name = models.CharField(max_length=100, blank=True, null=True,
+                                help_text="Child's name for parents")
+    subject = models.CharField(max_length=100, blank=True, null=True,
+                             help_text="Subject taught for teachers")
+    
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, 
                               related_name='children', limit_choices_to={'role': 'parent'})
     created_at = models.DateTimeField(default=timezone.now)
@@ -254,6 +280,42 @@ class LearningActivity(models.Model):
     
     def __str__(self):
         return f"{self.student.username} - {self.get_activity_type_display()}"
+
+
+# Student model for storing student information
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    email = models.EmailField(unique=True)
+    course = models.CharField(max_length=100)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.name} - {self.course}"
+
+
+# Parent model for storing parent information
+class Parent(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    relation = models.CharField(max_length=50)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.name} - {self.relation}"
+
+
+# Teacher model for storing teacher information
+class Teacher(models.Model):
+    name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    experience = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.name} - {self.subject}"
 
 
 # Import notification models

@@ -1,6 +1,9 @@
-Django==4.2.7
-mysqlclient==2.2.0
+Django==5.0.6
+psycopg2-binary==2.9.7
 Pillow==10.0.1
 python-decouple==3.8
 whitenoise==6.6.0
 django-bootstrap5==23.3
+setuptools
+pymongo==4.5.0
+bcrypt==4.0.1

@@ -53,4 +53,12 @@ urlpatterns = [
     path('panel/lessons/', views.custom_admin_lessons, name='custom_admin_lessons'),
     path('panel/lessons/add/', views.custom_admin_add_lesson, name='custom_admin_add_lesson'),
     path('panel/students/', views.custom_admin_students, name='custom_admin_students'),
+    
+    # Student, Parent, Teacher CRUD
+    path('students/', views.student_list, name='student_list'),
+    path('students/create/', views.student_create, name='student_create'),
+    path('parents/', views.parent_list, name='parent_list'),
+    path('parents/create/', views.parent_create, name='parent_create'),
+    path('teachers/', views.teacher_list, name='teacher_list'),
+    path('teachers/create/', views.teacher_create, name='teacher_create'),
 ]

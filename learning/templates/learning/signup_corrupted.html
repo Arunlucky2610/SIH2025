@@ -1,0 +1,1464 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - Rural Digital Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+        max-width: 700px;
+        width: 100%;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .auth-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .auth-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    }
+    
+    .auth-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .auth-header .subtitle {
+        margin-top: 0.5rem;
+        opacity: 0.9;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .auth-body {
+        padding: 2.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        background: white;
+        outline: none;
+    }
+    
+    .form-control.is-valid, .form-select.is-valid {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .input-group-text {
+        background: #fafafa;
+        border: 2px solid #e5e7eb;
+        border-right: none;
+        border-radius: 12px 0 0 12px;
+        color: #6b7280;
+    }
+    
+    .input-group .form-control {
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+    
+    .role-forms {
+        margin-top: 1.5rem;
+    }
+    
+    .role-form {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .role-form.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-check-input {
+        border-radius: 6px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #4f46e5;
+        border-color: #4f46e5;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        padding: 1rem 2.5rem 2.5rem;
+        border-top: 1px solid #f3f4f6;
+        background: #fafafa;
+    }
+    
+    .auth-link {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-link:hover {
+        color: #7c3aed;
+        text-decoration: underline;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border-left: 4px solid #dc2626;
+    }
+    
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        border-left: 4px solid #059669;
+    }
+    
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+    
+    .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+    
+    .shape:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 80%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    @media (max-width: 768px) {
+        .auth-container {
+            padding: 10px;
+        }
+        
+        .auth-card {
+            margin: 0;
+            border-radius: 15px;
+        }
+        
+        .auth-header, .auth-body, .auth-footer {
+            padding: 1.5rem;
+        }
+        
+        .auth-body {
+            max-height: 60vh;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="card auth-card">
+                    <div class="auth-header">
+                        <h2>
+                            <i class="fas fa-user-plus me-2"></i>
+                            Join Our Community
+                        </h2>
+                        <p class="subtitle mb-0">Start your digital learning journey today</p>
+                    </div>
+                    
+                    <div class="auth-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}" role="alert">
+                                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post" id="signupForm" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Role Selection -->
+                            <div class="form-group">
+                                <label for="role" class="form-label">
+                                    <i class="fas fa-users me-1"></i> I am a:
+                                </label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">Select your role</option>
+                                    <option value="student">Student</option>
+                                    <option value="parent">Parent</option>
+                                    <option value="teacher">Teacher</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your role.</div>
+                            </div>
+                            
+                            <!-- Dynamic Role Forms -->
+                            <div class="role-forms">
+                                
+                                <!-- Student Form -->
+                                <div id="studentForm" class="role-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="student_first_name" class="form-label">
+                                                    <i class="fas fa-user me-1"></i> First Name
+                                                </label>
+                                                <input type="text" class="form-control" id="student_first_name" name="student_first_name" 
+                                                       placeholder="Enter first name">
+                                                <div class="invalid-feedback">Please provide a valid first name.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="student_last_name" class="form-label">
+                                                    <i class="fas fa-user me-1"></i> Last Name
+                                                </label>
+                                                <input type="text" class="form-control" id="student_last_name" name="student_last_name" 
+                                                       placeholder="Enter last name">
+                                                <div class="invalid-feedback">Please provide a valid last name.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="school_type" class="form-label">
+                                                    <i class="fas fa-school me-1"></i> School Type
+                                                </label>
+                                                <select class="form-select" id="school_type" name="school_type">
+                                                    <option value="">Select school type</option>
+                                                    <option value="government">Government</option>
+                                                    <option value="private">Private</option>
+                                                </select>
+                                                <div class="invalid-feedback">Please select school type.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="student_class" class="form-label">
+                                                    <i class="fas fa-graduation-cap me-1"></i> Class
+                                                </label>
+                                                <select class="form-select" id="student_class" name="student_class">
+                                                    <option value="">Select class</option>
+                                                    <option value="nursery">Nursery</option>
+                                                    <option value="lkg">LKG</option>
+                                                    <option value="ukg">UKG</option>
+                                                    <option value="1">1st</option>
+                                                    <option value="2">2nd</option>
+                                                    <option value="3">3rd</option>
+                                                    <option value="4">4th</option>
+                                                    <option value="5">5th</option>
+                                                    <option value="6">6th</option>
+                                                    <option value="7">7th</option>
+                                                    <option value="8">8th</option>
+                                                    <option value="9">9th</option>
+                                                    <option value="10">10th</option>
+                                                </select>
+                                                <div class="invalid-feedback">Please select your class.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="parent_name" class="form-label">
+                                            <i class="fas fa-user-friends me-1"></i> Father/Mother Name
+                                        </label>
+                                        <input type="text" class="form-control" id="parent_name" name="parent_name" 
+                                               placeholder="Enter parent's name">
+                                        <div class="invalid-feedback">Please provide parent's name.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="parent_phone" class="form-label">
+                                            <i class="fas fa-phone me-1"></i> Parent Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control" id="parent_phone" name="parent_phone" 
+                                               placeholder="Enter parent's phone number">
+                                        <div class="invalid-feedback">Please provide a valid phone number.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="student_dob" class="form-label">
+                                            <i class="fas fa-calendar me-1"></i> Date of Birth
+                                        </label>
+                                        <input type="date" class="form-control" id="student_dob" name="student_dob">
+                                        <div class="invalid-feedback">Please provide your date of birth.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="student_school_name" class="form-label">
+                                            <i class="fas fa-university me-1"></i> School Name
+                                        </label>
+                                        <input type="text" class="form-control" id="student_school_name" name="student_school_name" 
+                                               placeholder="Enter your school name">
+                                        <div class="invalid-feedback">Please provide your school name.</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Parent Form -->
+                                <div id="parentForm" class="role-form">
+                                    <div class="form-group">
+                                        <label for="parent_full_name" class="form-label">
+                                            <i class="fas fa-user me-1"></i> Parent Name
+                                        </label>
+                                        <input type="text" class="form-control" id="parent_full_name" name="parent_full_name" 
+                                               placeholder="Enter your full name">
+                                        <div class="invalid-feedback">Please provide your name.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="parent_mobile" class="form-label">
+                                            <i class="fas fa-phone me-1"></i> Mobile Number
+                                        </label>
+                                        <input type="tel" class="form-control" id="parent_mobile" name="parent_mobile" 
+                                               placeholder="Enter your mobile number">
+                                        <div class="invalid-feedback">Please provide a valid mobile number.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="children_name" class="form-label">
+                                            <i class="fas fa-child me-1"></i> Children Name
+                                        </label>
+                                        <input type="text" class="form-control" id="children_name" name="children_name" 
+                                               placeholder="Enter your child's name">
+                                        <div class="invalid-feedback">Please provide your child's name.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fas fa-venus-mars me-1"></i> Gender
+                                        </label>
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="parent_gender" id="parent_male" value="male">
+                                                <label class="form-check-label" for="parent_male">
+                                                    <i class="fas fa-mars me-1"></i> Male
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="parent_gender" id="parent_female" value="female">
+                                                <label class="form-check-label" for="parent_female">
+                                                    <i class="fas fa-venus me-1"></i> Female
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback">Please select your gender.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="parent_email" class="form-label">
+                                            <i class="fas fa-envelope me-1"></i> Email ID
+                                        </label>
+                                        <input type="email" class="form-control" id="parent_email" name="parent_email" 
+                                               placeholder="Enter your email address">
+                                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="parent_password" class="form-label">
+                                            <i class="fas fa-lock me-1"></i> Password
+                                        </label>
+                                        <input type="password" class="form-control" id="parent_password" name="parent_password" 
+                                               placeholder="Create a strong password">
+                                        <div class="invalid-feedback">Please provide a strong password.</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Teacher Form -->
+                                <div id="teacherForm" class="role-form">
+                                    <div class="form-group">
+                                        <label for="teacher_name" class="form-label">
+                                            <i class="fas fa-user me-1"></i> Teacher Name
+                                        </label>
+                                        <input type="text" class="form-control" id="teacher_name" name="teacher_name" 
+                                               placeholder="Enter your full name">
+                                        <div class="invalid-feedback">Please provide your name.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_mobile" class="form-label">
+                                            <i class="fas fa-phone me-1"></i> Mobile Number
+                                        </label>
+                                        <input type="tel" class="form-control" id="teacher_mobile" name="teacher_mobile" 
+                                               placeholder="Enter your mobile number">
+                                        <div class="invalid-feedback">Please provide a valid mobile number.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_email" class="form-label">
+                                            <i class="fas fa-envelope me-1"></i> Email ID
+                                        </label>
+                                        <input type="email" class="form-control" id="teacher_email" name="teacher_email" 
+                                               placeholder="Enter your email address">
+                                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_password" class="form-label">
+                                            <i class="fas fa-lock me-1"></i> Password
+                                        </label>
+                                        <input type="password" class="form-control" id="teacher_password" name="teacher_password" 
+                                               placeholder="Create a strong password">
+                                        <div class="invalid-feedback">Please provide a strong password.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_class" class="form-label">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i> Class They Teach
+                                        </label>
+                                        <select class="form-select" id="teacher_class" name="teacher_class">
+                                            <option value="">Select class you teach</option>
+                                            <option value="nursery">Nursery</option>
+                                            <option value="lkg">LKG</option>
+                                            <option value="ukg">UKG</option>
+                                            <option value="1">1st</option>
+                                            <option value="2">2nd</option>
+                                            <option value="3">3rd</option>
+                                            <option value="4">4th</option>
+                                            <option value="5">5th</option>
+                                            <option value="6">6th</option>
+                                            <option value="7">7th</option>
+                                            <option value="8">8th</option>
+                                            <option value="9">9th</option>
+                                            <option value="10">10th</option>
+                                            <option value="multiple">Multiple Classes</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select the class you teach.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_school_name" class="form-label">
+                                            <i class="fas fa-university me-1"></i> School Name
+                                        </label>
+                                        <input type="text" class="form-control" id="teacher_school_name" name="teacher_school_name" 
+                                               placeholder="Enter your school name">
+                                        <div class="invalid-feedback">Please provide your school name.</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="teacher_school_type" class="form-label">
+                                            <i class="fas fa-school me-1"></i> School Type
+                                        </label>
+                                        <select class="form-select" id="teacher_school_type" name="teacher_school_type">
+                                            <option value="">Select school type</option>
+                                            <option value="government">Government</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select school type.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary" id="signupBtn">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    <span>Create Account</span>
+                                    <div class="spinner-border spinner-border-sm ms-2 d-none" id="signupSpinner"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="{% url 'login' %}" class="auth-link">
+                                <i class="fas fa-sign-in-alt me-1"></i>
+                                Sign In
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Role selection functionality
+    const roleSelect = document.getElementById('role');
+    const roleForms = document.querySelectorAll('.role-form');
+    
+    roleSelect.addEventListener('change', function() {
+        const selectedRole = this.value;
+        
+        // Hide all role forms
+        roleForms.forEach(form => {
+            form.classList.remove('active');
+        });
+        
+        // Show selected role form
+        if (selectedRole) {
+            const targetForm = document.getElementById(selectedRole + 'Form');
+            if (targetForm) {
+                targetForm.classList.add('active');
+                
+                // Set required fields based on role
+                setRequiredFields(selectedRole);
+            }
+        }
+    });
+    
+    function setRequiredFields(role) {
+        // Remove required from all role-specific fields
+        document.querySelectorAll('.role-form input, .role-form select').forEach(field => {
+            field.removeAttribute('required');
+        });
+        
+        // Add required to active role fields
+        const activeForm = document.getElementById(role + 'Form');
+        if (activeForm) {
+            const requiredFields = activeForm.querySelectorAll('input:not([type="radio"]), select');
+            requiredFields.forEach(field => {
+                if (field.id !== 'parent_phone' && field.id !== 'student_dob') { // Optional fields
+                    field.setAttribute('required', 'required');
+                }
+            });
+            
+            // Special handling for radio buttons
+            if (role === 'parent') {
+                const genderRadios = activeForm.querySelectorAll('input[name="parent_gender"]');
+                genderRadios.forEach(radio => radio.setAttribute('required', 'required'));
+            }
+        }
+    }
+    
+    // Form validation
+    const signupForm = document.getElementById('signupForm');
+    const signupBtn = document.getElementById('signupBtn');
+    const signupSpinner = document.getElementById('signupSpinner');
+    
+    signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (validateForm()) {
+            signupBtn.disabled = true;
+            signupSpinner.classList.remove('d-none');
+            
+            // Submit the form
+            this.submit();
+        }
+    });
+    
+    function validateForm() {
+        let isValid = true;
+        const role = roleSelect.value;
+        
+        // Check if role is selected
+        if (!role) {
+            roleSelect.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            roleSelect.classList.remove('is-invalid');
+            roleSelect.classList.add('is-valid');
+        }
+        
+        // Validate active role form
+        const activeForm = document.querySelector('.role-form.active');
+        if (activeForm) {
+            const requiredInputs = activeForm.querySelectorAll('input[required], select[required]');
+            
+            requiredInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    // Check if any radio button in the group is selected
+                    const radioGroup = activeForm.querySelectorAll(`input[name="${input.name}"]`);
+                    const isRadioSelected = Array.from(radioGroup).some(radio => radio.checked);
+                    
+                    radioGroup.forEach(radio => {
+                        if (!isRadioSelected) {
+                            radio.classList.add('is-invalid');
+                            isValid = false;
+                        } else {
+                            radio.classList.remove('is-invalid');
+                            radio.classList.add('is-valid');
+                        }
+                    });
+                } else {
+                    if (!input.value.trim()) {
+                        input.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    }
+                }
+            });
+        }
+        
+        return isValid;
+    }
+    
+    // Real-time validation
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('.form-control, .form-select')) {
+            if (e.target.hasAttribute('required') && e.target.value.trim()) {
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            }
+        }
+    });
+    
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('input[type="radio"]')) {
+            const radioGroup = document.querySelectorAll(`input[name="${e.target.name}"]`);
+            radioGroup.forEach(radio => {
+                radio.classList.remove('is-invalid');
+                radio.classList.add('is-valid');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    }
+    
+    .auth-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .auth-header .subtitle {
+        margin-top: 0.5rem;
+        opacity: 0.9;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .auth-body {
+        padding: 2.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    
+    .form-control:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        background: white;
+    }
+    
+    .form-control.is-valid {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .input-group-text {
+        background: #fafafa;
+        border: 2px solid #e5e7eb;
+        border-right: none;
+        border-radius: 12px 0 0 12px;
+        color: #6b7280;
+    }
+    
+    .input-group .form-control {
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+    
+    .role-selection {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .role-card {
+        background: #f8fafc;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .role-card:hover {
+        border-color: #4f46e5;
+        background: #f0f4ff;
+        transform: translateY(-2px);
+    }
+    
+    .role-card.selected {
+        border-color: #4f46e5;
+        background: #f0f4ff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+    
+    .role-card input[type="radio"] {
+        display: none;
+    }
+    
+    .role-icon {
+        font-size: 2rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+    
+    .role-card:hover .role-icon,
+    .role-card.selected .role-icon {
+        color: #4f46e5;
+    }
+    
+    .role-title {
+        font-weight: 600;
+        color: #374151;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        border-radius: 2px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .strength-weak { background: #ef4444; width: 25%; }
+    .strength-fair { background: #f59e0b; width: 50%; }
+    .strength-good { background: #10b981; width: 75%; }
+    .strength-strong { background: #059669; width: 100%; }
+    
+    .strength-text {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        padding: 1rem 2.5rem 2.5rem;
+        border-top: 1px solid #f3f4f6;
+        background: #fafafa;
+    }
+    
+    .auth-link {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-link:hover {
+        color: #7c3aed;
+        text-decoration: underline;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border-left: 4px solid #dc2626;
+    }
+    
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        border-left: 4px solid #059669;
+    }
+    
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+    
+    .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+    
+    .shape:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 80%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    @media (max-width: 768px) {
+        .auth-container {
+            padding: 10px;
+        }
+        
+        .auth-card {
+            margin: 0;
+            border-radius: 15px;
+        }
+        
+        .auth-header, .auth-body, .auth-footer {
+            padding: 1.5rem;
+        }
+        
+        .role-selection {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="card auth-card">
+                    <div class="auth-header">
+                        <h2>
+                            <i class="fas fa-user-plus me-2"></i>
+                            Join Our Community
+                        </h2>
+                        <p class="subtitle mb-0">Start your digital learning journey today</p>
+                    </div>
+                    
+                    <div class="auth-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}" role="alert">
+                                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post" id="signupForm" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Role Selection -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-users me-1"></i> I am a:
+                                </label>
+                                <div class="role-selection">
+                                    <div class="role-card" data-role="student">
+                                        <input type="radio" name="role" value="student" id="role_student" required>
+                                        <div class="role-icon">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </div>
+                                        <p class="role-title">Student</p>
+                                    </div>
+                                    <div class="role-card" data-role="teacher">
+                                        <input type="radio" name="role" value="teacher" id="role_teacher">
+                                        <div class="role-icon">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                        </div>
+                                        <p class="role-title">Teacher</p>
+                                    </div>
+                                    <div class="role-card" data-role="parent">
+                                        <input type="radio" name="role" value="parent" id="role_parent">
+                                        <div class="role-icon">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                        <p class="role-title">Parent</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Personal Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="first_name" class="form-label">
+                                            <i class="fas fa-user me-1"></i> First Name
+                                        </label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                                               placeholder="Enter your first name" required>
+                                        <div class="invalid-feedback">Please provide a valid first name.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="last_name" class="form-label">
+                                            <i class="fas fa-user me-1"></i> Last Name
+                                        </label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                                               placeholder="Enter your last name" required>
+                                        <div class="invalid-feedback">Please provide a valid last name.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Username -->
+                            <div class="form-group">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-at me-1"></i> Username
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-at"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           placeholder="Choose a unique username" required>
+                                </div>
+                                <div class="invalid-feedback">Please choose a unique username.</div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i> Email Address
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="Enter your email address" required>
+                                </div>
+                                <div class="invalid-feedback">Please provide a valid email address.</div>
+                            </div>
+                            
+                            <!-- Phone (Optional) -->
+                            <div class="form-group">
+                                <label for="phone_number" class="form-label">
+                                    <i class="fas fa-phone me-1"></i> Phone Number <span class="text-muted">(Optional)</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-phone"></i>
+                                    </span>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           placeholder="Enter your phone number">
+                                </div>
+                            </div>
+                            
+                            <!-- Language Preference -->
+                            <div class="form-group">
+                                <label for="language_preference" class="form-label">
+                                    <i class="fas fa-globe me-1"></i> Preferred Language
+                                </label>
+                                <select class="form-control" id="language_preference" name="language_preference" required>
+                                    <option value="">Select your preferred language</option>
+                                    <option value="en">English</option>
+                                    <option value="hi">हिंदी (Hindi)</option>
+                                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your preferred language.</div>
+                            </div>
+                            
+                            <!-- Password -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="password1" class="form-label">
+                                            <i class="fas fa-lock me-1"></i> Password
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                            <input type="password" class="form-control" id="password1" name="password1" 
+                                                   placeholder="Create a strong password" required>
+                                            <button class="btn toggle-password" type="button" data-target="password1">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="password-strength">
+                                            <div class="strength-bar">
+                                                <div class="strength-fill" id="strengthFill"></div>
+                                            </div>
+                                            <div class="strength-text" id="strengthText"></div>
+                                        </div>
+                                        <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="password2" class="form-label">
+                                            <i class="fas fa-lock me-1"></i> Confirm Password
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                            <input type="password" class="form-control" id="password2" name="password2" 
+                                                   placeholder="Confirm your password" required>
+                                            <button class="btn toggle-password" type="button" data-target="password2">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="invalid-feedback">Passwords do not match.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="auth-link">Terms of Service</a> and 
+                                        <a href="#" class="auth-link">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">You must agree to the terms and conditions.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary" id="signupBtn">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    <span>Create Account</span>
+                                    <div class="spinner-border spinner-border-sm ms-2 d-none" id="signupSpinner"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="{% url 'login' %}" class="auth-link">
+                                <i class="fas fa-sign-in-alt me-1"></i>
+                                Sign In
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Role selection functionality
+    const roleCards = document.querySelectorAll('.role-card');
+    const roleInputs = document.querySelectorAll('input[name="role"]');
+    
+    roleCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const role = this.dataset.role;
+            const input = document.getElementById(`role_${role}`);
+            
+            // Remove selected class from all cards
+            roleCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            this.classList.add('selected');
+            
+            // Check the radio button
+            input.checked = true;
+        });
+    });
+    
+    // Password toggle functionality
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const passwordField = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+    });
+    
+    // Password strength checker
+    const password1 = document.getElementById('password1');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    password1.addEventListener('input', function() {
+        const password = this.value;
+        const strength = calculatePasswordStrength(password);
+        
+        // Reset classes
+        strengthFill.className = 'strength-fill';
+        
+        if (password.length === 0) {
+            strengthText.textContent = '';
+            return;
+        }
+        
+        switch (strength) {
+            case 1:
+                strengthFill.classList.add('strength-weak');
+                strengthText.textContent = 'Weak';
+                strengthText.style.color = '#ef4444';
+                break;
+            case 2:
+                strengthFill.classList.add('strength-fair');
+                strengthText.textContent = 'Fair';
+                strengthText.style.color = '#f59e0b';
+                break;
+            case 3:
+                strengthFill.classList.add('strength-good');
+                strengthText.textContent = 'Good';
+                strengthText.style.color = '#10b981';
+                break;
+            case 4:
+                strengthFill.classList.add('strength-strong');
+                strengthText.textContent = 'Strong';
+                strengthText.style.color = '#059669';
+                break;
+        }
+    });
+    
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        return Math.min(strength, 4);
+    }
+    
+    // Form validation
+    const signupForm = document.getElementById('signupForm');
+    const signupBtn = document.getElementById('signupBtn');
+    const signupSpinner = document.getElementById('signupSpinner');
+    
+    signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (validateForm()) {
+            signupBtn.disabled = true;
+            signupSpinner.classList.remove('d-none');
+            
+            // Submit the form
+            this.submit();
+        }
+    });
+    
+    function validateForm() {
+        let isValid = true;
+        const inputs = signupForm.querySelectorAll('input[required], select[required]');
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+        });
+        
+        // Check password match
+        const password1 = document.getElementById('password1');
+        const password2 = document.getElementById('password2');
+        
+        if (password1.value !== password2.value) {
+            password2.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            password2.classList.remove('is-invalid');
+            password2.classList.add('is-valid');
+        }
+        
+        return isValid;
+    }
+    
+    // Real-time validation
+    const inputs = signupForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+    
+    // Password confirmation validation
+    const password2 = document.getElementById('password2');
+    password2.addEventListener('input', function() {
+        const password1 = document.getElementById('password1');
+        if (this.value && this.value === password1.value) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else if (this.value) {
+            this.classList.add('is-invalid');
+            this.classList.remove('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}

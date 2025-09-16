@@ -87,7 +87,7 @@ The app includes full PWA functionality:
 
 ### Tech Stack
 - **Backend**: Django 4.2 (Python)
-- **Database**: SQLite (development) / MySQL (production)
+- **Database**: SQLite (development) / PostgreSQL (production)
 - **Frontend**: Bootstrap 5 + vanilla JavaScript
 - **PWA**: Service Worker + Web App Manifest
 - **Authentication**: Django built-in auth system
@@ -199,17 +199,17 @@ The app supports three languages with easy extensibility:
 - Sample data included
 
 ### Production Setup
-1. **Switch to MySQL**
+1. **Switch to PostgreSQL**
    ```python
-   # Uncomment MySQL config in settings.py
+   # Uncomment PostgreSQL config in settings.py
    DATABASES = {
        'default': {
-           'ENGINE': 'django.db.backends.mysql',
+           'ENGINE': 'django.db.backends.postgresql',
            'NAME': 'rural_edu_db',
            'USER': 'your_user',
            'PASSWORD': 'your_password',
            'HOST': 'localhost',
-           'PORT': '3306',
+           'PORT': '5432',
        }
    }
    ```
@@ -218,7 +218,7 @@ The app supports three languages with easy extensibility:
    ```bash
    export DEBUG=False
    export SECRET_KEY='your-secret-key'
-   export DATABASE_URL='mysql://user:pass@localhost/dbname'
+   export DATABASE_URL='postgresql://user:pass@localhost:5432/dbname'
    ```
 
 3. **Static Files**

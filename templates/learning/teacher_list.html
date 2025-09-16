@@ -1,0 +1,69 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Teachers - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Teachers</h2>
+                <a href="{% url 'teacher_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Teacher
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">All Teachers</h5>
+                </div>
+                <div class="card-body">
+                    {% if teachers %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Subject</th>
+                                        <th>Email</th>
+                                        <th>Experience (Years)</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for teacher in teachers %}
+                                        <tr>
+                                            <td>{{ teacher.name }}</td>
+                                            <td>{{ teacher.subject }}</td>
+                                            <td>{{ teacher.email }}</td>
+                                            <td>{{ teacher.experience }}</td>
+                                            <td>{{ teacher.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No teachers found</h5>
+                            <p class="text-muted">Start by adding your first teacher!</p>
+                            <a href="{% url 'teacher_create' %}" class="btn btn-primary">Add Teacher</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

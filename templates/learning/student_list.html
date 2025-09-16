@@ -1,0 +1,69 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Students - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Students</h2>
+                <a href="{% url 'student_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Student
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">All Students</h5>
+                </div>
+                <div class="card-body">
+                    {% if students %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Email</th>
+                                        <th>Course</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <td>{{ student.name }}</td>
+                                            <td>{{ student.age }}</td>
+                                            <td>{{ student.email }}</td>
+                                            <td>{{ student.course }}</td>
+                                            <td>{{ student.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No students found</h5>
+                            <p class="text-muted">Start by adding your first student!</p>
+                            <a href="{% url 'student_create' %}" class="btn btn-primary">Add Student</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,8 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import (UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, 
                      LessonDownload, LoginSession, LearningStreak, WeeklyProgress, 
-                     MonthlyProgress, SubjectPerformance, LearningActivity)
+                     MonthlyProgress, SubjectPerformance, LearningActivity,
+                     Student, Parent, Teacher)
 from .teacher_communication_models import (
     TeacherAssignment, TeacherMessage, TeacherAvailability,
     ConversationThread, TeacherProfile
@@ -481,3 +482,33 @@ class TeacherAvailabilityAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user__userprofile')
+
+
+# Register Student model
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'age', 'email', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['name', 'email', 'course']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']
+
+
+# Register Parent model
+@admin.register(Parent)
+class ParentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'phone', 'email', 'relation', 'created_at']
+    list_filter = ['relation', 'created_at']
+    search_fields = ['name', 'email', 'phone']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']
+
+
+# Register Teacher model
+@admin.register(Teacher)
+class TeacherAdmin(admin.ModelAdmin):
+    list_display = ['name', 'subject', 'email', 'experience', 'created_at']
+    list_filter = ['subject', 'experience', 'created_at']
+    search_fields = ['name', 'email', 'subject']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']

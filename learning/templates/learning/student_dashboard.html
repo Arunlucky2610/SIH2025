@@ -16,9 +16,18 @@
                     <div class="col-lg-8">
                         <div class="text-white">
                             <h1 class="display-5 fw-bold mb-3 fade-in-up">
-                                Welcome back, 
-                                <span class="text-warning">{{ user.first_name|default:user.username }}!</span>
+                                Welcome, {{ user.username }} 👋
                             </h1>
+                            <p class="lead mb-2 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
+                                Role: <span class="badge bg-white bg-opacity-20 text-white">{{ user.userprofile.role|title }}</span>
+                                {% if user.userprofile.role == 'student' and user.userprofile.grade %}
+                                    <span class="badge bg-white bg-opacity-20 text-white ms-2">Grade {{ user.userprofile.grade }}</span>
+                                {% elif user.userprofile.role == 'teacher' and user.userprofile.subject %}
+                                    <span class="badge bg-white bg-opacity-20 text-white ms-2">{{ user.userprofile.subject }}</span>
+                                {% elif user.userprofile.role == 'parent' and user.userprofile.child_name %}
+                                    <span class="badge bg-white bg-opacity-20 text-white ms-2">Parent of {{ user.userprofile.child_name }}</span>
+                                {% endif %}
+                            </p>
                             <p class="lead mb-4 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
                                 Continue your digital learning journey and master new skills today.
                             </p>

@@ -1,0 +1,35 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="none"/>
+  
+  <!-- Educational icons pattern -->
+  <g fill="rgba(79, 70, 229, 0.1)" stroke="rgba(79, 70, 229, 0.2)" stroke-width="1">
+    <!-- Books -->
+    <rect x="20" y="30" width="15" height="20" rx="2"/>
+    <rect x="22" y="32" width="11" height="2" fill="rgba(79, 70, 229, 0.3)"/>
+    <rect x="22" y="36" width="8" height="1" fill="rgba(79, 70, 229, 0.3)"/>
+    
+    <!-- Graduation cap -->
+    <polygon points="160,40 175,35 190,40 190,45 175,50 160,45" fill="rgba(79, 70, 229, 0.15)"/>
+    <rect x="173" y="35" width="4" height="12" fill="rgba(79, 70, 229, 0.2)"/>
+    
+    <!-- Light bulb -->
+    <circle cx="50" cy="120" r="8" fill="rgba(124, 58, 237, 0.1)"/>
+    <rect x="47" y="125" width="6" height="4" rx="1" fill="rgba(124, 58, 237, 0.15)"/>
+    
+    <!-- Apple -->
+    <circle cx="150" cy="120" r="10" fill="rgba(239, 68, 68, 0.1)"/>
+    <path d="M148,110 Q150,108 152,110" stroke="rgba(34, 197, 94, 0.3)" stroke-width="2" fill="none"/>
+    
+    <!-- Pencil -->
+    <rect x="25" y="160" width="4" height="25" rx="2" fill="rgba(251, 191, 36, 0.2)"/>
+    <polygon points="25,160 29,160 27,155" fill="rgba(251, 191, 36, 0.3)"/>
+    
+    <!-- Stars -->
+    <g fill="rgba(79, 70, 229, 0.2)">
+      <polygon points="100,25 102,31 108,31 103,35 105,41 100,37 95,41 97,35 92,31 98,31"/>
+      <polygon points="80,170 81,174 85,174 82,177 83,181 80,179 77,181 78,177 75,174 79,174"/>
+      <polygon points="170,170 171,174 175,174 172,177 173,181 170,179 167,181 168,177 165,174 169,174"/>
+    </g>
+  </g>
+</svg>

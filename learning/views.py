@@ -13,12 +13,13 @@ from datetime import timedelta
 import json
 import os
 
-from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession
+from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher
 from .analytics import (
     get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
     get_current_streak, update_all_analytics_for_student
 )
 from .notifications import NotificationService
+from .mongodb_utils import create_user_in_mongodb, get_user_by_username, update_user_login_session
 
 def home(request):
     """Landing page - redirect based on user role"""
@@ -72,45 +73,289 @@ def user_login(request):
     return render(request, 'learning/login.html')
 
 def user_signup(request):
-    """User signup view"""
+    """Enhanced user signup view with MongoDB integration and role-specific collections"""
+    print(f"=== SIGNUP DEBUG: Method = {request.method} ===")
+    
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        role = request.POST.get('role', 'student')
-        language = request.POST.get('language', 'en')
-        phone = request.POST.get('phone')
+        print(f"POST data received: {dict(request.POST)}")
+        role = request.POST.get('role', '').strip()
+        print(f"Selected role: '{role}'")
         
-        if password != confirm_password:
-            messages.error(request, 'Passwords do not match')
-            return render(request, 'learning/signup.html')
+        # Get form data based on role
+        if role == 'student':
+            print("Processing student signup...")
+            username = request.POST.get('student_username', '').strip()
+            first_name = request.POST.get('student_first_name', '').strip()
+            last_name = request.POST.get('student_last_name', '').strip()
+            school_type = request.POST.get('student_school_type', '').strip()
+            father_mother_name = request.POST.get('student_parent_name', '').strip()
+            parent_phone = request.POST.get('student_parent_phone', '').strip()
+            class_level = request.POST.get('student_class_level', '').strip()
+            date_of_birth = request.POST.get('student_date_of_birth', '').strip()
+            school_name = request.POST.get('student_school_name', '').strip()
+            
+            print(f"Student data: username={username}, first_name={first_name}, last_name={last_name}")
+            print(f"Student extra: school_type={school_type}, class_level={class_level}")
+            
+        elif role == 'parent':
+            username = request.POST.get('parent_username', '').strip()
+            name = request.POST.get('parent_full_name', '').strip()
+            mobile = request.POST.get('parent_mobile_number', '').strip()
+            children_name = request.POST.get('parent_children_name', '').strip()
+            gender = request.POST.get('parent_gender', '').strip()
+            email = request.POST.get('parent_email', '').strip()
+            password = request.POST.get('parent_password', '').strip()
+            
+        elif role == 'teacher':
+            username = request.POST.get('teacher_username', '').strip()
+            name = request.POST.get('teacher_name', '').strip()
+            mobile = request.POST.get('teacher_mobile', '').strip()
+            email = request.POST.get('teacher_email', '').strip()
+            password = request.POST.get('teacher_password', '').strip()
+            teaching_class = request.POST.get('teacher_teaching_class', '').strip()
+            school_name = request.POST.get('teacher_school_name', '').strip()
+            school_type = request.POST.get('teacher_school_type', '').strip()
         
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-            return render(request, 'learning/signup.html')
+        # Validation
+        errors = []
+        print(f"Starting validation for role: {role}")
         
-        # Create user
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            email=email
-        )
+        # Validate role
+        if not role or role not in ['student', 'teacher', 'parent']:
+            errors.append('Please select a valid role')
+            print(f"Invalid role error: {role}")
+            return render(request, 'learning/signup.html', {'errors': errors})
         
-        # Create profile
-        UserProfile.objects.create(
-            user=user,
-            role=role,
-            language_preference=language,
-            phone_number=phone
-        )
+        # Validate username (check both Django and MongoDB)
+        if not username:
+            errors.append('Username is required')
+        elif len(username) < 3:
+            errors.append('Username must be at least 3 characters long')
+        elif User.objects.filter(username=username).exists():
+            errors.append('Username already exists')
+        else:
+            # Check MongoDB collections
+            from .mongodb_utils import check_username_exists_in_collections
+            if check_username_exists_in_collections(username):
+                errors.append('Username already exists')
+            
+        # Role-specific validation
+        if role == 'student':
+            if not first_name:
+                errors.append('First name is required')
+            if not last_name:
+                errors.append('Last name is required')
+            if not school_type:
+                errors.append('School type is required')
+            if not father_mother_name:
+                errors.append('Father/Mother name is required')
+            if not parent_phone:
+                errors.append('Parent phone number is required')
+            if not class_level:
+                errors.append('Class is required')
+            if not date_of_birth:
+                errors.append('Date of birth is required')
+            if not school_name:
+                errors.append('School name is required')
+                
+        elif role == 'parent':
+            if not name:
+                errors.append('Parent name is required')
+            if not mobile:
+                errors.append('Mobile number is required')
+            if not children_name:
+                errors.append('Children name is required')
+            if not gender:
+                errors.append('Gender is required')
+            if not email:
+                errors.append('Email is required')
+            elif '@' not in email or '.' not in email.split('@')[-1]:
+                errors.append('Please enter a valid email address')
+            elif User.objects.filter(email=email).exists():
+                errors.append('Email already exists')
+            else:
+                # Check MongoDB collections
+                from .mongodb_utils import check_email_exists_in_collections
+                if check_email_exists_in_collections(email):
+                    errors.append('Email already exists')
+            if not password:
+                errors.append('Password is required')
+            elif len(password) < 6:
+                errors.append('Password must be at least 6 characters long')
+                
+        elif role == 'teacher':
+            if not name:
+                errors.append('Teacher name is required')
+            if not mobile:
+                errors.append('Mobile number is required')
+            if not email:
+                errors.append('Email is required')
+            elif '@' not in email or '.' not in email.split('@')[-1]:
+                errors.append('Please enter a valid email address')
+            elif User.objects.filter(email=email).exists():
+                errors.append('Email already exists')
+            else:
+                # Check MongoDB collections
+                from .mongodb_utils import check_email_exists_in_collections
+                if check_email_exists_in_collections(email):
+                    errors.append('Email already exists')
+            if not password:
+                errors.append('Password is required')
+            elif len(password) < 6:
+                errors.append('Password must be at least 6 characters long')
+            if not teaching_class:
+                errors.append('Teaching class is required')
+            if not school_name:
+                errors.append('School name is required')
+            if not school_type:
+                errors.append('School type is required')
         
-        messages.success(request, 'Account created successfully')
-        return redirect('login')
+        # If there are validation errors, return to form with errors
+        if errors:
+            print(f"Validation errors found: {errors}")
+            return render(request, 'learning/signup.html', {'errors': errors})
+        
+        print("Validation passed, proceeding to save data...")
+        
+        try:
+            # Prepare data for MongoDB storage
+            mongodb_data = {
+                'username': username,
+                'role': role
+            }
+            
+            if role == 'student':
+                mongodb_data.update({
+                    'firstName': first_name,
+                    'lastName': last_name,
+                    'schoolType': school_type,
+                    'fatherMotherName': father_mother_name,
+                    'parentPhone': parent_phone,
+                    'class': class_level,
+                    'dateOfBirth': date_of_birth,
+                    'schoolName': school_name,
+                    'password': 'student123'  # Default password for students
+                })
+                collection_name = 'students'
+                email = f"{username}@student.rural-learning.com"  # Generate email for students
+                
+            elif role == 'parent':
+                mongodb_data.update({
+                    'name': name,
+                    'mobile': mobile,
+                    'childrenName': children_name,
+                    'gender': gender,
+                    'email': email,
+                    'password': password
+                })
+                collection_name = 'parents'
+                
+            elif role == 'teacher':
+                mongodb_data.update({
+                    'name': name,
+                    'mobile': mobile,
+                    'email': email,
+                    'password': password,
+                    'teachingClass': teaching_class,
+                    'schoolName': school_name,
+                    'schoolType': school_type
+                })
+                collection_name = 'teachers'
+            
+            # Save to MongoDB
+            from .mongodb_utils import save_to_role_collection
+            print(f"Saving to MongoDB collection: {collection_name}")
+            print(f"MongoDB data: {mongodb_data}")
+            
+            mongodb_result = save_to_role_collection(collection_name, mongodb_data)
+            print(f"MongoDB save result: {mongodb_result}")
+            
+            if not mongodb_result:
+                errors.append('Failed to save data. Please try again.')
+                print("MongoDB save failed!")
+                return render(request, 'learning/signup.html', {'errors': errors})
+            
+            print("MongoDB save successful, creating Django user...")
+            
+            # Create Django User for authentication
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=mongodb_data['password']
+            )
+            print(f"Django user created: {user}")
+            
+            # Create UserProfile
+            profile_data = {
+                'user': user,
+                'role': role,
+                'language_preference': 'en'
+            }
+            
+            if role == 'student':
+                profile_data['grade'] = class_level
+            elif role == 'teacher':
+                profile_data['subject'] = teaching_class
+            elif role == 'parent':
+                profile_data['child_name'] = children_name
+            
+            print(f"Creating UserProfile with data: {profile_data}")
+            
+            UserProfile.objects.create(**profile_data)
+            print("UserProfile created successfully!")
+            
+            # Log the user in automatically
+            login(request, user)
+            print(f"User logged in: {user.is_authenticated}")
+            
+            # Create login session record
+            def get_client_ip(request):
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                if x_forwarded_for:
+                    ip = x_forwarded_for.split(',')[0]
+                else:
+                    ip = request.META.get('REMOTE_ADDR')
+                return ip
+            
+            LoginSession.objects.create(
+                user=user,
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                session_key=request.session.session_key
+            )
+            
+            # Success message
+            role_display = {
+                'student': 'Student',
+                'teacher': 'Teacher', 
+                'parent': 'Parent'
+            }.get(role, 'User')
+            
+            messages.success(request, f'Welcome to Rural Learning Platform, {username}! Your {role_display} account has been created successfully.')
+            
+            print(f"About to redirect for role: {role}")
+            
+            # Redirect based on role
+            if role == 'student':
+                print("Redirecting to student_dashboard...")
+                return redirect('student_dashboard')
+            elif role == 'teacher':
+                print("Redirecting to teacher_dashboard...")
+                return redirect('teacher_dashboard')
+            elif role == 'parent':
+                print("Redirecting to parent_dashboard...")
+                return redirect('parent_dashboard')
+            else:
+                print("Redirecting to home...")
+                return redirect('home')
+                
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            errors.append(f'An error occurred while creating your account: {str(e)}')
+            print(f"Signup error: {str(e)}")  # For debugging
+            print(f"Full traceback: {error_details}")  # For debugging
+            return render(request, 'learning/signup.html', {'errors': errors})
     
     return render(request, 'learning/signup.html')
 
@@ -1016,3 +1261,123 @@ def custom_admin_add_lesson(request):
     }
     
     return render(request, 'learning/custom_admin_add_lesson.html', context)
+
+
+# Student CRUD Views
+@login_required
+def student_list(request):
+    """List all students"""
+    students = Student.objects.all().order_by('-created_at')
+    
+    context = {
+        'students': students,
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/student_list.html', context)
+
+
+@login_required
+def student_create(request):
+    """Create a new student"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        age = request.POST.get('age')
+        email = request.POST.get('email')
+        course = request.POST.get('course')
+        
+        try:
+            student = Student.objects.create(
+                name=name,
+                age=int(age),
+                email=email,
+                course=course
+            )
+            messages.success(request, f'Student "{student.name}" created successfully!')
+            return redirect('student_list')
+        except Exception as e:
+            messages.error(request, f'Error creating student: {str(e)}')
+    
+    context = {
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/student_form.html', context)
+
+
+# Parent CRUD Views
+@login_required
+def parent_list(request):
+    """List all parents"""
+    parents = Parent.objects.all().order_by('-created_at')
+    
+    context = {
+        'parents': parents,
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/parent_list.html', context)
+
+
+@login_required
+def parent_create(request):
+    """Create a new parent"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        relation = request.POST.get('relation')
+        
+        try:
+            parent = Parent.objects.create(
+                name=name,
+                phone=phone,
+                email=email,
+                relation=relation
+            )
+            messages.success(request, f'Parent "{parent.name}" created successfully!')
+            return redirect('parent_list')
+        except Exception as e:
+            messages.error(request, f'Error creating parent: {str(e)}')
+    
+    context = {
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/parent_form.html', context)
+
+
+# Teacher CRUD Views
+@login_required
+def teacher_list(request):
+    """List all teachers"""
+    teachers = Teacher.objects.all().order_by('-created_at')
+    
+    context = {
+        'teachers': teachers,
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/teacher_list.html', context)
+
+
+@login_required
+def teacher_create(request):
+    """Create a new teacher"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        subject = request.POST.get('subject')
+        email = request.POST.get('email')
+        experience = request.POST.get('experience')
+        
+        try:
+            teacher = Teacher.objects.create(
+                name=name,
+                subject=subject,
+                email=email,
+                experience=int(experience)
+            )
+            messages.success(request, f'Teacher "{teacher.name}" created successfully!')
+            return redirect('teacher_list')
+        except Exception as e:
+            messages.error(request, f'Error creating teacher: {str(e)}')
+    
+    context = {
+        'user_profile': getattr(request.user, 'userprofile', None),
+    }
+    return render(request, 'learning/teacher_form.html', context)

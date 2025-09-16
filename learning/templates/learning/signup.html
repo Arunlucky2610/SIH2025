@@ -1,131 +1,1034 @@
 {% extends 'learning/base.html' %}
+{% load static %}
 
-{% block title %}Sign Up - Rural Digital Learning{% endblock %}
+{% block title %}Join Rural Learning Community{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .signup-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .signup-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        box-shadow: 0 32px 64px rgba(0, 0, 0, 0.12);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .signup-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+        background-size: 300% 300%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .signup-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 0;
+    }
+    
+    .logo-icon {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
+        animation: logoFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    .logo-text {
+        font-size: 1.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .logo-container:hover .logo-text {
+        letter-spacing: 2px;
+        transform: scale(1.05);
+    }
+    
+    .logo-container:hover .logo-icon {
+        transform: scale(1.1) rotate(5deg);
+        filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+    }
+    
+    .signup-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+    }
+    
+    .signup-header p {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+    
+    /* Role Selection Cards */
+    .role-selection {
+        margin-bottom: 2rem;
+    }
+    
+    .role-selection h6 {
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    
+    .role-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .role-cards {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+    }
+    
+    .role-card {
+        background: white;
+        border: 3px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .role-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.15), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .role-card:hover::before {
+        left: 100%;
+    }
+    
+    .role-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+    
+    .role-card.selected {
+        background: white;
+        border-color: #667eea;
+        color: inherit;
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        border-width: 3px;
+    }
+    
+    .role-card.selected::before {
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    }
+    
+    .role-card .emoji {
+        font-size: 3.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 1;
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+    
+    .role-card.selected .emoji {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    .role-card .role-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-top: 0.25rem;
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+    
+    .role-card:hover .role-label {
+        color: #667eea;
+    }
+    
+    .role-card.selected .role-label {
+        color: #667eea;
+        font-weight: 700;
+    }
+    
+    .role-card i {
+        opacity: 0;
+    }
+    
+    .role-card.selected i {
+        opacity: 0;
+    }
+    
+    .role-card i {
+        font-size: 3.5rem;
+        display: block;
+        transition: all 0.3s ease;
+        color: #667eea;
+    }
+    
+    /* Specific role colors */
+    .role-card[data-role="student"] i {
+        color: #3b82f6; /* Blue for students */
+    }
+    
+    .role-card[data-role="teacher"] i {
+        color: #10b981; /* Green for teachers */
+    }
+    
+    .role-card[data-role="parent"] i {
+        color: #f59e0b; /* Orange for parents */
+    }
+    
+    .role-card:hover i {
+        transform: scale(1.1);
+    }
+    
+    .role-card[data-role="student"]:hover i {
+        color: #2563eb;
+    }
+    
+    .role-card[data-role="teacher"]:hover i {
+        color: #059669;
+    }
+    
+    .role-card[data-role="parent"]:hover i {
+        color: #d97706;
+    }
+    
+    .role-card.selected i {
+        transform: scale(1.15);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        color: white;
+    }
+    
+    .role-card .role-title {
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .role-card .role-desc {
+        font-size: 0.8rem;
+        font-weight: 500;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        display: block;
+        color: #6b7280;
+    }
+    
+    .role-card.selected .role-desc {
+        color: rgba(255, 255, 255, 0.9);
+        opacity: 1;
+    }
+    
+    .role-card:hover .role-title {
+        transform: translateY(-2px);
+    }
+    
+    .role-card.selected .role-title {
+        transform: translateY(-2px);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Form Styles */
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1rem;
+        background: white;
+        color: #1f2937;
+        transition: all 0.3s ease;
+        height: 3.5rem;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+        color: #1f2937;
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
+    
+    .form-control:focus::placeholder {
+        color: #d1d5db;
+    }
+    
+    .form-floating label {
+        color: #374151;
+        font-weight: 500;
+        padding: 1rem;
+        background: transparent;
+    }
+    
+    .form-control option {
+        color: #1f2937;
+        background: white;
+    }
+    
+    .form-control select {
+        color: #1f2937;
+    }
+    
+    /* Ensure text is visible in all input types */
+    input.form-control,
+    select.form-control,
+    textarea.form-control {
+        color: #1f2937 !important;
+        background-color: white !important;
+    }
+    
+    input.form-control:focus,
+    select.form-control:focus,
+    textarea.form-control:focus {
+        color: #1f2937 !important;
+        background-color: white !important;
+    }
+    
+    /* Fix for autofill styling */
+    input.form-control:-webkit-autofill,
+    input.form-control:-webkit-autofill:hover,
+    input.form-control:-webkit-autofill:focus {
+        -webkit-text-fill-color: #1f2937 !important;
+        -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        z-index: 10;
+        padding: 0.25rem;
+        border-radius: 4px;
+        transition: color 0.2s;
+    }
+    
+    .password-toggle:hover {
+        color: #667eea;
+    }
+    
+    .password-strength {
+        height: 3px;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+        background: #e5e7eb;
+    }
+    
+    .password-strength::after {
+        content: '';
+        display: block;
+        height: 100%;
+        border-radius: 2px;
+        width: 0%;
+        transition: all 0.3s ease;
+    }
+    
+    .strength-weak::after { 
+        width: 33%; 
+        background: linear-gradient(90deg, #ef4444, #f87171); 
+    }
+    .strength-medium::after { 
+        width: 66%; 
+        background: linear-gradient(90deg, #f59e0b, #fbbf24); 
+    }
+    .strength-strong::after { 
+        width: 100%; 
+        background: linear-gradient(90deg, #10b981, #34d399); 
+    }
+    
+    /* Role-specific fields */
+    .role-fields {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 1.5rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 2px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .role-fields.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .role-fields h6 {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .role-fields h6 i {
+        font-size: 1.2rem;
+    }
+    
+    /* Radio button styling */
+    .radio-group {
+        margin-bottom: 1rem;
+    }
+    
+    .radio-label {
+        display: block;
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .radio-options {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.7);
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .radio-options:hover {
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid #667eea;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-input:checked {
+        background: #667eea;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes successPulse {
+        0% { 
+            opacity: 0; 
+            transform: scale(0.5); 
+        }
+        50% { 
+            opacity: 1; 
+            transform: scale(1.2); 
+        }
+        100% { 
+            opacity: 1; 
+            transform: scale(1); 
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .role-fields.show .form-floating {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .btn-signup {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: white;
+        width: 100%;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-signup::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-signup:hover::before {
+        left: 100%;
+    }
+    
+    .btn-signup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    
+    .login-link a:hover {
+        color: #764ba2;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: none;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #dc2626;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        color: #16a34a;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .signup-card {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .role-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .role-card {
+            padding: 1.5rem;
+            min-height: 120px;
+        }
+        
+        .role-card i {
+            font-size: 1.8rem;
+        }
+        
+        .role-card .role-title {
+            font-size: 0.9rem;
+        }
+        
+        .role-card .role-desc {
+            font-size: 0.75rem;
+        }
+        
+        .signup-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+        }
+        
+        .logo-container {
+            margin-bottom: 1rem;
+        }
+        
+        .role-selection h6 {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .signup-card {
+            padding: 1.25rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .logo-text {
+            font-size: 1.3rem;
+        }
+        
+        .logo-container {
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .signup-header h1 {
+            font-size: 1.3rem;
+        }
+        
+        .role-card {
+            padding: 1.25rem;
+            min-height: 110px;
+        }
+        
+        .role-card i {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .role-card .role-title {
+            font-size: 0.85rem;
+        }
+        
+        .role-card .role-desc {
+            font-size: 0.7rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 0.75rem;
+        }
+        
+        .role-fields {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center py-4">
-        <div class="col-md-8 col-lg-6">
-            <div class="card dashboard-card">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4 class="mb-0">
-                        <i class="bi bi-person-plus"></i> Create Account
-                    </h4>
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-header">
+            <div class="logo-container">
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                <span class="logo-text">Rural Learning</span>
+            </div>
+            <h1>
+                Join Our Learning Community
+            </h1>
+            <p>Create your account and start your educational journey</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post" id="signupForm">
+            {% csrf_token %}
+            
+            <!-- Role Selection -->
+            <div class="role-selection">
+                <h6>I am a...</h6>
+                <div class="role-cards">
+                    <div class="role-card" data-role="student">
+                        <i class="fas fa-user-graduate"></i>
+                        <div class="emoji">🎓</div>
+                        <div class="role-label">Student</div>
+                    </div>
+                    <div class="role-card" data-role="teacher">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <div class="emoji">👩‍🏫</div>
+                        <div class="role-label">Teacher</div>
+                    </div>
+                    <div class="role-card" data-role="parent">
+                        <i class="fas fa-heart"></i>
+                        <div class="emoji">👨‍👩‍👧</div>
+                        <div class="role-label">Parent</div>
+                    </div>
+                </div>
+                <input type="hidden" id="role" name="role" required>
+            </div>
+            
+            
+            <!-- Student-specific fields -->
+            <div class="role-fields" id="student-fields">
+                <h6><i class="fas fa-graduation-cap"></i>Student Information</h6>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="student_username" name="student_username" 
+                           placeholder="Username" required>
+                    <label for="student_username"><i class="fas fa-user me-2"></i>Username</label>
                 </div>
                 
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" 
-                                       placeholder="Enter first name" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" 
-                                       placeholder="Enter last name" required>
-                            </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="student_first_name" name="student_first_name" 
+                                   placeholder="First Name">
+                            <label for="student_first_name"><i class="fas fa-user me-2"></i>First Name</label>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-person"></i>
-                                </span>
-                                <input type="text" class="form-control" id="username" name="username" 
-                                       placeholder="Choose a username" required>
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="student_last_name" name="student_last_name" 
+                                   placeholder="Last Name">
+                            <label for="student_last_name"><i class="fas fa-user me-2"></i>Last Name</label>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-envelope"></i>
-                                </span>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       placeholder="Enter email address">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-phone"></i>
-                                </span>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       placeholder="Enter phone number">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="student" selected>Student</option>
-                                    <option value="teacher">Teacher</option>
-                                    <option value="parent">Parent</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="language" class="form-label">Preferred Language</label>
-                                <select class="form-select" id="language" name="language" required>
-                                    <option value="en" selected>English</option>
-                                    <option value="hi">Hindi (हिंदी)</option>
-                                    <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock"></i>
-                                </span>
-                                <input type="password" class="form-control" id="password" name="password" 
-                                       placeholder="Create a password" required>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            <div class="form-text">Password should be at least 8 characters long</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="confirm_password" class="form-label">Confirm Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock-fill"></i>
-                                </span>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
-                                       placeholder="Confirm your password" required>
-                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-person-plus"></i> Create Account
-                            </button>
-                        </div>
-                        
-                        <div class="text-center">
-                            <p class="mb-0">Already have an account?</p>
-                            <a href="{% url 'login' %}" class="btn btn-link">
-                                <i class="bi bi-box-arrow-in-right"></i> Login here
-                            </a>
-                        </div>
-                    </form>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <select class="form-control" id="student_school_type" name="student_school_type">
+                        <option value="">Select School Type</option>
+                        <option value="govt">Government</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <label for="student_school_type"><i class="fas fa-building me-2"></i>School Type</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="student_parent_name" name="student_parent_name" 
+                           placeholder="Father/Mother Name">
+                    <label for="student_parent_name"><i class="fas fa-users me-2"></i>Father/Mother Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="tel" class="form-control" id="student_parent_phone" name="student_parent_phone" 
+                           placeholder="Parent Phone Number">
+                    <label for="student_parent_phone"><i class="fas fa-phone me-2"></i>Parent Phone Number</label>
+                </div>
+                
+                <div class="form-floating">
+                    <select class="form-control" id="student_class_level" name="student_class_level">
+                        <option value="">Select Class</option>
+                        <option value="nursery">Nursery</option>
+                        <option value="kg1">KG1</option>
+                        <option value="kg2">KG2</option>
+                        <option value="1">Class 1</option>
+                        <option value="2">Class 2</option>
+                        <option value="3">Class 3</option>
+                        <option value="4">Class 4</option>
+                        <option value="5">Class 5</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                    </select>
+                    <label for="student_class_level"><i class="fas fa-school me-2"></i>Class</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="student_date_of_birth" name="student_date_of_birth" 
+                           placeholder="Date of Birth">
+                    <label for="student_date_of_birth"><i class="fas fa-calendar me-2"></i>Date of Birth</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="student_school_name" name="student_school_name" 
+                           placeholder="School Name">
+                    <label for="student_school_name"><i class="fas fa-school me-2"></i>School Name</label>
                 </div>
             </div>
+            
+            <!-- Parent-specific fields -->
+            <div class="role-fields" id="parent-fields">
+                <h6><i class="fas fa-heart"></i>Parent Information</h6>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="parent_username" name="parent_username" 
+                           placeholder="Username" required>
+                    <label for="parent_username"><i class="fas fa-user me-2"></i>Username</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="parent_full_name" name="parent_full_name" 
+                           placeholder="Parent Name">
+                    <label for="parent_full_name"><i class="fas fa-user me-2"></i>Parent Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="tel" class="form-control" id="parent_mobile_number" name="parent_mobile_number" 
+                           placeholder="Mobile Number">
+                    <label for="parent_mobile_number"><i class="fas fa-phone me-2"></i>Mobile Number</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="parent_children_name" name="parent_children_name" 
+                           placeholder="Children Name">
+                    <label for="parent_children_name"><i class="fas fa-child me-2"></i>Children Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <div class="radio-group">
+                        <label class="radio-label"><strong><i class="fas fa-venus-mars me-2"></i>Gender</strong></label>
+                        <div class="radio-options">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="parent_gender" id="parent_male" value="male">
+                                <label class="form-check-label" for="parent_male">Male</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="parent_gender" id="parent_female" value="female">
+                                <label class="form-check-label" for="parent_female">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="parent_email" name="parent_email" 
+                           placeholder="Email ID">
+                    <label for="parent_email"><i class="fas fa-envelope me-2"></i>Email ID</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="parent_password" name="parent_password" 
+                           placeholder="Password">
+                    <label for="parent_password"><i class="fas fa-lock me-2"></i>Password</label>
+                    <button type="button" class="password-toggle" onclick="togglePassword('parent_password')">
+                        <i class="fas fa-eye" id="parent_password-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Teacher-specific fields -->
+            <div class="role-fields" id="teacher-fields">
+                <h6><i class="fas fa-chalkboard-teacher"></i>Teacher Information</h6>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="teacher_username" name="teacher_username" 
+                           placeholder="Username" required>
+                    <label for="teacher_username"><i class="fas fa-user me-2"></i>Username</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="teacher_name" name="teacher_name" 
+                           placeholder="Teacher Name">
+                    <label for="teacher_name"><i class="fas fa-user me-2"></i>Teacher Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="tel" class="form-control" id="teacher_mobile" name="teacher_mobile" 
+                           placeholder="Mobile Number">
+                    <label for="teacher_mobile"><i class="fas fa-phone me-2"></i>Mobile Number</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="teacher_email" name="teacher_email" 
+                           placeholder="Email ID">
+                    <label for="teacher_email"><i class="fas fa-envelope me-2"></i>Email ID</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="teacher_password" name="teacher_password" 
+                           placeholder="Password">
+                    <label for="teacher_password"><i class="fas fa-lock me-2"></i>Password</label>
+                    <button type="button" class="password-toggle" onclick="togglePassword('teacher_password')">
+                        <i class="fas fa-eye" id="teacher_password-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="form-floating">
+                    <select class="form-control" id="teacher_teaching_class" name="teacher_teaching_class">
+                        <option value="">Select Class You Teach</option>
+                        <option value="nursery">Nursery</option>
+                        <option value="kg1">KG1</option>
+                        <option value="kg2">KG2</option>
+                        <option value="1">Class 1</option>
+                        <option value="2">Class 2</option>
+                        <option value="3">Class 3</option>
+                        <option value="4">Class 4</option>
+                        <option value="5">Class 5</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                    <label for="teacher_teaching_class"><i class="fas fa-school me-2"></i>Class You Teach</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="teacher_school_name" name="teacher_school_name" 
+                           placeholder="School Name">
+                    <label for="teacher_school_name"><i class="fas fa-school me-2"></i>School Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <select class="form-control" id="teacher_school_type" name="teacher_school_type">
+                        <option value="">Select School Type</option>
+                        <option value="govt">Government</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <label for="teacher_school_type"><i class="fas fa-building me-2"></i>School Type</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-signup" onclick="debugFormSubmission()">
+                <i class="fas fa-user-plus me-2"></i>
+                Create My Account
+            </button>
+        </form>
+        
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
         </div>
     </div>
 </div>
@@ -133,35 +1036,423 @@
 
 {% block extra_js %}
 <script>
-    // Toggle password visibility
-    function setupPasswordToggle(passwordId, toggleId) {
-        document.getElementById(toggleId).addEventListener('click', function() {
-            const passwordInput = document.getElementById(passwordId);
-            const toggleIcon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'bi bi-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'bi bi-eye';
-            }
-        });
-    }
-    
-    setupPasswordToggle('password', 'togglePassword');
-    setupPasswordToggle('confirm_password', 'toggleConfirmPassword');
-    
-    // Password confirmation validation
-    document.getElementById('confirm_password').addEventListener('input', function() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = this.value;
+// Role selection functionality with enhanced UX
+document.querySelectorAll('.role-card').forEach(card => {
+    card.addEventListener('click', function() {
+        // Add loading state
+        this.style.transform = 'scale(0.95)';
         
-        if (password !== confirmPassword) {
-            this.setCustomValidity('Passwords do not match');
-        } else {
-            this.setCustomValidity('');
+        setTimeout(() => {
+            // Remove selection from all cards
+            document.querySelectorAll('.role-card').forEach(c => {
+                c.classList.remove('selected');
+                c.style.transform = '';
+            });
+            
+            // Add selection to clicked card with enhanced animation
+            this.classList.add('selected');
+            this.style.transform = 'translateY(-5px) scale(1.05)';
+            
+            // Set hidden input value
+            const role = this.dataset.role;
+            document.getElementById('role').value = role;
+            
+            // Hide all role-specific fields with fade out
+            document.querySelectorAll('.role-fields').forEach(field => {
+                if (field.classList.contains('show')) {
+                    field.style.opacity = '0';
+                    field.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        field.classList.remove('show');
+                        field.style.transform = 'translateY(20px)';
+                    }, 300);
+                }
+            });
+            
+            // Show relevant fields with enhanced animation
+            const fieldsToShow = document.getElementById(role + '-fields');
+            if (fieldsToShow) {
+                setTimeout(() => {
+                    fieldsToShow.classList.add('show');
+                    // Add subtle shake animation to draw attention
+                    fieldsToShow.style.animation = 'fadeInUp 0.6s ease forwards';
+                }, 400);
+            }
+            
+            // Show success feedback
+            const successIcon = document.createElement('i');
+            successIcon.className = 'fas fa-check-circle';
+            successIcon.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                color: white;
+                font-size: 1.2rem;
+                opacity: 0;
+                animation: successPulse 0.6s ease forwards;
+            `;
+            this.appendChild(successIcon);
+            
+            setTimeout(() => {
+                if (successIcon.parentNode) {
+                    successIcon.remove();
+                }
+            }, 2000);
+            
+        }, 100);
+    });
+    
+    // Add hover sound effect simulation with visual feedback
+    card.addEventListener('mouseenter', function() {
+        if (!this.classList.contains('selected')) {
+            this.style.borderColor = '#667eea';
+            this.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.15)';
         }
     });
+    
+    card.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('selected')) {
+            this.style.borderColor = '#e5e7eb';
+            this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+        }
+    });
+});
+
+// Real-time form updates - add event listeners to all form inputs
+document.addEventListener('DOMContentLoaded', function() {
+    // Add input event listeners for real-time updates
+    const formInputs = document.querySelectorAll('.form-control');
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Clear any error styling on input
+            this.style.borderColor = '#e5e7eb';
+            
+            // Save form data to localStorage for persistence
+            const role = document.getElementById('role').value;
+            if (role) {
+                saveFormData(role);
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            // Validate individual field on blur
+            validateField(this);
+        });
+    });
+    
+    // Add change event listeners for dropdowns and radio buttons
+    const selectInputs = document.querySelectorAll('select, input[type="radio"]');
+    selectInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const role = document.getElementById('role').value;
+            if (role) {
+                saveFormData(role);
+            }
+        });
+    });
+});
+
+// Save form data to localStorage
+function saveFormData(role) {
+    const formData = {};
+    const currentFields = document.getElementById(role + '-fields');
+    
+    if (currentFields) {
+        const inputs = currentFields.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (input.checked) {
+                    formData[input.name] = input.value;
+                }
+            } else {
+                formData[input.name] = input.value;
+            }
+        });
+        
+        localStorage.setItem(`signup_${role}_data`, JSON.stringify(formData));
+    }
+}
+
+// Load saved form data
+function loadFormData(role) {
+    const savedData = localStorage.getItem(`signup_${role}_data`);
+    if (savedData) {
+        const formData = JSON.parse(savedData);
+        const currentFields = document.getElementById(role + '-fields');
+        
+        if (currentFields) {
+            Object.keys(formData).forEach(fieldName => {
+                const field = currentFields.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    if (field.type === 'radio') {
+                        const radioButton = currentFields.querySelector(`[name="${fieldName}"][value="${formData[fieldName]}"]`);
+                        if (radioButton) {
+                            radioButton.checked = true;
+                        }
+                    } else {
+                        field.value = formData[fieldName];
+                    }
+                }
+            });
+        }
+    }
+}
+
+// Individual field validation
+function validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Required field validation
+    if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+    }
+    
+    // Email validation
+    if (field.type === 'email' && value && !isValidEmail(value)) {
+        isValid = false;
+        errorMessage = 'Please enter a valid email address';
+    }
+    
+    // Phone validation
+    if (field.type === 'tel' && value && value.length < 10) {
+        isValid = false;
+        errorMessage = 'Please enter a valid phone number';
+    }
+    
+    // Password validation
+    if (field.type === 'password' && value && value.length < 6) {
+        isValid = false;
+        errorMessage = 'Password must be at least 6 characters long';
+    }
+    
+    // Show/hide validation feedback
+    if (!isValid) {
+        field.style.borderColor = '#ef4444';
+        showFieldError(field, errorMessage);
+    } else {
+        field.style.borderColor = '#10b981';
+        hideFieldError(field);
+    }
+    
+    return isValid;
+}
+
+// Email validation helper
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Show field-specific error
+function showFieldError(field, message) {
+    // Remove existing error
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Create error element
+    const errorElement = document.createElement('div');
+    errorElement.className = 'field-error';
+    errorElement.textContent = message;
+    errorElement.style.cssText = `
+        color: #ef4444;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    field.parentNode.appendChild(errorElement);
+}
+
+// Hide field error
+function hideFieldError(field) {
+    const errorElement = field.parentNode.querySelector('.field-error');
+    if (errorElement) {
+        errorElement.remove();
+    }
+}
+
+// Password toggle functionality
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const eye = document.getElementById(fieldId + '-eye');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
+    }
+}
+
+// Debug function for button clicks
+function debugFormSubmission() {
+    console.log('Create Account button clicked!');
+    const role = document.getElementById('role').value;
+    console.log('Selected role:', role);
+    
+    if (!role) {
+        alert('Please select your role first!');
+        return false;
+    }
+    
+    const form = document.getElementById('signupForm');
+    console.log('Form found:', form);
+    
+    // Force form submission as fallback
+    setTimeout(() => {
+        if (form) {
+            console.log('Forcing form submission...');
+            form.removeEventListener('submit', arguments.callee); // Remove event listener to avoid loop
+            HTMLFormElement.prototype.submit.call(form); // Use native submit
+        }
+    }, 100);
+}
+
+// Enhanced form submission
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    console.log('Form submit event triggered');
+    const role = document.getElementById('role').value;
+    
+    if (!role) {
+        e.preventDefault();
+        showErrorMessage('Please select your role (Student, Teacher, or Parent)');
+        return false;
+    }
+    
+    // Get current role fields
+    const currentFields = document.getElementById(role + '-fields');
+    if (!currentFields || !currentFields.classList.contains('show')) {
+        e.preventDefault();
+        showErrorMessage('Please select a role first');
+        return false;
+    }
+    
+    // Basic validation for required fields only
+    const requiredInputs = currentFields.querySelectorAll('input[required], select[required]');
+    let isFormValid = true;
+    let firstErrorField = null;
+    
+    requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+            isFormValid = false;
+            if (!firstErrorField) {
+                firstErrorField = input;
+            }
+            input.style.borderColor = '#ef4444';
+        } else {
+            input.style.borderColor = '#10b981';
+        }
+    });
+    
+    // Check required radio buttons for parent role
+    if (role === 'parent') {
+        const genderSelected = currentFields.querySelector('input[name="parent_gender"]:checked');
+        if (!genderSelected) {
+            isFormValid = false;
+            e.preventDefault();
+            showErrorMessage('Please select gender');
+            return false;
+        }
+    }
+    
+    if (!isFormValid) {
+        e.preventDefault();
+        if (firstErrorField) {
+            firstErrorField.focus();
+            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        showErrorMessage('Please fill in all required fields');
+        return false;
+    }
+    
+    // Show loading state (but allow form to submit naturally)
+    const submitBtn = this.querySelector('.btn-signup');
+    if (submitBtn) {
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Your Account...';
+        submitBtn.disabled = true;
+    }
+    
+    // Let the form submit naturally - don't prevent default
+    console.log('Form validation passed, submitting naturally...');
+    return true;
+});
+
+// Enhanced error message display
+function showErrorMessage(message) {
+    // Remove existing error messages
+    const existingError = document.querySelector('.error-toast');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Create error toast
+    const errorToast = document.createElement('div');
+    errorToast.className = 'error-toast';
+    errorToast.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close ms-auto" onclick="this.parentElement.remove()"></button>
+    `;
+    errorToast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ef4444, #f87171);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(errorToast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (errorToast.parentNode) {
+            errorToast.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => errorToast.remove(), 300);
+        }
+    }, 5000);
+}
+
+// Add smooth animations and load saved data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const card = document.querySelector('.signup-card');
+    if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    }
+    
+    // Listen for role changes to load saved data
+    const roleCards = document.querySelectorAll('.role-card');
+    roleCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const role = this.dataset.role;
+            setTimeout(() => {
+                loadFormData(role);
+            }, 500); // Load after animation completes
+        });
+    });
+});
 </script>
 {% endblock %}
