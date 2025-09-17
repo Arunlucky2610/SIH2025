@@ -13,7 +13,7 @@ from datetime import timedelta
 import json
 import os
 
-from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher
+from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher, LearningStreak
 from .analytics import (
     get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
     get_current_streak, update_all_analytics_for_student
@@ -288,6 +288,81 @@ def user_logout(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
     return redirect('login')
+
+@login_required
+def student_home(request):
+    """Student home page view with welcome features"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'student':
+        messages.error(request, 'Access denied')
+        return redirect('home')
+    
+    # Get lessons based on language preference
+    lessons = Lesson.objects.filter(
+        Q(language=profile.language_preference) | Q(language='en'),
+        is_active=True
+    ).order_by('lesson_type', 'order')
+    
+    # Get user progress
+    progress = ModuleProgress.objects.filter(student=request.user)
+    progress_dict = {p.lesson_id: p for p in progress}
+    
+    # Calculate overall progress
+    total_lessons = lessons.count()
+    completed_lessons = progress.filter(completed=True).count()
+    progress_percentage = (completed_lessons / total_lessons * 100) if total_lessons > 0 else 0
+    
+    # Get recent downloads
+    recent_downloads = LessonDownload.objects.filter(
+        student=request.user
+    ).order_by('-downloaded_at')[:5]
+    
+    # Get learning streak and level (from analytics if available)
+    try:
+        streak_record = LearningStreak.objects.get(student=request.user)
+        current_streak = streak_record.current_streak
+    except LearningStreak.DoesNotExist:
+        current_streak = 0
+    
+    # Calculate level based on completed lessons (simple calculation)
+    level = min(10, max(1, (completed_lessons // 5) + 1))
+    
+    # Create mock recent activities for now
+    recent_activities = []
+    recent_progress = progress.filter(completed=True).order_by('-completed_at')[:4]
+    for p in recent_progress:
+        lesson = lessons.get(id=p.lesson_id) if lessons.filter(id=p.lesson_id).exists() else None
+        if lesson:
+            recent_activities.append({
+                'title': f'Completed "{lesson.title}"',
+                'time_ago': f'{(timezone.now() - p.completed_at).days} days ago' if p.completed_at else 'Recently',
+                'icon': 'check-circle-fill',
+                'type': 'success'
+            })
+    
+    # Add download activities
+    for download in recent_downloads[:2]:
+        recent_activities.append({
+            'title': f'Downloaded "{download.lesson.title}"',
+            'time_ago': f'{(timezone.now() - download.downloaded_at).days} days ago',
+            'icon': 'download',
+            'type': 'info'
+        })
+    
+    context = {
+        'lessons': lessons,
+        'progress_dict': progress_dict,
+        'total_lessons': total_lessons,
+        'completed_lessons': completed_lessons,
+        'progress_percentage': progress_percentage,
+        'recent_downloads': recent_downloads,
+        'recent_activities': recent_activities[:6],  # Limit to 6 activities
+        'streak': current_streak,
+        'level': level,
+        'profile': profile,
+    }
+    
+    return render(request, 'learning/student_home.html', context)
 
 @login_required
 def student_dashboard(request):

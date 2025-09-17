@@ -48,7 +48,7 @@
                 <h3 class="stat-number">{{ progress_percentage|floatformat:0 }}%</h3>
                 <p class="stat-label">Progress</p>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+                    <div class="progress-fill" data-width="{{ progress_percentage|default:0 }}"></div>
                 </div>
             </div>
         </div>
@@ -219,7 +219,7 @@
                     <div class="analytics-item">
                         <div class="analytics-label">This Week</div>
                         <div class="analytics-bar">
-                            <div class="bar-fill" style="width: {{ progress_percentage }}%"></div>
+                            <div class="bar-fill" data-width="{{ progress_percentage }}"></div>
                         </div>
                         <div class="analytics-value">{{ completed_lessons }} lessons</div>
                     </div>
@@ -958,6 +958,19 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleDarkMode = function() {
         document.body.classList.toggle('dark-mode');
     };
+    
+    // Initialize progress bars with data-width attributes
+    function initializeProgressBars() {
+        document.querySelectorAll('.progress-fill[data-width], .bar-fill[data-width]').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width) {
+                bar.style.width = width + '%';
+            }
+        });
+    }
+    
+    // Initialize progress bars when page loads
+    initializeProgressBars();
 });
 </script>
 
