@@ -1816,7 +1816,7 @@ def delete_quiz(request, quiz_id):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if user_profile.role != 'teacher':
         messages.error(request, 'Only teachers can delete quizzes.')
-        return redirect('custom_admin_lessons')
+        return redirect('teacher_home')
     
     # Get quiz
     from .models import QuizContainer
@@ -1825,7 +1825,7 @@ def delete_quiz(request, quiz_id):
     # Check if teacher is the creator of this quiz
     if quiz.created_by != request.user:
         messages.error(request, 'You can only delete quizzes you created.')
-        return redirect('custom_admin_lessons')
+        return redirect('teacher_home')
     
     if request.method == 'GET':
         # Show confirmation page
@@ -1859,13 +1859,13 @@ def delete_quiz(request, quiz_id):
                 
             logger.info(f"Successfully deleted quiz: {quiz_title}")
             
-            # Redirect back to manage lessons without success message
-            return redirect('custom_admin_lessons')
+            # Redirect back to teacher home page
+            return redirect('teacher_home')
             
         except Exception as e:
             logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
             messages.error(request, f'Error deleting quiz: {str(e)}')
-            return redirect('custom_admin_lessons')
+            return redirect('teacher_home')
 
 @login_required
 def delete_lesson(request, lesson_id):
