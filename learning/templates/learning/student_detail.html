@@ -140,23 +140,24 @@
         to { transform: rotate(360deg); }
     }
     
-    /* Message sent animation - Toast style like login page */
+    /* Message sent animation - Toast style with black text for visibility */
     .message-sent-animation {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
+        background: #ffffff;
+        color: #000000;
         padding: 1rem 1.5rem;
         border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         z-index: 10000;
         text-align: left;
         animation: toastSlideIn 4s ease-in-out;
         opacity: 0;
         transform: translateX(100%);
         min-width: 300px;
-        border-left: 4px solid #ffffff;
+        border-left: 4px solid #28a745;
+        border: 2px solid #28a745;
     }
     
     @keyframes toastSlideIn {
@@ -184,6 +185,7 @@
         display: inline-block;
         vertical-align: middle;
         animation: checkPulse 0.6s ease-in-out 0.2s;
+        color: #28a745;
     }
     
     @keyframes checkPulse {
@@ -201,13 +203,15 @@
         font-size: 1rem;
         margin: 0;
         line-height: 1.2;
+        color: #000000;
     }
     
     .message-sent-animation .message-text {
         font-size: 0.875rem;
         margin: 0;
-        opacity: 0.9;
+        opacity: 0.8;
         line-height: 1.2;
+        color: #333333;
     }
     
     .lesson-type-card {
