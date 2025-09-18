@@ -1804,26 +1804,68 @@ def publish_quiz(request, quiz_id):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
+@login_required
 def delete_quiz(request, quiz_id):
-    """Delete a quiz"""
-    if request.method == 'DELETE':
+    """Delete a quiz with confirmation page"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"delete_quiz view called - Method: {request.method}, User: {request.user.id}, Quiz ID: {quiz_id}")
+    
+    # Check permission
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can delete quizzes.')
+        return redirect('custom_admin_lessons')
+    
+    # Get quiz
+    from .models import QuizContainer
+    quiz = get_object_or_404(QuizContainer, id=quiz_id)
+    
+    # Check if teacher is the creator of this quiz
+    if quiz.created_by != request.user:
+        messages.error(request, 'You can only delete quizzes you created.')
+        return redirect('custom_admin_lessons')
+    
+    if request.method == 'GET':
+        # Show confirmation page
+        context = {
+            'quiz': quiz,
+            'user_profile': user_profile,
+        }
+        return render(request, 'learning/delete_quiz_confirm.html', context)
+    
+    elif request.method == 'POST':
         try:
-            # Check permission
-            user_profile = get_object_or_404(UserProfile, user=request.user)
-            if user_profile.role != 'teacher':
-                return JsonResponse({'success': False, 'error': 'Only teachers can delete quizzes'})
+            logger.info(f"Starting deletion of quiz {quiz_id}")
+            quiz_title = quiz.title
             
-            # Get and delete quiz
-            from .models import QuizContainer
-            quiz = get_object_or_404(QuizContainer, id=quiz_id, created_by=request.user)
-            quiz.delete()
+            logger.info(f"Deleting quiz: {quiz_title}")
             
-            return JsonResponse({'success': True, 'message': 'Quiz deleted successfully'})
+            # Manual cascade delete for better performance and control
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Delete related quiz attempts and container attempts
+                from .models import QuizAttempt, QuizContainerAttempt
+                QuizAttempt.objects.filter(quiz__quiz_container=quiz).delete()
+                QuizContainerAttempt.objects.filter(quiz_container=quiz).delete()
+                
+                # Delete all quizzes in this container
+                quiz.quizzes.all().delete()
+                
+                # Finally delete the quiz container itself
+                quiz.delete()
+                
+            logger.info(f"Successfully deleted quiz: {quiz_title}")
+            
+            # Redirect back to manage lessons without success message
+            return redirect('custom_admin_lessons')
             
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+            logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
+            messages.error(request, f'Error deleting quiz: {str(e)}')
+            return redirect('custom_admin_lessons')
 
 @login_required
 def delete_lesson(request, lesson_id):
