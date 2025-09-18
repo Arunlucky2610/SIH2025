@@ -145,9 +145,9 @@
             </div>
             
             <div class="text-center">
-                <form method="post" class="d-inline">
+                <form method="post" class="d-inline" id="deleteForm">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-delete-confirm me-3">
+                    <button type="submit" class="btn btn-delete-confirm me-3" id="deleteButton">
                         <i class="bi bi-trash me-2"></i>Delete Lesson
                     </button>
                 </form>
@@ -159,4 +159,165 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteButton = document.getElementById('deleteButton');
+    
+    deleteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        const originalButtonContent = deleteButton.innerHTML;
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Deleting...';
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Send delete request
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            },
+            body: new URLSearchParams(new FormData(deleteForm))
+        })
+        .then(response => {
+            if (response.redirected) {
+                // Show success popup before redirecting
+                showLessonDeletedAnimation();
+                
+                // Redirect after animation
+                setTimeout(() => {
+                    window.location.href = response.url;
+                }, 2000);
+            } else {
+                // Reset button on error
+                deleteButton.disabled = false;
+                deleteButton.innerHTML = originalButtonContent;
+                alert('Error deleting lesson. Please try again.');
+            }
+        })
+        .catch(error => {
+            // Reset button on error
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalButtonContent;
+            console.error('Error:', error);
+            alert('Error deleting lesson. Please try again.');
+        });
+    });
+});
+
+function showLessonDeletedAnimation() {
+    // Create the animated toast message element
+    const messageAnimation = document.createElement('div');
+    messageAnimation.className = 'lesson-deleted-animation';
+    messageAnimation.innerHTML = `
+        <i class="bi bi-check-circle-fill check-icon"></i>
+        <div class="message-content">
+            <div class="message-title">✅ Lesson Deleted Successfully!</div>
+            <div class="message-text">The lesson has been permanently removed.</div>
+        </div>
+    `;
+    
+    // Add to body
+    document.body.appendChild(messageAnimation);
+    
+    // Remove after animation completes (2 seconds)
+    setTimeout(() => {
+        if (messageAnimation.parentNode) {
+            messageAnimation.remove();
+        }
+    }, 2000);
+}
+</script>
+
+<style>
+    /* Loading spinner animation */
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Lesson deleted animation - Same style as message sent */
+    .lesson-deleted-animation {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ffffff;
+        color: #000000;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        text-align: left;
+        animation: toastSlideIn 2s ease-in-out;
+        opacity: 0;
+        transform: translateX(100%);
+        min-width: 300px;
+        border-left: 4px solid #dc3545;
+        border: 2px solid #dc3545;
+    }
+    
+    @keyframes toastSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        15% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        85% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+    
+    .lesson-deleted-animation .check-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        display: inline-block;
+        vertical-align: middle;
+        animation: checkPulse 0.6s ease-in-out 0.2s;
+        color: #dc3545;
+    }
+    
+    @keyframes checkPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .lesson-deleted-animation .message-content {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    
+    .lesson-deleted-animation .message-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0;
+        line-height: 1.2;
+        color: #000000;
+    }
+    
+    .lesson-deleted-animation .message-text {
+        font-size: 0.875rem;
+        margin: 0;
+        opacity: 0.8;
+        line-height: 1.2;
+        color: #333333;
+    }
+</style>
 {% endblock %}
