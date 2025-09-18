@@ -1779,31 +1779,37 @@ def delete_quiz(request, quiz_id):
 
 @login_required
 def delete_lesson(request, lesson_id):
-    """Delete a lesson"""
+    """Delete a lesson with confirmation page"""
     import logging
     logger = logging.getLogger(__name__)
     
     logger.info(f"delete_lesson view called - Method: {request.method}, User: {request.user.id}, Lesson ID: {lesson_id}")
     
-    if request.method == 'POST':
+    # Check permission
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can delete lessons.')
+        return redirect('custom_admin_lessons')
+    
+    # Get lesson
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    
+    # Check if teacher is the creator of this lesson
+    if lesson.created_by != request.user:
+        messages.error(request, 'You can only delete lessons you created.')
+        return redirect('custom_admin_lessons')
+    
+    if request.method == 'GET':
+        # Show confirmation page
+        context = {
+            'lesson': lesson,
+            'user_profile': user_profile,
+        }
+        return render(request, 'learning/delete_lesson_confirm.html', context)
+    
+    elif request.method == 'POST':
         try:
             logger.info(f"Starting deletion of lesson {lesson_id}")
-            
-            # Check permission
-            user_profile = get_object_or_404(UserProfile, user=request.user)
-            if user_profile.role != 'teacher':
-                logger.warning(f"Non-teacher user {request.user.id} attempted to delete lesson {lesson_id}")
-                return JsonResponse({'success': False, 'error': 'Only teachers can delete lessons'})
-            
-            # Get and delete lesson
-            logger.info(f"Fetching lesson {lesson_id}")
-            lesson = get_object_or_404(Lesson, id=lesson_id)
-            
-            # Check if teacher is the creator of this lesson
-            if lesson.created_by != request.user:
-                logger.warning(f"Teacher {request.user.id} attempted to delete lesson {lesson_id} created by {lesson.created_by.id}")
-                return JsonResponse({'success': False, 'error': 'You can only delete lessons you created'})
-            
             lesson_title = lesson.title
             
             logger.info(f"Deleting lesson: {lesson_title}")
@@ -1826,17 +1832,15 @@ def delete_lesson(request, lesson_id):
                 
             logger.info(f"Successfully deleted lesson: {lesson_title}")
             
-            return JsonResponse({
-                'success': True, 
-                'message': f'Lesson "{lesson_title}" deleted successfully'
-            })
+            # Redirect back to manage lessons without success message
+            return redirect('custom_admin_lessons')
             
         except Exception as e:
             logger.error(f"Error deleting lesson {lesson_id}: {str(e)}")
-            return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, f'Error deleting lesson: {str(e)}')
+            return redirect('custom_admin_lessons')
     
-    logger.warning(f"Invalid request method {request.method} for lesson deletion")
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    return redirect('custom_admin_lessons')
 
 @login_required
 def edit_quiz(request, quiz_id):
