@@ -411,6 +411,8 @@ def teacher_home(request):
     try:
         from .models import QuizContainer
         recent_quizzes = QuizContainer.objects.filter(created_by=request.user).order_by('-created_at')[:5]
+        # Force query evaluation to avoid any caching issues
+        recent_quizzes = list(recent_quizzes)
     except:
         recent_quizzes = []  # In case QuizContainer model doesn't exist yet
     
@@ -1841,26 +1843,34 @@ def delete_quiz(request, quiz_id):
             quiz_title = quiz.title
             
             logger.info(f"Deleting quiz: {quiz_title}")
+            logger.info(f"Quiz exists before deletion: {QuizContainer.objects.filter(id=quiz_id).exists()}")
             
             # Manual cascade delete for better performance and control
             from django.db import transaction
             
             with transaction.atomic():
-                # Delete related quiz attempts and container attempts
+                # Log what we're deleting
                 from .models import QuizAttempt, QuizContainerAttempt
-                QuizAttempt.objects.filter(quiz__quiz_container=quiz).delete()
-                QuizContainerAttempt.objects.filter(quiz_container=quiz).delete()
+                quiz_attempts_count = QuizAttempt.objects.filter(quiz__quiz_container=quiz).count()
+                container_attempts_count = QuizContainerAttempt.objects.filter(quiz_container=quiz).count()
+                questions_count = quiz.quiz_questions.count()
                 
-                # Delete all quizzes in this container
-                quiz.quizzes.all().delete()
+                logger.info(f"Deleting {quiz_attempts_count} quiz attempts")
+                logger.info(f"Deleting {container_attempts_count} container attempts")
+                logger.info(f"Deleting {questions_count} questions")
                 
-                # Finally delete the quiz container itself
+                # Delete the quiz container - Django will handle CASCADE deletion
                 quiz.delete()
                 
             logger.info(f"Successfully deleted quiz: {quiz_title}")
+            logger.info(f"Quiz exists after deletion: {QuizContainer.objects.filter(id=quiz_id).exists()}")
             
-            # Redirect back to teacher home page
-            return redirect('teacher_home')
+            # Redirect back to teacher home page with cache busting
+            from django.http import HttpResponseRedirect
+            from django.urls import reverse
+            import time
+            redirect_url = reverse('teacher_home') + f'?t={int(time.time())}'
+            return HttpResponseRedirect(redirect_url)
             
         except Exception as e:
             logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
