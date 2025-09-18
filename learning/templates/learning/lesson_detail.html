@@ -132,64 +132,37 @@
                 <div class="card dashboard-card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-question-circle"></i> Quiz
+                            <i class="bi bi-question-circle"></i> Quizzes
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div id="quiz-container">
-                            {% for quiz in quizzes %}
-                                <div class="quiz-question mb-4" data-quiz-id="{{ quiz.id }}">
-                                    <h6 class="fw-bold">Question {{ forloop.counter }}</h6>
-                                    <p>{{ quiz.question }}</p>
-                                    
-                                    <div class="quiz-options">
-                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="A">
-                                            <strong>A.</strong> {{ quiz.option_a }}
-                                        </div>
-                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="B">
-                                            <strong>B.</strong> {{ quiz.option_b }}
-                                        </div>
-                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="C">
-                                            <strong>C.</strong> {{ quiz.option_c }}
-                                        </div>
-                                        <div class="quiz-option mb-2 p-3 border rounded" data-answer="D">
-                                            <strong>D.</strong> {{ quiz.option_d }}
-                                        </div>
+                        <p class="text-muted mb-3">Test your understanding of this lesson:</p>
+                        {% for quiz in quizzes %}
+                            <div class="quiz-item mb-3 p-3 border rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ quiz.question|truncatewords:10 }}</h6>
+                                        <small class="text-muted">
+                                            {% if quiz.id in quiz_attempts %}
+                                                <span class="badge bg-success">Completed</span>
+                                                Score: {{ quiz_attempts.quiz.id.score|default:"N/A" }}%
+                                            {% else %}
+                                                <span class="badge bg-warning">Not attempted</span>
+                                            {% endif %}
+                                        </small>
                                     </div>
-                                    
-                                    <div class="quiz-result mt-3" style="display: none;">
-                                        <div class="alert quiz-feedback">
-                                            <div class="quiz-explanation"></div>
-                                        </div>
+                                    <div>
+                                        <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary btn-sm">
+                                            {% if quiz.id in quiz_attempts %}
+                                                <i class="bi bi-arrow-repeat"></i> Retake
+                                            {% else %}
+                                                <i class="bi bi-play-fill"></i> Take Quiz
+                                            {% endif %}
+                                        </a>
                                     </div>
-                                    
-                                    {% with attempt=quiz_attempts|default_if_none:quiz.id %}
-                                        {% if attempt %}
-                                            <div class="alert alert-info">
-                                                <small>
-                                                    <i class="bi bi-info-circle"></i>
-                                                    You answered: <strong>{{ attempt.selected_answer }}</strong>
-                                                    ({{ attempt.is_correct|yesno:"Correct,Incorrect" }})
-                                                </small>
-                                            </div>
-                                        {% endif %}
-                                    {% endwith %}
                                 </div>
-                                {% if not forloop.last %}<hr>{% endif %}
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="text-center mt-4">
-                            <button class="btn btn-primary" onclick="submitQuiz()">
-                                <i class="bi bi-check-circle"></i> Submit Quiz
-                            </button>
-                        </div>
-                        
-                        <div id="quiz-score" class="mt-3" style="display: none;">
-                            <div class="alert alert-success text-center">
-                                <h5>Quiz Score: <span id="score-percentage"></span>%</h5>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endif %}
@@ -265,98 +238,6 @@
 
 {% block extra_js %}
 <script>
-    let selectedAnswers = {};
-    
-    // Quiz option selection
-    document.querySelectorAll('.quiz-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const questionDiv = this.closest('.quiz-question');
-            const quizId = questionDiv.getAttribute('data-quiz-id');
-            const answer = this.getAttribute('data-answer');
-            
-            // Remove previous selection
-            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            
-            // Mark current selection
-            this.classList.add('selected');
-            selectedAnswers[quizId] = answer;
-        });
-    });
-    
-    // Submit quiz
-    function submitQuiz() {
-        const quizQuestions = document.querySelectorAll('.quiz-question');
-        let totalQuestions = quizQuestions.length;
-        let correctAnswers = 0;
-        
-        quizQuestions.forEach(questionDiv => {
-            const quizId = questionDiv.getAttribute('data-quiz-id');
-            const selectedAnswer = selectedAnswers[quizId];
-            
-            if (!selectedAnswer) {
-                alert('Please answer all questions before submitting.');
-                return;
-            }
-            
-            // Submit individual quiz answer
-            fetch(`/quiz/${quizId}/submit/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({ answer: selectedAnswer })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Show result
-                const resultDiv = questionDiv.querySelector('.quiz-result');
-                const feedbackDiv = questionDiv.querySelector('.quiz-feedback');
-                const explanationDiv = questionDiv.querySelector('.quiz-explanation');
-                
-                resultDiv.style.display = 'block';
-                
-                if (data.correct) {
-                    feedbackDiv.className = 'alert alert-success quiz-feedback';
-                    feedbackDiv.innerHTML = '<i class="bi bi-check-circle"></i> Correct!';
-                    correctAnswers++;
-                } else {
-                    feedbackDiv.className = 'alert alert-danger quiz-feedback';
-                    feedbackDiv.innerHTML = `<i class="bi bi-x-circle"></i> Incorrect. The correct answer is ${data.correct_answer}.`;
-                }
-                
-                if (data.explanation) {
-                    explanationDiv.innerHTML = `<hr><small><strong>Explanation:</strong> ${data.explanation}</small>`;
-                }
-                
-                // Highlight correct/incorrect options
-                const selectedOption = questionDiv.querySelector(`[data-answer="${selectedAnswer}"]`);
-                const correctOption = questionDiv.querySelector(`[data-answer="${data.correct_answer}"]`);
-                
-                if (data.correct) {
-                    selectedOption.classList.add('correct');
-                } else {
-                    selectedOption.classList.add('incorrect');
-                    correctOption.classList.add('correct');
-                }
-                
-                // Show overall score when all questions are processed
-                const completedQuestions = document.querySelectorAll('.quiz-result[style*="block"]').length;
-                if (completedQuestions === totalQuestions) {
-                    const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
-                    document.getElementById('score-percentage').textContent = scorePercentage;
-                    document.getElementById('quiz-score').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error submitting quiz. Please try again.');
-            });
-        });
-    }
-    
     // Mark lesson as complete
     function markComplete() {
         fetch(`/lesson/{{ lesson.id }}/complete/`, {
