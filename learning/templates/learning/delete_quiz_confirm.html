@@ -149,7 +149,7 @@
             </div>
             
             <div class="text-center">
-                <form method="post" class="d-inline" id="deleteForm">
+                <form method="post" class="d-inline" id="deleteForm" action="">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-delete-confirm me-3" id="deleteButton">
                         <i class="bi bi-trash me-2"></i>Delete Quiz
@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     deleteForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         console.log('Form submission prevented, starting AJAX request');
         
         // Show loading state
@@ -234,6 +235,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             alert('Error deleting quiz. Please try again.');
         });
+        
+        return false; // Extra safety to prevent form submission
+    });
     });
 });
 
