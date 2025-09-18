@@ -37,6 +37,7 @@ urlpatterns = [
     # Lessons
     path('lesson/<int:lesson_id>/', views.lesson_detail, name='lesson_detail'),
     path('lesson/<int:lesson_id>/download/', views.download_lesson, name='download_lesson'),
+    path('lesson/<int:lesson_id>/view/', views.view_lesson_file, name='view_lesson_file'),
     path('lesson/<int:lesson_id>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
     
     # Quiz

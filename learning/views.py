@@ -917,10 +917,58 @@ def download_lesson(request, lesson_id):
         }
     )
     
-    # Serve file
+    # Serve file for download
     response = HttpResponse(lesson.file.read(), content_type='application/octet-stream')
     response['Content-Disposition'] = f'attachment; filename="{lesson.file.name}"'
     return response
+
+@login_required
+def view_lesson_file(request, lesson_id):
+    """View lesson file online in browser"""
+    lesson = get_object_or_404(Lesson, id=lesson_id, is_active=True)
+    
+    if not lesson.file:
+        messages.error(request, 'No file available for viewing')
+        return redirect('lesson_detail', lesson_id=lesson_id)
+    
+    # Get file extension to determine content type
+    import os
+    file_name = lesson.file.name
+    file_extension = os.path.splitext(file_name)[1].lower()
+    
+    # Define content types for different file types
+    content_types = {
+        '.pdf': 'application/pdf',
+        '.txt': 'text/plain',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.ppt': 'application/vnd.ms-powerpoint',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+    }
+    
+    content_type = content_types.get(file_extension, 'application/octet-stream')
+    
+    # For PDFs and images, display inline. For others, try to display or fallback to download
+    if file_extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.svg']:
+        disposition = 'inline'
+    else:
+        disposition = 'attachment'
+    
+    # Serve file for viewing
+    try:
+        response = HttpResponse(lesson.file.read(), content_type=content_type)
+        response['Content-Disposition'] = f'{disposition}; filename="{os.path.basename(file_name)}"'
+        return response
+    except Exception as e:
+        messages.error(request, f'Error viewing file: {str(e)}')
+        return redirect('lesson_detail', lesson_id=lesson_id)
 
 @login_required
 @csrf_exempt

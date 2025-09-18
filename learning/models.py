@@ -120,6 +120,51 @@ class Lesson(models.Model):
         
         # If not a YouTube URL, return original URL
         return url
+    
+    def get_file_type(self):
+        """Get file type for display purposes"""
+        if not self.file:
+            return None
+        
+        import os
+        file_extension = os.path.splitext(self.file.name)[1].lower()
+        
+        file_types = {
+            '.pdf': 'PDF Document',
+            '.doc': 'Word Document',
+            '.docx': 'Word Document',
+            '.ppt': 'PowerPoint',
+            '.pptx': 'PowerPoint',
+            '.xls': 'Excel Spreadsheet',
+            '.xlsx': 'Excel Spreadsheet',
+            '.txt': 'Text File',
+            '.jpg': 'Image',
+            '.jpeg': 'Image',
+            '.png': 'Image',
+            '.gif': 'Image',
+            '.svg': 'Image',
+        }
+        
+        return file_types.get(file_extension, 'File')
+    
+    def is_viewable_online(self):
+        """Check if file can be viewed online"""
+        if not self.file:
+            return False
+        
+        import os
+        file_extension = os.path.splitext(self.file.name)[1].lower()
+        viewable_extensions = ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.svg']
+        
+        return file_extension in viewable_extensions
+    
+    def get_filename(self):
+        """Get just the filename without path"""
+        if not self.file:
+            return None
+        
+        import os
+        return os.path.basename(self.file.name)
 
 # Track student progress on lessons
 class ModuleProgress(models.Model):
