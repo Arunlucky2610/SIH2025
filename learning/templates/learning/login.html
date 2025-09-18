@@ -697,13 +697,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Validate role selection
             if (!selectedRole) {
-                showErrorMessage('Please select your role first');
+                // showErrorMessage('Please select your role first');
+                console.log('Please select your role first');
                 return;
             }
             
             // Validate credentials
             if (!username || !password) {
-                showErrorMessage('Please fill in all fields');
+                // showErrorMessage('Please fill in all fields');
+                console.log('Please fill in all fields');
                 return;
             }
             
@@ -733,17 +735,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    showSuccessMessage('Login successful! Redirecting...');
+                    // showSuccessMessage('Login successful! Redirecting...');
+                    console.log('Login successful! Redirecting...');
                     setTimeout(() => {
                         window.location.href = data.redirect_url;
-                    }, 1500);
+                    }, 1000); // Reduced delay since no popup
                 } else {
-                    showErrorMessage(data.message || 'Login failed. Please try again.');
+                    // showErrorMessage(data.message || 'Login failed. Please try again.');
+                    console.log(data.message || 'Login failed. Please try again.');
                 }
                 
             } catch (error) {
                 console.error('Login error:', error);
-                showErrorMessage('An error occurred. Please try again.');
+                // showErrorMessage('An error occurred. Please try again.');
+                console.log('An error occurred. Please try again.');
             } finally {
                 // Reset loading state
                 loginBtn.disabled = false;
