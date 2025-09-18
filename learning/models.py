@@ -114,7 +114,8 @@ class ModuleProgress(models.Model):
 
 # Quiz model for assessment
 class Quiz(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quizzes')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quizzes', null=True, blank=True)
+    quiz_container = models.ForeignKey('QuizContainer', on_delete=models.CASCADE, related_name='quiz_questions', null=True, blank=True)
     question = models.TextField()
     option_a = models.CharField(max_length=200)
     option_b = models.CharField(max_length=200)
@@ -131,10 +132,15 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     
     class Meta:
-        ordering = ['lesson', 'order']
+        ordering = ['lesson', 'quiz_container', 'order']
     
     def __str__(self):
-        return f"Quiz for {self.lesson.title}: {self.question[:50]}..."
+        if self.lesson:
+            return f"Quiz for {self.lesson.title}: {self.question[:50]}..."
+        elif self.quiz_container:
+            return f"Quiz for {self.quiz_container.title}: {self.question[:50]}..."
+        else:
+            return f"Quiz: {self.question[:50]}..."
 
 # Track quiz attempts
 class QuizAttempt(models.Model):
@@ -151,9 +157,63 @@ class QuizAttempt(models.Model):
     
     class Meta:
         unique_together = ['student', 'quiz']
+
+# Track quiz container attempts (overall quiz sessions)
+class QuizContainerAttempt(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quiz_container_attempts')
+    quiz_container = models.ForeignKey('QuizContainer', on_delete=models.CASCADE, related_name='attempts')
+    score = models.PositiveIntegerField(default=0)
+    total_questions = models.PositiveIntegerField(default=0)
+    percentage = models.FloatField(default=0.0)
+    started_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.quiz_container.title} ({self.percentage}%)"
     
     def __str__(self):
         return f"{self.student.username} - {self.quiz.question[:30]}... ({'Correct' if self.is_correct else 'Incorrect'})"
+
+# Quiz Container for managing complete quizzes
+class QuizContainer(models.Model):
+    QUIZ_TYPES = [
+        ('quick', 'Quick Quiz'),
+        ('assignment', 'Assignment'),
+        ('practice', 'Practice'),
+    ]
+    
+    DIFFICULTY_LEVELS = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    quiz_type = models.CharField(max_length=20, choices=QUIZ_TYPES, default='quick')
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_LEVELS, default='medium')
+    duration = models.PositiveIntegerField(default=30, help_text="Duration in minutes")
+    randomize_questions = models.BooleanField(default=False)
+    show_results = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_quizzes')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_quiz_type_display()})"
+    
+    @property
+    def question_count(self):
+        """Return the number of questions in this quiz"""
+        return self.quiz_questions.count()
 
 # Download tracking for offline capability
 class LessonDownload(models.Model):

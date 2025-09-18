@@ -4,31 +4,49 @@
 
 {% block content %}
 <div class="container-fluid">
+    <!-- Breadcrumb Navigation -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'teacher_home' %}" class="text-decoration-none">
+                            <i class="bi bi-house-fill me-1"></i>Teacher Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">
+            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
                 <div class="row align-items-center position-relative">
                     <div class="col-lg-8">
                         <div class="text-white">
-                            <h1 class="display-5 fw-bold mb-3">
-                                <i class="bi bi-mortarboard-fill me-3"></i>
+                            <h1 class="display-4 fw-bold mb-3">
+                                <i class="bi bi-speedometer2 me-3"></i>
                                 Teacher Dashboard
                             </h1>
                             <p class="lead mb-4 opacity-90">
-                                Empower rural education by monitoring student progress and managing quality learning content.
+                                Detailed analytics and comprehensive student progress monitoring for rural education excellence.
                             </p>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
-                                    <i class="bi bi-calendar me-1"></i> 
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <div class="badge bg-white bg-opacity-20 text-dark text-center rounded-pill px-4 py-2 d-flex align-items-center justify-content-center" style="min-width: 180px; height: 40px;">
+                                    <i class="bi bi-calendar me-2"></i> 
                                     {% now "F d, Y" %}
                                 </div>
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
-                                    <i class="bi bi-people me-1"></i> 
+                                <div class="badge bg-white bg-opacity-20 text-dark text-center rounded-pill px-4 py-2 d-flex align-items-center justify-content-center" style="min-width: 180px; height: 40px;">
+                                    <i class="bi bi-people me-2"></i> 
                                     {{ students|length }} Active Students
                                 </div>
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
-                                    <i class="bi bi-book me-1"></i> 
+                                <div class="badge bg-white bg-opacity-20 text-dark text-center rounded-pill px-4 py-2 d-flex align-items-center justify-content-center" style="min-width: 180px; height: 40px;">
+                                    <i class="bi bi-book me-2"></i> 
                                     {{ lessons|length }} Lessons Created
                                 </div>
                             </div>
@@ -36,10 +54,10 @@
                     </div>
                     <div class="col-lg-4 text-end">
                         <div class="position-relative">
-                            <i class="bi bi-person-workspace text-white opacity-25" style="font-size: 8rem;"></i>
+                            <i class="bi bi-graph-up-arrow text-white opacity-25" style="font-size: 8rem;"></i>
                             <div class="position-absolute top-50 start-50 translate-middle">
                                 <div class="bg-white rounded-circle p-3 shadow-lg">
-                                    <i class="bi bi-person-check-fill text-success fs-2"></i>
+                                    <i class="bi bi-bar-chart-fill text-primary fs-2"></i>
                                 </div>
                             </div>
                         </div>
@@ -51,15 +69,14 @@
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
-                <div class="card-body p-4">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-people-fill text-primary" style="font-size: 2.5rem;"></i>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-people-fill text-primary fs-2"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-primary">Total Students</h5>
-                    <div class="display-4 fw-bold text-primary mb-2">{{ students|length }}</div>
-                    <p class="card-text text-muted mb-3">Active learners</p>
+                    <h3 class="card-title fs-2 fw-bold text-primary">{{ students|length }}</h3>
+                    <p class="card-text text-muted">Total Students</p>
                     <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
                         <i class="bi bi-graph-up me-1"></i>
                         Growing community
@@ -67,16 +84,15 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
-                <div class="card-body p-4">
-                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-book-fill text-success" style="font-size: 2.5rem;"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-book-fill text-success fs-2"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-success">Lessons Created</h5>
-                    <div class="display-4 fw-bold text-success mb-2">{{ lessons|length }}</div>
-                    <p class="card-text text-muted mb-3">Educational content</p>
+                    <h3 class="card-title fs-2 fw-bold text-success">{{ lessons|length }}</h3>
+                    <p class="card-text text-muted">Lessons Created</p>
                     <div class="badge bg-success bg-opacity-10 text-success rounded-pill">
                         <i class="bi bi-plus-circle me-1"></i>
                         Keep creating
@@ -84,16 +100,15 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
-                <div class="card-body p-4">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-check-circle-fill text-info" style="font-size: 2.5rem;"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-circle-fill text-info fs-2"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-info">Avg Completion</h5>
-                    <div class="display-4 fw-bold text-info mb-2">85%</div>
-                    <p class="card-text text-muted mb-3">Student success rate</p>
+                    <h3 class="card-title fs-2 fw-bold text-info">85%</h3>
+                    <p class="card-text text-muted">Avg Completion</p>
                     <div class="badge bg-info bg-opacity-10 text-info rounded-pill">
                         <i class="bi bi-trophy me-1"></i>
                         Excellent results
@@ -101,16 +116,15 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
-                <div class="card-body p-4">
-                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-trophy-fill text-warning" style="font-size: 2.5rem;"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-trophy-fill text-warning fs-2"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-warning">Avg Quiz Score</h5>
-                    <div class="display-4 fw-bold text-warning mb-2">92%</div>
-                    <p class="card-text text-muted mb-3">Student performance</p>
+                    <h3 class="card-title fs-2 fw-bold text-warning">92%</h3>
+                    <p class="card-text text-muted">Avg Quiz Score</p>
                     <div class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
                         <i class="bi bi-star me-1"></i>
                         Quality teaching
@@ -120,41 +134,58 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Progress Graph Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-transparent border-0 p-4">
-                    <h4 class="mb-0 fw-bold">
-                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
-                        Quick Actions
-                    </h4>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #17a2b8, #6f42c1);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-bar-chart-line me-2"></i>
+                        Weekly Progress Overview
+                    </h5>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-outline-primary w-100 py-3 rounded-3">
-                                <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
-                                Create New Lesson
-                            </a>
+                        <div class="col-lg-8">
+                            <!-- Simple Bar Chart using CSS -->
+                            <div class="progress-chart">
+                                <div class="d-flex justify-content-between align-items-end" style="height: 200px;">
+                                    {% for day_data in weekly_data %}
+                                        <div class="text-center" style="width: 12%;">
+                                            <div class="bg-{% cycle 'primary' 'success' 'info' 'warning' 'danger' 'secondary' 'dark' %} rounded-top mb-2" 
+                                                 style="height: {{ day_data.percentage|floatformat:0|add:'20' }}px; width: 100%; max-height: 180px;"></div>
+                                            <small class="text-muted">{{ day_data.day }}</small>
+                                            <div><strong>{{ day_data.percentage|floatformat:0 }}%</strong></div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="text-center w-100">
+                                            <p class="text-muted">No data available for this week</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="{% url 'custom_admin_lessons' %}" class="btn btn-outline-success w-100 py-3 rounded-3">
-                                <i class="bi bi-book fs-4 d-block mb-2"></i>
-                                Manage Lessons
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="{% url 'custom_admin_students' %}" class="btn btn-outline-info w-100 py-3 rounded-3">
-                                <i class="bi bi-people fs-4 d-block mb-2"></i>
-                                View Students
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="#" class="btn btn-outline-warning w-100 py-3 rounded-3">
-                                <i class="bi bi-bar-chart fs-4 d-block mb-2"></i>
-                                View Reports
-                            </a>
+                        <div class="col-lg-4">
+                            <!-- Progress Stats -->
+                            <div class="h-100 d-flex flex-column justify-content-center">
+                                <div class="text-center mb-3">
+                                    <h4 class="text-primary mb-1">{{ weekly_average|floatformat:0 }}%</h4>
+                                    <small class="text-muted">Weekly Average</small>
+                                </div>
+                                <div class="progress mb-3" style="height: 12px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ weekly_average }}%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                    <span>Best Day: {{ best_day.day }} ({{ best_day.percentage|floatformat:0 }}%)</span>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                    <span>Total Students: {{ students|length }}</span>
+                                </div>
+                                <div class="badge bg-{% if weekly_average > 70 %}success{% elif weekly_average > 50 %}warning{% else %}danger{% endif %} bg-opacity-10 text-{% if weekly_average > 70 %}success{% elif weekly_average > 50 %}warning{% else %}danger{% endif %}">
+                                    <i class="bi bi-{% if weekly_average > 70 %}trending-up{% elif weekly_average > 50 %}dash{% else %}trending-down{% endif %} me-1"></i>
+                                    {% if weekly_average > 70 %}Excellent Progress{% elif weekly_average > 50 %}Good Progress{% else %}Needs Attention{% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -162,77 +193,96 @@
         </div>
     </div>
 
-    <!-- Recent Student Progress -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-transparent border-0 p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 fw-bold">
-                            <i class="bi bi-graph-up text-success me-2"></i>
-                            Student Progress Overview
-                        </h4>
-                        <a href="{% url 'custom_admin_students' %}" class="btn btn-outline-primary">
-                            View All Students
-                        </a>
+    <!-- Quick Actions and Analytics -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #20c997, #198754);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-success w-100 text-start d-flex align-items-center py-3 shadow-sm border border-success border-opacity-25">
+                                <i class="bi bi-plus-circle-fill me-3 fs-5"></i>
+                                <span class="flex-grow-1">Create New Lesson</span>
+                                <i class="bi bi-arrow-right fs-6"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_lessons' %}" class="btn btn-primary w-100 text-start d-flex align-items-center py-3 shadow-sm border border-primary border-opacity-25">
+                                <i class="bi bi-collection-fill me-3 fs-5"></i>
+                                <span class="flex-grow-1">Manage Lessons</span>
+                                <i class="bi bi-arrow-right fs-6"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_students' %}" class="btn btn-info w-100 text-start d-flex align-items-center py-3 shadow-sm border border-info border-opacity-25">
+                                <i class="bi bi-people-fill me-3 fs-5"></i>
+                                <span class="flex-grow-1">View Students</span>
+                                <i class="bi bi-arrow-right fs-6"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body p-4">
-                    {% if students %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Progress</th>
-                                        <th>Completed</th>
-                                        <th>Score</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for student in students|slice:":5" %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px;">
-                                                    {{ student.first_name|first }}{{ student.last_name|first }}
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">{{ student.first_name }} {{ student.last_name }}</div>
-                                                    <small class="text-muted">{{ student.email }}</small>
-                                                </div>
+            </div>
+        </div>
+
+        <!-- Student Progress Analytics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #e83e8c, #6f42c1);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Student Progress Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if progress_summary %}
+                        <div class="progress-overview">
+                            {% for item in progress_summary|slice:":5" %}
+                                <div class="progress-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-{% if item.progress_percentage >= 80 %}success{% elif item.progress_percentage >= 60 %}warning{% else %}danger{% endif %} bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person-fill text-{% if item.progress_percentage >= 80 %}success{% elif item.progress_percentage >= 60 %}warning{% else %}danger{% endif %}"></i>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <div class="progress" style="height: 20px;">
-                                                <div class="progress-bar bg-info" role="progressbar" 
-                                                     style="width: 75%"
-                                                     aria-valuenow="75" 
-                                                     aria-valuemin="0" aria-valuemax="100">
-                                                    75%
-                                                </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1">{{ item.student.get_full_name|default:item.student.username }}</h6>
+                                            <div class="progress mb-1" style="height: 8px;">
+                                                <div class="progress-bar bg-{% if item.progress_percentage >= 80 %}success{% elif item.progress_percentage >= 60 %}warning{% else %}danger{% endif %}" 
+                                                     style="width: {{ item.progress_percentage }}%"></div>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">3</span> / 8
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success rounded-pill">92%</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success rounded-pill">Active</span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                            <small class="text-muted">
+                                                {{ item.completed_lessons }}/{{ item.total_lessons }} lessons • {{ item.progress_percentage|floatformat:0 }}% complete
+                                            </small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-{% if item.avg_score >= 80 %}success{% elif item.avg_score >= 60 %}warning{% else %}danger{% endif %} rounded-pill">
+                                                {{ item.avg_score|floatformat:0 }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'custom_admin_students' %}" class="btn btn-sm btn-outline-primary">
+                                View All Students
+                            </a>
                         </div>
                     {% else %}
-                        <div class="text-center py-5">
-                            <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mt-3">No student progress data available</h5>
-                            <p class="text-muted">Students will appear here as they start completing lessons.</p>
+                        <div class="text-center py-4">
+                            <i class="bi bi-people text-muted fs-1"></i>
+                            <p class="text-muted mt-2">No student data available</p>
+                            <a href="{% url 'custom_admin_students' %}" class="btn btn-sm btn-primary">
+                                Manage Students
+                            </a>
                         </div>
                     {% endif %}
                 </div>
@@ -240,59 +290,96 @@
         </div>
     </div>
 
-    <!-- Recent Lessons -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-transparent border-0 p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 fw-bold">
-                            <i class="bi bi-book text-primary me-2"></i>
-                            Your Recent Lessons
-                        </h4>
-                        <a href="{% url 'custom_admin_lessons' %}" class="btn btn-outline-primary">
-                            Manage All Lessons
-                        </a>
-                    </div>
+    <!-- Recent Quiz Activity & Lessons -->
+    <div class="row">
+        <!-- Recent Quiz Activity -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #fd7e14, #dc3545);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-activity me-2"></i>
+                        Recent Quiz Activity
+                    </h5>
                 </div>
-                <div class="card-body p-4">
-                    {% if lessons %}
-                        <div class="row">
-                            {% for lesson in lessons|slice:":4" %}
-                            <div class="col-lg-6 mb-3">
-                                <div class="card border h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-start">
-                                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
-                                                <i class="bi bi-book-half text-primary"></i>
+                <div class="card-body">
+                    {% if recent_attempts %}
+                        <div class="quiz-activity">
+                            {% for attempt in recent_attempts|slice:":5" %}
+                                <div class="activity-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-{% if attempt.score >= 80 %}success{% elif attempt.score >= 60 %}warning{% else %}danger{% endif %} bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-{% if attempt.score >= 80 %}check-circle{% elif attempt.score >= 60 %}exclamation-circle{% else %}x-circle{% endif %}-fill text-{% if attempt.score >= 80 %}success{% elif attempt.score >= 60 %}warning{% else %}danger{% endif %}"></i>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <h6 class="card-title mb-1">{{ lesson.title }}</h6>
-                                                <p class="card-text text-muted small mb-2">{{ lesson.description|truncatewords:10 }}</p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <small class="text-muted">
-                                                        <i class="bi bi-calendar me-1"></i>
-                                                        {{ lesson.created_at|date:"M d" }}
-                                                    </small>
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary">
-                                                        {{ lesson.lesson_type|title }}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1">{{ attempt.student.get_full_name|default:attempt.student.username }}</h6>
+                                            <p class="mb-1 text-muted small">{{ attempt.quiz.lesson.title }}</p>
+                                            <small class="text-muted">
+                                                Score: {{ attempt.score }}% • {{ attempt.attempted_at|timesince }} ago
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="text-center py-5">
-                            <i class="bi bi-book text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mt-3">No lessons created yet</h5>
-                            <p class="text-muted">Start creating educational content for your students.</p>
-                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>
-                                Create Your First Lesson
+                        <div class="text-center py-4">
+                            <i class="bi bi-clipboard-data text-muted fs-1"></i>
+                            <p class="text-muted mt-2">No recent quiz activity</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Lessons -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #0d6efd, #6610f2);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-book me-2"></i>
+                        Your Recent Lessons
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if lessons %}
+                        <div class="lessons-list">
+                            {% for lesson in lessons|slice:":5" %}
+                                <div class="lesson-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-book-fill text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1">{{ lesson.title }}</h6>
+                                            <p class="mb-1 text-muted small">{{ lesson.description|truncatewords:8 }}</p>
+                                            <small class="text-muted">
+                                                Created {{ lesson.created_at|timesince }} ago
+                                            </small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                                                {{ lesson.lesson_type|title }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'custom_admin_lessons' %}" class="btn btn-sm btn-outline-primary">
+                                Manage All Lessons
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-book text-muted fs-1"></i>
+                            <p class="text-muted mt-2">No lessons created yet</p>
+                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-sm btn-primary">
+                                Create First Lesson
                             </a>
                         </div>
                     {% endif %}
@@ -303,34 +390,30 @@
 </div>
 
 <style>
-    .dashboard-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
-    }
-    
-    .avatar-circle {
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-    
-    .progress-bar {
-        transition: width 0.6s ease;
-    }
+.activity-item:not(:last-child)::after,
+.lesson-item:not(:last-child)::after,
+.progress-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    width: 2px;
+    height: 20px;
+    background: #dee2e6;
+}
 
-    .btn-outline-primary:hover,
-    .btn-outline-success:hover,
-    .btn-outline-info:hover,
-    .btn-outline-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease;
+}
 </style>
 {% endblock %}

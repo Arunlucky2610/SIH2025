@@ -1,0 +1,458 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}{{ student.get_full_name|default:student.username }} - Student Details{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/enhanced-ui.css' %}" rel="stylesheet">
+<style>
+    .student-detail-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .detail-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 2rem;
+        padding: 2rem;
+        color: white;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .progress-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin: 0 auto 1rem;
+    }
+    
+    .activity-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-left: 4px solid #007bff;
+    }
+    
+    .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .lesson-type-card {
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="student-detail-container">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="detail-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="{% url 'custom_admin_students' %}" class="back-btn me-3">
+                            <i class="bi bi-arrow-left"></i>
+                            Back to Students
+                        </a>
+                        <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#messageModal">
+                            <i class="bi bi-chat-dots me-2"></i>
+                            Send Message
+                        </button>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-2">
+                        <i class="bi bi-person-circle me-3"></i>
+                        {{ student.get_full_name|default:student.username }}
+                    </h1>
+                    <p class="lead mb-0">
+                        Comprehensive learning progress and activity overview
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="progress-circle" style="background: linear-gradient(45deg, #11998e, #38ef7d);">
+                        {{ progress_percentage|floatformat:0 }}%
+                    </div>
+                    <p class="mb-0">Overall Progress</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-book-fill text-primary fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">{{ completed_count }}/{{ total_count }}</h3>
+                    <p class="text-muted mb-1">Lessons Completed</p>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card text-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-circle-fill text-success fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">{{ quiz_accuracy|floatformat:0 }}%</h3>
+                    <p class="text-muted mb-1">Quiz Accuracy</p>
+                    <small class="text-muted">{{ total_quiz_attempts }} attempts</small>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card text-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-fire text-warning fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-warning">{{ learning_streak }}</h3>
+                    <p class="text-muted mb-1">Learning Streak</p>
+                    <small class="text-muted">consecutive days</small>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card text-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-clock-fill text-info fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-info">{{ total_time_spent.total_seconds|floatformat:0|default:"0" }}</h3>
+                    <p class="text-muted mb-1">Minutes Studied</p>
+                    <small class="text-muted">total time</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Information and Progress Details -->
+        <div class="row">
+            <!-- Student Info -->
+            <div class="col-lg-4 mb-4">
+                <div class="stat-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-person-lines-fill me-2"></i>
+                        Student Information
+                    </h5>
+                    <div class="mb-2">
+                        <strong>Name:</strong> {{ student.get_full_name|default:student.username }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Username:</strong> {{ student.username }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Email:</strong> {{ student.email|default:"Not provided" }}
+                    </div>
+                    {% if student_profile.grade %}
+                    <div class="mb-2">
+                        <strong>Grade:</strong> {{ student_profile.get_grade_display }}
+                    </div>
+                    {% endif %}
+                    {% if student_profile.school_name %}
+                    <div class="mb-2">
+                        <strong>School:</strong> {{ student_profile.school_name }}
+                    </div>
+                    {% endif %}
+                    <div class="mb-2">
+                        <strong>Joined:</strong> {{ student.date_joined|date:"M d, Y" }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Last Login:</strong> 
+                        {% if student.last_login %}
+                            {{ student.last_login|timesince }} ago
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Lesson Types Progress -->
+                <div class="stat-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Progress by Type
+                    </h5>
+                    {% for type_name, data in lesson_types.items %}
+                    <div class="lesson-type-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">{{ type_name }}</span>
+                            <span>{{ data.completed }}/{{ data.total }}</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar bg-white" style="width: {% widthratio data.completed data.total 100 %}%"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No lesson data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="col-lg-8 mb-4">
+                <div class="stat-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-activity me-2"></i>
+                        Recent Learning Activity
+                    </h5>
+                    
+                    <!-- Recent Lessons -->
+                    <h6 class="text-primary mb-3">Recent Lessons</h6>
+                    {% for progress in recent_progress %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ progress.lesson.title }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    Started {{ progress.started_at|timesince }} ago
+                                    {% if progress.completed %}
+                                        • Completed {{ progress.completed_at|timesince }} ago
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div>
+                                {% if progress.completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% if progress.score %}
+                                        <span class="badge bg-primary">{{ progress.score }}%</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-warning">In Progress</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No recent lesson activity</p>
+                    {% endfor %}
+
+                    <!-- Recent Quizzes -->
+                    <h6 class="text-success mb-3 mt-4">Recent Quiz Attempts</h6>
+                    {% for attempt in recent_quizzes %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ attempt.quiz.lesson.title }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    Question: {{ attempt.quiz.question|truncatewords:10 }}
+                                    <br>
+                                    Attempted {{ attempt.attempted_at|timesince }} ago
+                                </small>
+                            </div>
+                            <div>
+                                {% if attempt.is_correct %}
+                                    <span class="badge bg-success">Correct</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Incorrect</span>
+                                {% endif %}
+                                <small class="text-muted">Answer: {{ attempt.selected_answer }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No recent quiz attempts</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="messageModalLabel">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    Send Message to {{ student.get_full_name|default:student.username }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="studentId" value="{{ student.id }}">
+                    
+                    <div class="mb-3">
+                        <label for="messageSubject" class="form-label">
+                            <i class="bi bi-tag me-1"></i>Subject
+                        </label>
+                        <input type="text" class="form-control" id="messageSubject" placeholder="Enter message subject..." required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="messageType" class="form-label">
+                            <i class="bi bi-list me-1"></i>Message Type
+                        </label>
+                        <select class="form-select" id="messageType" required>
+                            <option value="">Select message type...</option>
+                            <option value="progress">Progress Update</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="reminder">Reminder</option>
+                            <option value="encouragement">Encouragement</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="messageContent" class="form-label">
+                            <i class="bi bi-chat-text me-1"></i>Message Content
+                        </label>
+                        <textarea class="form-control" id="messageContent" rows="5" placeholder="Write your message here..." required></textarea>
+                        <div class="form-text">Share progress updates, feedback, or encouragement with the student.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyParent">
+                            <label class="form-check-label" for="notifyParent">
+                                <i class="bi bi-bell me-1"></i>Also notify parent/guardian
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="sendMessage()">
+                    <i class="bi bi-send me-1"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-open message modal if URL contains #message
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#message') {
+        const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        messageModal.show();
+    }
+});
+
+function sendMessage() {
+    const studentId = document.getElementById('studentId').value;
+    const subject = document.getElementById('messageSubject').value;
+    const messageType = document.getElementById('messageType').value;
+    const content = document.getElementById('messageContent').value;
+    const notifyParent = document.getElementById('notifyParent').checked;
+    
+    if (!subject || !messageType || !content) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Send message via AJAX
+    fetch('/send-message/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            student_id: studentId,
+            subject: subject,
+            message_type: messageType,
+            content: content,
+            notify_parent: notifyParent
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const modalElement = document.getElementById('messageModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('messageForm').reset();
+            
+            // Show success notification
+            showNotification('Message sent successfully!', 'success');
+        } else {
+            showNotification('Error sending message: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error sending message. Please try again.', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>
+
+{% endblock %}
