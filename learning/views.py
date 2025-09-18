@@ -14,7 +14,7 @@ import json
 import os
 import bcrypt
 
-from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher
+from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher, QuizContainer, QuizContainerAttempt, QuizContainerAttempt
 from .analytics import (
     get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
     get_current_streak, update_all_analytics_for_student
@@ -34,7 +34,7 @@ def home(request):
             if profile.role == 'student':
                 return redirect('student_dashboard')
             elif profile.role == 'teacher':
-                return redirect('teacher_dashboard')
+                return redirect('teacher_home')
             elif profile.role == 'parent':
                 return redirect('parent_dashboard')
         except UserProfile.DoesNotExist:
@@ -352,6 +352,20 @@ def student_dashboard(request):
         student=request.user
     ).order_by('-downloaded_at')[:5]
     
+    # Get available quizzes
+    available_quizzes = QuizContainer.objects.filter(
+        is_active=True
+    ).order_by('-created_at')[:10]
+    
+    # Get quiz attempts for this student
+    quiz_attempts = QuizContainerAttempt.objects.filter(
+        student=request.user
+    ).select_related('quiz_container')
+    
+    # Add attempt info to each quiz
+    for quiz in available_quizzes:
+        quiz.user_attempt = quiz_attempts.filter(quiz_container=quiz).first()
+    
     context = {
         'lessons': lessons,
         'progress_dict': progress_dict,
@@ -359,10 +373,61 @@ def student_dashboard(request):
         'completed_lessons': completed_lessons,
         'progress_percentage': progress_percentage,
         'recent_downloads': recent_downloads,
-        'profile': profile,
+        'available_quizzes': available_quizzes,
+        'quiz_attempts': quiz_attempts,
+        'user_profile': profile,  # Template expects 'user_profile' not 'profile'
     }
     
     return render(request, 'learning/student_dashboard.html', context)
+
+@login_required
+def teacher_home(request):
+    """Teacher home page - overview and quick actions"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'teacher' and not request.user.is_staff:
+        messages.error(request, 'Access denied')
+        return redirect('home')
+    
+    # Basic stats for teacher home
+    total_students = User.objects.filter(userprofile__role='student').count()
+    my_lessons = Lesson.objects.filter(created_by=request.user).count()
+    
+    # Recent activity - last 5 quiz attempts
+    recent_quiz_attempts = QuizAttempt.objects.select_related(
+        'student', 'quiz__lesson'
+    ).order_by('-attempted_at')[:5]
+    
+    # Today's completed lessons
+    today = timezone.now().date()
+    today_completions = ModuleProgress.objects.filter(
+        completed=True,
+        completed_at__date=today
+    ).select_related('student', 'lesson').count()
+    
+    # Quick actions data
+    pending_quizzes = Quiz.objects.filter(lesson__created_by=request.user).count()
+    
+    # Recent quizzes created by teacher
+    try:
+        from .models import QuizContainer
+        recent_quizzes = QuizContainer.objects.filter(created_by=request.user).order_by('-created_at')[:5]
+        # Force query evaluation to avoid any caching issues
+        recent_quizzes = list(recent_quizzes)
+    except:
+        recent_quizzes = []  # In case QuizContainer model doesn't exist yet
+    
+    context = {
+        'profile': profile,
+        'total_students': total_students,
+        'my_lessons': my_lessons,
+        'recent_quiz_attempts': recent_quiz_attempts,
+        'today_completions': today_completions,
+        'pending_quizzes': pending_quizzes,
+        'recent_quizzes': recent_quizzes,
+        'today': today,
+    }
+    
+    return render(request, 'learning/teacher_home.html', context)
 
 @login_required
 def teacher_dashboard(request):
@@ -384,7 +449,16 @@ def teacher_dashboard(request):
         total_progress = ModuleProgress.objects.filter(student=student)
         completed_count = total_progress.filter(completed=True).count()
         total_count = total_progress.count()
-        avg_score = total_progress.filter(score__isnull=False).aggregate(Avg('score'))['score__avg'] or 0
+        
+        # Calculate average score from quiz attempts
+        quiz_attempts = QuizAttempt.objects.filter(student=student)
+        if quiz_attempts.exists():
+            correct_attempts = quiz_attempts.filter(is_correct=True).count()
+            total_attempts = quiz_attempts.count()
+            avg_score = (correct_attempts / total_attempts) * 100 if total_attempts > 0 else 0
+        else:
+            # Fallback to ModuleProgress scores
+            avg_score = total_progress.filter(score__isnull=False).aggregate(Avg('score'))['score__avg'] or 0
         
         progress_summary.append({
             'student': student,
@@ -397,6 +471,55 @@ def teacher_dashboard(request):
     # Recent quiz attempts
     recent_attempts = QuizAttempt.objects.select_related('student', 'quiz__lesson').order_by('-attempted_at')[:10]
     
+    # Weekly progress data for chart
+    today = timezone.now().date()
+    weekly_data = []
+    weekly_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    
+    for i in range(7):
+        day_date = today - timedelta(days=today.weekday()) + timedelta(days=i)
+        
+        # Get quiz attempts for this day and calculate percentage of correct answers
+        day_attempts = QuizAttempt.objects.filter(attempted_at__date=day_date)
+        if day_attempts.exists():
+            correct_count = day_attempts.filter(is_correct=True).count()
+            total_attempts = day_attempts.count()
+            quiz_percentage = (correct_count / total_attempts) * 100 if total_attempts > 0 else 0
+        else:
+            quiz_percentage = 0
+        
+        # Get module progress for this day
+        day_progress = ModuleProgress.objects.filter(
+            completed_at__date=day_date,
+            completed=True
+        ).count()
+        
+        # Calculate daily progress percentage based on completed modules
+        total_students = students.count()
+        progress_percentage = (day_progress / max(1, total_students)) * 100 if total_students > 0 else 0
+        
+        # Use average of quiz performance and progress completion
+        if quiz_percentage > 0 and progress_percentage > 0:
+            daily_percentage = (quiz_percentage + progress_percentage) / 2
+        elif quiz_percentage > 0:
+            daily_percentage = quiz_percentage
+        elif progress_percentage > 0:
+            daily_percentage = progress_percentage
+        else:
+            daily_percentage = 0
+        
+        weekly_data.append({
+            'day': weekly_labels[i],
+            'percentage': round(min(100, daily_percentage), 1),
+            'date': day_date
+        })
+    
+    # Calculate weekly average
+    weekly_average = sum(day['percentage'] for day in weekly_data) / 7 if weekly_data else 0
+    
+    # Find best day
+    best_day = max(weekly_data, key=lambda x: x['percentage']) if weekly_data else {'day': 'N/A', 'percentage': 0}
+    
     context = {
         'students': students,
         'lessons': lessons,
@@ -404,6 +527,9 @@ def teacher_dashboard(request):
         'recent_attempts': recent_attempts,
         'profile': profile,
         'today': timezone.now().date(),
+        'weekly_data': weekly_data,
+        'weekly_average': round(weekly_average, 1),
+        'best_day': best_day,
     }
     
     return render(request, 'learning/teacher_dashboard.html', context)
@@ -812,10 +938,58 @@ def download_lesson(request, lesson_id):
         }
     )
     
-    # Serve file
+    # Serve file for download
     response = HttpResponse(lesson.file.read(), content_type='application/octet-stream')
     response['Content-Disposition'] = f'attachment; filename="{lesson.file.name}"'
     return response
+
+@login_required
+def view_lesson_file(request, lesson_id):
+    """View lesson file online in browser"""
+    lesson = get_object_or_404(Lesson, id=lesson_id, is_active=True)
+    
+    if not lesson.file:
+        messages.error(request, 'No file available for viewing')
+        return redirect('lesson_detail', lesson_id=lesson_id)
+    
+    # Get file extension to determine content type
+    import os
+    file_name = lesson.file.name
+    file_extension = os.path.splitext(file_name)[1].lower()
+    
+    # Define content types for different file types
+    content_types = {
+        '.pdf': 'application/pdf',
+        '.txt': 'text/plain',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.ppt': 'application/vnd.ms-powerpoint',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+    }
+    
+    content_type = content_types.get(file_extension, 'application/octet-stream')
+    
+    # For PDFs and images, display inline. For others, try to display or fallback to download
+    if file_extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.svg']:
+        disposition = 'inline'
+    else:
+        disposition = 'attachment'
+    
+    # Serve file for viewing
+    try:
+        response = HttpResponse(lesson.file.read(), content_type=content_type)
+        response['Content-Disposition'] = f'{disposition}; filename="{os.path.basename(file_name)}"'
+        return response
+    except Exception as e:
+        messages.error(request, f'Error viewing file: {str(e)}')
+        return redirect('lesson_detail', lesson_id=lesson_id)
 
 @login_required
 @csrf_exempt
@@ -979,6 +1153,101 @@ def admin_stats(request):
     }
     
     return JsonResponse(stats)
+
+@login_required
+def teacher_reports(request):
+    """Teacher reports and analytics dashboard"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    
+    if profile.role != 'teacher' and not request.user.is_staff:
+        messages.error(request, 'Access denied. Only teachers can view reports.')
+        return redirect('home')
+    
+    today = timezone.now().date()
+    
+    # Get students data
+    students = User.objects.filter(userprofile__role='student').select_related('userprofile')
+    
+    # Get lessons created by this teacher
+    teacher_lessons = Lesson.objects.filter(created_by=request.user)
+    
+    # Overall statistics
+    stats = {
+        'total_students': students.count(),
+        'active_students': students.filter(is_active=True).count(),
+        'total_lessons': teacher_lessons.count(),
+        'total_progress_records': ModuleProgress.objects.count(),
+        'completed_lessons_total': ModuleProgress.objects.filter(completed=True).count(),
+        'total_quiz_attempts': QuizAttempt.objects.count(),
+        'correct_quiz_attempts': QuizAttempt.objects.filter(is_correct=True).count(),
+    }
+    
+    # Calculate completion rate
+    if stats['total_progress_records'] > 0:
+        stats['completion_rate'] = (stats['completed_lessons_total'] / stats['total_progress_records']) * 100
+    else:
+        stats['completion_rate'] = 0
+    
+    # Calculate quiz accuracy
+    if stats['total_quiz_attempts'] > 0:
+        stats['quiz_accuracy'] = (stats['correct_quiz_attempts'] / stats['total_quiz_attempts']) * 100
+    else:
+        stats['quiz_accuracy'] = 0
+    
+    # Recent activity (last 7 days)
+    week_ago = today - timedelta(days=7)
+    recent_progress = ModuleProgress.objects.filter(
+        started_at__date__gte=week_ago
+    ).order_by('-started_at')[:20]
+    
+    recent_quiz_attempts = QuizAttempt.objects.filter(
+        attempted_at__date__gte=week_ago
+    ).select_related('student', 'quiz__lesson').order_by('-attempted_at')[:20]
+    
+    # Student performance data
+    student_performance = []
+    for student in students[:10]:  # Top 10 students for performance view
+        progress_records = ModuleProgress.objects.filter(student=student)
+        completed = progress_records.filter(completed=True).count()
+        total = progress_records.count()
+        
+        quiz_attempts = QuizAttempt.objects.filter(student=student)
+        correct_quizzes = quiz_attempts.filter(is_correct=True).count()
+        total_quizzes = quiz_attempts.count()
+        
+        student_performance.append({
+            'student': student,
+            'completed_lessons': completed,
+            'total_lessons': total,
+            'completion_rate': (completed / total * 100) if total > 0 else 0,
+            'quiz_accuracy': (correct_quizzes / total_quizzes * 100) if total_quizzes > 0 else 0,
+            'total_quiz_attempts': total_quizzes,
+        })
+    
+    # Lesson popularity data
+    lesson_stats = []
+    for lesson in teacher_lessons:
+        progress_count = ModuleProgress.objects.filter(lesson=lesson).count()
+        completed_count = ModuleProgress.objects.filter(lesson=lesson, completed=True).count()
+        
+        lesson_stats.append({
+            'lesson': lesson,
+            'total_enrollments': progress_count,
+            'completions': completed_count,
+            'completion_rate': (completed_count / progress_count * 100) if progress_count > 0 else 0,
+        })
+    
+    context = {
+        'profile': profile,
+        'stats': stats,
+        'recent_progress': recent_progress,
+        'recent_quiz_attempts': recent_quiz_attempts,
+        'student_performance': student_performance,
+        'lesson_stats': lesson_stats,
+        'teacher_lessons': teacher_lessons,
+    }
+    
+    return render(request, 'learning/teacher_reports.html', context)
 
 # Custom Admin Interface for Parents and Teachers
 @login_required
@@ -1185,6 +1454,92 @@ def custom_admin_students(request):
     return render(request, 'learning/custom_admin_students.html', context)
 
 @login_required
+def student_detail_view(request, student_id):
+    """Detailed view of a specific student's progress and activities"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    
+    if profile.role not in ['parent', 'teacher']:
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    # Get the student
+    student = get_object_or_404(User, id=student_id, userprofile__role='student')
+    student_profile = student.userprofile
+    
+    # Check permission - parents can only view their children
+    if profile.role == 'parent' and student_profile.parent != profile:
+        messages.error(request, 'You can only view your own children.')
+        return redirect('custom_admin_students')
+    
+    # Get student progress data
+    progress_records = ModuleProgress.objects.filter(student=student).select_related('lesson')
+    completed_count = progress_records.filter(completed=True).count()
+    total_count = progress_records.count()
+    progress_percentage = (completed_count / total_count * 100) if total_count > 0 else 0
+    
+    # Get quiz attempts
+    quiz_attempts = QuizAttempt.objects.filter(student=student).select_related('quiz__lesson').order_by('-attempted_at')
+    correct_attempts = quiz_attempts.filter(is_correct=True).count()
+    total_quiz_attempts = quiz_attempts.count()
+    quiz_accuracy = (correct_attempts / total_quiz_attempts * 100) if total_quiz_attempts > 0 else 0
+    
+    # Get recent activity (last 10 items)
+    recent_progress = progress_records.order_by('-started_at')[:10]
+    recent_quizzes = quiz_attempts[:10]
+    
+    # Get learning streak and time spent
+    learning_streak = 0
+    total_time_spent = timedelta(0)
+    
+    for progress in progress_records:
+        if progress.time_spent:
+            total_time_spent += progress.time_spent
+    
+    # Calculate learning streak (consecutive days with activity)
+    if progress_records.exists():
+        last_activity = progress_records.order_by('-started_at').first().started_at.date()
+        current_date = timezone.now().date()
+        
+        # Simple streak calculation - count days back from today
+        streak_date = current_date
+        while streak_date >= last_activity:
+            day_activity = progress_records.filter(started_at__date=streak_date).exists()
+            if day_activity:
+                learning_streak += 1
+                streak_date -= timedelta(days=1)
+            else:
+                break
+    
+    # Get lessons breakdown by type
+    lesson_types = {}
+    for progress in progress_records:
+        lesson_type = progress.lesson.get_lesson_type_display()
+        if lesson_type not in lesson_types:
+            lesson_types[lesson_type] = {'total': 0, 'completed': 0}
+        lesson_types[lesson_type]['total'] += 1
+        if progress.completed:
+            lesson_types[lesson_type]['completed'] += 1
+    
+    context = {
+        'student': student,
+        'student_profile': student_profile,
+        'user_profile': profile,
+        'completed_count': completed_count,
+        'total_count': total_count,
+        'progress_percentage': round(progress_percentage, 1),
+        'quiz_accuracy': round(quiz_accuracy, 1),
+        'total_quiz_attempts': total_quiz_attempts,
+        'learning_streak': learning_streak,
+        'total_time_spent': total_time_spent,
+        'recent_progress': recent_progress,
+        'recent_quizzes': recent_quizzes,
+        'lesson_types': lesson_types,
+        'progress_records': progress_records,
+    }
+    
+    return render(request, 'learning/student_detail.html', context)
+
+@login_required
 def custom_admin_add_lesson(request):
     """Add new lesson for teachers"""
     profile = get_object_or_404(UserProfile, user=request.user)
@@ -1344,3 +1699,566 @@ def teacher_create(request):
         'user_profile': getattr(request.user, 'userprofile', None),
     }
     return render(request, 'learning/teacher_form.html', context)
+
+@login_required
+def send_message(request):
+    """Send a message to a student"""
+    if request.method == 'POST':
+        try:
+            import json
+            from django.http import JsonResponse
+            from .notification_models import Notification
+            
+            # Parse JSON data
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+            subject = data.get('subject')
+            message_type = data.get('message_type')
+            content = data.get('content')
+            notify_parent = data.get('notify_parent', False)
+            
+            # Get the student
+            student = get_object_or_404(User, id=student_id, userprofile__role='student')
+            
+            # Check permission
+            user_profile = get_object_or_404(UserProfile, user=request.user)
+            if user_profile.role not in ['teacher', 'parent']:
+                return JsonResponse({'success': False, 'error': 'Permission denied'})
+            
+            # Create notification for student
+            notification = Notification.objects.create(
+                recipient=student,
+                sender=request.user,
+                title=f"{message_type.title()}: {subject}",
+                message=content,
+                notification_type=message_type,
+                is_read=False
+            )
+            
+            # If notify parent is checked, also send to parent
+            if notify_parent and hasattr(student.userprofile, 'parent') and student.userprofile.parent:
+                parent_user = student.userprofile.parent.user
+                Notification.objects.create(
+                    recipient=parent_user,
+                    sender=request.user,
+                    title=f"Message about {student.get_full_name()}: {subject}",
+                    message=f"Message sent to your child:\n\n{content}",
+                    notification_type=message_type,
+                    is_read=False
+                )
+            
+            return JsonResponse({'success': True, 'message': 'Message sent successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def create_quiz(request):
+    """Create a new quiz"""
+    # Check permission first
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can create quizzes.')
+        return redirect('teacher_dashboard')
+    
+    if request.method == 'POST':
+        try:
+            # Check if it's an AJAX request with JSON data
+            if request.content_type == 'application/json':
+                import json
+                # Parse JSON data for AJAX requests
+                data = json.loads(request.body)
+                title = data.get('title')
+                quiz_type = data.get('quiz_type')
+                description = data.get('description', '')
+                duration = data.get('duration', 30)
+                difficulty = data.get('difficulty', 'medium')
+                randomize_questions = data.get('randomize_questions', False)
+                show_results = data.get('show_results', True)
+                
+                # Create quiz
+                from .models import QuizContainer
+                quiz = QuizContainer.objects.create(
+                    title=title,
+                    description=description,
+                    quiz_type=quiz_type,
+                    duration=duration,
+                    difficulty=difficulty,
+                    randomize_questions=randomize_questions,
+                    show_results=show_results,
+                    created_by=request.user,
+                    is_active=True  # Create as active quiz
+                )
+                
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Quiz created successfully',
+                    'quiz_id': quiz.id
+                })
+            else:
+                # Handle regular form submission
+                title = request.POST.get('quiz_title')
+                quiz_type = request.GET.get('type', 'quick')
+                description = request.POST.get('quiz_description', '')
+                duration = int(request.POST.get('quiz_duration', 30))
+                
+                if not title:
+                    messages.error(request, 'Quiz title is required.')
+                    return redirect('create_quiz')
+                
+                # Create quiz
+                from .models import QuizContainer
+                quiz = QuizContainer.objects.create(
+                    title=title,
+                    description=description,
+                    quiz_type=quiz_type,
+                    duration=duration,
+                    difficulty='medium',
+                    randomize_questions=False,
+                    show_results=True,
+                    created_by=request.user,
+                    is_active=True  # Create as active quiz
+                )
+                
+                messages.success(request, f'Quiz "{title}" created successfully!')
+                return redirect('teacher_home')
+                
+        except Exception as e:
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'error': str(e)})
+            else:
+                messages.error(request, f'Error creating quiz: {str(e)}')
+                return redirect('create_quiz')
+    
+    # Handle GET request - show quiz creation form
+    context = {
+        'quiz_type': request.GET.get('type', 'quick'),  # Default to quick quiz
+        'user_profile': user_profile
+    }
+    return render(request, 'learning/create_quiz.html', context)
+
+@login_required
+def publish_quiz(request, quiz_id):
+    """Publish a quiz to make it available to students"""
+    if request.method == 'POST':
+        try:
+            # Check permission
+            user_profile = get_object_or_404(UserProfile, user=request.user)
+            if user_profile.role != 'teacher':
+                return JsonResponse({'success': False, 'error': 'Only teachers can publish quizzes'})
+            
+            # Get and publish quiz
+            from .models import QuizContainer
+            quiz = get_object_or_404(QuizContainer, id=quiz_id, created_by=request.user)
+            quiz.is_active = True
+            quiz.save()
+            
+            return JsonResponse({'success': True, 'message': 'Quiz published successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+@login_required
+def delete_quiz(request, quiz_id):
+    """Delete a quiz with confirmation page"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"delete_quiz view called - Method: {request.method}, User: {request.user.id}, Quiz ID: {quiz_id}")
+    
+    # Check permission
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can delete quizzes.')
+        return redirect('teacher_home')
+    
+    # Get quiz
+    from .models import QuizContainer
+    quiz = get_object_or_404(QuizContainer, id=quiz_id)
+    
+    # Check if teacher is the creator of this quiz
+    if quiz.created_by != request.user:
+        messages.error(request, 'You can only delete quizzes you created.')
+        return redirect('teacher_home')
+    
+    if request.method == 'GET':
+        # Show confirmation page
+        context = {
+            'quiz': quiz,
+            'user_profile': user_profile,
+        }
+        return render(request, 'learning/delete_quiz_confirm.html', context)
+    
+    elif request.method == 'POST':
+        try:
+            # Double-check that quiz still exists and user has permission
+            if not QuizContainer.objects.filter(id=quiz_id, created_by=request.user).exists():
+                logger.error(f"Quiz {quiz_id} not found or user {request.user.id} lacks permission")
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Quiz not found or you do not have permission to delete it'
+                })
+            
+            logger.info(f"Starting deletion of quiz {quiz_id}")
+            quiz_title = quiz.title
+            
+            logger.info(f"Deleting quiz: {quiz_title}")
+            logger.info(f"Quiz exists before deletion: {QuizContainer.objects.filter(id=quiz_id).exists()}")
+            
+            # Manual cascade delete for better performance and control
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Log what we're deleting
+                from .models import QuizAttempt, QuizContainerAttempt
+                quiz_attempts_count = QuizAttempt.objects.filter(quiz__quiz_container=quiz).count()
+                container_attempts_count = QuizContainerAttempt.objects.filter(quiz_container=quiz).count()
+                questions_count = quiz.quiz_questions.count()
+                
+                logger.info(f"Deleting {quiz_attempts_count} quiz attempts")
+                logger.info(f"Deleting {container_attempts_count} container attempts")
+                logger.info(f"Deleting {questions_count} questions")
+                
+                # Delete the quiz container - Django will handle CASCADE deletion
+                quiz.delete()
+                
+            logger.info(f"Successfully deleted quiz: {quiz_title}")
+            logger.info(f"Quiz exists after deletion: {QuizContainer.objects.filter(id=quiz_id).exists()}")
+            
+            # Return JSON response for AJAX handling
+            from django.http import JsonResponse
+            return JsonResponse({
+                'success': True,
+                'message': 'Quiz deleted successfully',
+                'redirect_url': '/teacher/'
+            })
+            
+        except Exception as e:
+            import traceback
+            logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            from django.http import JsonResponse
+            return JsonResponse({
+                'success': False,
+                'message': f'Error deleting quiz: {str(e)}',
+                'error_type': type(e).__name__
+            })
+
+@login_required
+def delete_lesson(request, lesson_id):
+    """Delete a lesson with confirmation page"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"delete_lesson view called - Method: {request.method}, User: {request.user.id}, Lesson ID: {lesson_id}")
+    
+    # Check permission
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can delete lessons.')
+        return redirect('custom_admin_lessons')
+    
+    # Get lesson
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    
+    # Check if teacher is the creator of this lesson
+    if lesson.created_by != request.user:
+        messages.error(request, 'You can only delete lessons you created.')
+        return redirect('custom_admin_lessons')
+    
+    if request.method == 'GET':
+        # Show confirmation page
+        context = {
+            'lesson': lesson,
+            'user_profile': user_profile,
+        }
+        return render(request, 'learning/delete_lesson_confirm.html', context)
+    
+    elif request.method == 'POST':
+        try:
+            logger.info(f"Starting deletion of lesson {lesson_id}")
+            lesson_title = lesson.title
+            
+            logger.info(f"Deleting lesson: {lesson_title}")
+            
+            # Manual cascade delete for better performance and control
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Delete related records first to avoid cascade overhead
+                lesson.student_progress.all().delete()
+                lesson.quizzes.all().delete() 
+                lesson.downloads.all().delete()
+                
+                # Also delete any LearningActivity records
+                from .models import LearningActivity
+                LearningActivity.objects.filter(lesson=lesson).delete()
+                
+                # Finally delete the lesson itself
+                lesson.delete()
+                
+            logger.info(f"Successfully deleted lesson: {lesson_title}")
+            
+            # Redirect back to manage lessons without success message
+            return redirect('custom_admin_lessons')
+            
+        except Exception as e:
+            logger.error(f"Error deleting lesson {lesson_id}: {str(e)}")
+            messages.error(request, f'Error deleting lesson: {str(e)}')
+            return redirect('custom_admin_lessons')
+    
+    return redirect('custom_admin_lessons')
+
+@login_required
+def edit_quiz(request, quiz_id):
+    """Edit quiz page"""
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can edit quizzes.')
+        return redirect('teacher_home')
+    
+    try:
+        from .models import QuizContainer
+        quiz = get_object_or_404(QuizContainer, id=quiz_id, created_by=request.user)
+        
+        context = {
+            'quiz': quiz,
+            'user_profile': user_profile,
+        }
+        
+        return render(request, 'learning/edit_quiz.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Error loading quiz: {str(e)}')
+        return redirect('teacher_home')
+
+@login_required
+def create_quick_quiz(request):
+    """Create quick quiz page"""
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can create quizzes.')
+        return redirect('teacher_home')
+    
+    if request.method == 'POST':
+        try:
+            # Get quiz details
+            quiz_title = request.POST.get('quiz_title')
+            quiz_description = request.POST.get('quiz_description', '')
+            
+            # Create quiz container
+            from .models import QuizContainer
+            quiz_container = QuizContainer.objects.create(
+                title=quiz_title,
+                description=quiz_description,
+                quiz_type='quick',
+                duration=30,  # Default 30 minutes for quick quiz
+                created_by=request.user,
+                is_active=True  # Quick quizzes are immediately active
+            )
+            
+            # Process questions
+            question_count = 0
+            for key in request.POST.keys():
+                if key.startswith('question_'):
+                    question_num = key.split('_')[1]
+                    question_text = request.POST.get(f'question_{question_num}')
+                    option_a = request.POST.get(f'option_a_{question_num}')
+                    option_b = request.POST.get(f'option_b_{question_num}')
+                    option_c = request.POST.get(f'option_c_{question_num}')
+                    option_d = request.POST.get(f'option_d_{question_num}')
+                    correct_answer = request.POST.get(f'correct_answer_{question_num}')
+                    
+                    if question_text and option_a and option_b and option_c and option_d and correct_answer:
+                        # Create quiz question
+                        Quiz.objects.create(
+                            quiz_container=quiz_container,
+                            question=question_text,
+                            option_a=option_a,
+                            option_b=option_b,
+                            option_c=option_c,
+                            option_d=option_d,
+                            correct_answer=correct_answer,
+                            order=question_count + 1
+                        )
+                        question_count += 1
+            
+            messages.success(request, f'Quick quiz "{quiz_title}" created successfully with {question_count} questions!')
+            return redirect('teacher_home')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating quiz: {str(e)}')
+    
+    context = {
+        'user_profile': user_profile,
+        'quiz_type': 'quick'
+    }
+    return render(request, 'learning/create_quiz.html', context)
+
+@login_required
+def schedule_quiz(request):
+    """Schedule quiz page"""
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can create quizzes.')
+        return redirect('teacher_home')
+    
+    if request.method == 'POST':
+        try:
+            # Get quiz details
+            quiz_title = request.POST.get('quiz_title')
+            quiz_description = request.POST.get('quiz_description', '')
+            quiz_duration = request.POST.get('quiz_duration', 60)
+            schedule_date = request.POST.get('schedule_date')
+            schedule_time = request.POST.get('schedule_time')
+            
+            # Create quiz container
+            from .models import QuizContainer
+            quiz_container = QuizContainer.objects.create(
+                title=quiz_title,
+                description=quiz_description,
+                quiz_type='assignment',
+                duration=int(quiz_duration),
+                created_by=request.user,
+                is_active=False  # Scheduled quizzes start as inactive
+            )
+            
+            # Process questions (same as quick quiz)
+            question_count = 0
+            for key in request.POST.keys():
+                if key.startswith('question_'):
+                    question_num = key.split('_')[1]
+                    question_text = request.POST.get(f'question_{question_num}')
+                    option_a = request.POST.get(f'option_a_{question_num}')
+                    option_b = request.POST.get(f'option_b_{question_num}')
+                    option_c = request.POST.get(f'option_c_{question_num}')
+                    option_d = request.POST.get(f'option_d_{question_num}')
+                    correct_answer = request.POST.get(f'correct_answer_{question_num}')
+                    
+                    if question_text and option_a and option_b and option_c and option_d and correct_answer:
+                        Quiz.objects.create(
+                            quiz_container=quiz_container,
+                            question=question_text,
+                            option_a=option_a,
+                            option_b=option_b,
+                            option_c=option_c,
+                            option_d=option_d,
+                            correct_answer=correct_answer,
+                            order=question_count + 1
+                        )
+                        question_count += 1
+            
+            messages.success(request, f'Quiz "{quiz_title}" scheduled successfully with {question_count} questions!')
+            return redirect('teacher_home')
+            
+        except Exception as e:
+            messages.error(request, f'Error scheduling quiz: {str(e)}')
+    
+    context = {
+        'user_profile': user_profile,
+        'quiz_type': 'schedule'
+    }
+    return render(request, 'learning/create_quiz.html', context)
+
+@login_required
+def take_quiz(request, quiz_id):
+    """Take a quiz"""
+    quiz_container = get_object_or_404(QuizContainer, id=quiz_id, is_active=True)
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    
+    if user_profile.role != 'student':
+        messages.error(request, 'Only students can take quizzes.')
+        return redirect('home')
+    
+    # Check if student has already completed this quiz
+    existing_attempt = QuizContainerAttempt.objects.filter(
+        student=request.user,
+        quiz_container=quiz_container,
+        is_completed=True
+    ).first()
+    
+    if existing_attempt:
+        messages.info(request, f'You have already completed this quiz with a score of {existing_attempt.percentage}%')
+        return redirect('student_dashboard')
+    
+    # Get all questions for this quiz
+    questions = Quiz.objects.filter(quiz_container=quiz_container).order_by('order')
+    
+    if not questions.exists():
+        messages.error(request, 'This quiz has no questions.')
+        return redirect('student_dashboard')
+    
+    if request.method == 'POST':
+        # Process quiz submission
+        score = 0
+        total_questions = questions.count()
+        
+        # Create or get quiz container attempt
+        container_attempt, created = QuizContainerAttempt.objects.get_or_create(
+            student=request.user,
+            quiz_container=quiz_container,
+            defaults={
+                'total_questions': total_questions,
+                'started_at': timezone.now()
+            }
+        )
+        
+        # Process each question
+        for question in questions:
+            selected_answer = request.POST.get(f'question_{question.id}')
+            if selected_answer:
+                is_correct = selected_answer == question.correct_answer
+                if is_correct:
+                    score += 1
+                
+                # Save individual question attempt
+                QuizAttempt.objects.update_or_create(
+                    student=request.user,
+                    quiz=question,
+                    defaults={
+                        'selected_answer': selected_answer,
+                        'is_correct': is_correct,
+                        'attempted_at': timezone.now()
+                    }
+                )
+        
+        # Update container attempt
+        percentage = (score / total_questions * 100) if total_questions > 0 else 0
+        container_attempt.score = score
+        container_attempt.percentage = percentage
+        container_attempt.completed_at = timezone.now()
+        container_attempt.is_completed = True
+        container_attempt.save()
+        
+        messages.success(request, f'Quiz completed! You scored {score}/{total_questions} ({percentage:.1f}%)')
+        return redirect('quiz_result', attempt_id=container_attempt.id)
+    
+    context = {
+        'quiz_container': quiz_container,
+        'questions': questions,
+        'user_profile': user_profile,
+    }
+    return render(request, 'learning/take_quiz.html', context)
+
+@login_required 
+def quiz_result(request, attempt_id):
+    """Show quiz results"""
+    attempt = get_object_or_404(QuizContainerAttempt, id=attempt_id, student=request.user)
+    
+    # Get detailed question results
+    question_attempts = QuizAttempt.objects.filter(
+        student=request.user,
+        quiz__quiz_container=attempt.quiz_container
+    ).select_related('quiz')
+    
+    context = {
+        'attempt': attempt,
+        'question_attempts': question_attempts,
+    }
+    return render(request, 'learning/quiz_result.html', context)

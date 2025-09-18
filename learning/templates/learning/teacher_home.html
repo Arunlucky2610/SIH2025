@@ -1,0 +1,590 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}Teacher Home - Rural Digital Learning{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
+                <div class="row align-items-center position-relative">
+                    <div class="col-lg-8">
+                        <div class="text-white">
+                            <h1 class="display-4 fw-bold mb-3">
+                                <i class="bi bi-house-heart-fill me-3"></i>
+                                Welcome, {{ request.user.first_name|default:"Teacher" }}!
+                            </h1>
+                            <p class="lead mb-4 opacity-90">
+                                Your teaching journey starts here. Quick overview of your impact on rural education.
+                            </p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="{% url 'teacher_dashboard' %}" class="btn btn-light btn-lg">
+                                    <i class="bi bi-speedometer2 me-2"></i>
+                                    Go to Full Dashboard
+                                </a>
+                                <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-light btn-lg">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Create New Lesson
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-end">
+                        <div class="position-relative">
+                            <i class="bi bi-person-hearts text-white opacity-25" style="font-size: 8rem;"></i>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <div class="bg-white rounded-circle p-3 shadow-lg">
+                                    <i class="bi bi-emoji-smile-fill text-primary fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-people-fill text-primary fs-2"></i>
+                    </div>
+                    <h3 class="card-title fs-2 fw-bold text-primary">{{ total_students }}</h3>
+                    <p class="card-text text-muted">Total Students</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-book-fill text-success fs-2"></i>
+                    </div>
+                    <h3 class="card-title fs-2 fw-bold text-success">{{ my_lessons }}</h3>
+                    <p class="card-text text-muted">My Lessons</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-trophy-fill text-warning fs-2"></i>
+                    </div>
+                    <h3 class="card-title fs-2 fw-bold text-warning">{{ today_completions }}</h3>
+                    <p class="card-text text-muted">Today's Completions</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-question-circle-fill text-info fs-2"></i>
+                    </div>
+                    <h3 class="card-title fs-2 fw-bold text-info">{{ pending_quizzes }}</h3>
+                    <p class="card-text text-muted">Total Quizzes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions and Recent Activity -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #20c997, #198754);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn w-100 text-start shadow-lg border-0 text-white fw-bold py-3" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+                                <i class="bi bi-plus-circle-fill me-3 fs-5"></i>
+                                Create New Lesson
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% url 'teacher_dashboard' %}" class="btn w-100 text-start shadow-lg border-0 text-white fw-bold py-3" style="background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0, 123, 255, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+                                <i class="bi bi-speedometer2 me-3 fs-5"></i>
+                                View Full Dashboard
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_students' %}" class="btn w-100 text-start shadow-lg border-0 text-white fw-bold py-3" style="background: linear-gradient(135deg, #17a2b8 0%, #e83e8c 100%); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(23, 162, 184, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+                                <i class="bi bi-people-fill me-3 fs-5"></i>
+                                Manage Students
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% url 'custom_admin_lessons' %}" class="btn w-100 text-start shadow-lg border-0 text-white fw-bold py-3" style="background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(253, 126, 20, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+                                <i class="bi bi-collection-fill me-3 fs-5"></i>
+                                Manage Lessons
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Quiz Activity -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #e83e8c, #6f42c1);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-activity me-2"></i>
+                        Recent Quiz Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_quiz_attempts %}
+                        <div class="timeline">
+                            {% for attempt in recent_quiz_attempts %}
+                                <div class="timeline-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-{% if attempt.score >= 80 %}success{% elif attempt.score >= 60 %}warning{% else %}danger{% endif %} bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-{% if attempt.score >= 80 %}check-circle{% elif attempt.score >= 60 %}exclamation-circle{% else %}x-circle{% endif %}-fill text-{% if attempt.score >= 80 %}success{% elif attempt.score >= 60 %}warning{% else %}danger{% endif %}"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1">{{ attempt.student.get_full_name|default:attempt.student.username }}</h6>
+                                            <p class="mb-1 text-muted small">{{ attempt.quiz.lesson.title }}</p>
+                                            <small class="text-muted">
+                                                Score: {{ attempt.score }}% • {{ attempt.attempted_at|timesince }} ago
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'teacher_dashboard' %}" class="btn btn-sm btn-outline-primary">
+                                View All Activity
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="bi bi-lightbulb text-warning fs-1"></i>
+                            </div>
+                            <h6 class="text-dark mb-2">Ready to Engage Your Students?</h6>
+                            <p class="text-muted mb-3 small">Create interactive quizzes and lessons to make learning exciting!</p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a href="{% url 'create_quiz' %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-circle me-1"></i>Create Quiz
+                                </a>
+                                <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-book me-1"></i>Add Lesson
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Management Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #17a2b8, #28a745);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-question-circle-fill me-2"></i>
+                            Quiz Management
+                        </h5>
+                        <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+                            <i class="bi bi-plus-circle me-1"></i>Add New Quiz
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Quick Quiz -->
+                        <div class="col-lg-6 mb-3">
+                            <div class="text-center p-4 rounded-3" style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5);">
+                                <i class="bi bi-lightning-fill text-primary fs-1 mb-3"></i>
+                                <h5 class="fw-bold">Create Quick Quiz</h5>
+                                <p class="text-muted mb-3">Create an instant quiz for immediate student assessment</p>
+                                <a href="/create-quick-quiz/" class="btn btn-primary">
+                                    <i class="bi bi-lightning-fill me-2"></i>Create Quick Quiz
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Schedule Quiz -->
+                        <div class="col-lg-6 mb-3">
+                            <div class="text-center p-4 rounded-3" style="background: linear-gradient(135deg, #fff3e0, #fce4ec);">
+                                <i class="bi bi-calendar-check text-warning fs-1 mb-3"></i>
+                                <h5 class="fw-bold">Schedule Quiz</h5>
+                                <p class="text-muted mb-3">Schedule a quiz assignment with specific timing and deadlines</p>
+                                <a href="/schedule-quiz/" class="btn btn-warning">
+                                    <i class="bi bi-calendar-plus me-2"></i>Schedule Quiz
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Quizzes -->
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-clock-history me-2"></i>Recently Created Quizzes
+                        </h6>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Quiz Title</th>
+                                                <th>Type</th>
+                                                <th>Questions</th>
+                                                <th>Created</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if recent_quizzes %}
+                                                {% for quiz in recent_quizzes %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="bi bi-question-circle me-2 text-primary"></i>
+                                                            <strong>{{ quiz.title|truncatechars:30 }}</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-{% if quiz.quiz_type == 'quick' %}primary{% elif quiz.quiz_type == 'assignment' %}warning{% else %}success{% endif %}">
+                                                            {{ quiz.quiz_type|capfirst }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ quiz.question_count|default:0 }}</td>
+                                                    <td>{{ quiz.created_at|timesince }} ago</td>
+                                                    <td>
+                                                        <span class="badge bg-{% if quiz.is_active %}success{% else %}secondary{% endif %}">
+                                                            {% if quiz.is_active %}Active{% else %}Draft{% endif %}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm">
+                                                            <button class="btn btn-outline-primary btn-sm" onclick="editQuiz({{ quiz.id }})">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-success btn-sm" onclick="publishQuiz({{ quiz.id }})">
+                                                                <i class="bi bi-share"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm" onclick="deleteQuiz({{ quiz.id }})">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                        <i class="bi bi-question-circle fs-1 mb-2"></i>
+                                                        <p class="mb-0">No quizzes created yet. Start by creating your first quiz!</p>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #fd7e14, #dc3545);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-event-fill me-2"></i>
+                        Today's Summary - {{ today|date:"F d, Y" }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                            <h4 class="mt-2">{{ today_completions }}</h4>
+                            <p class="text-muted">Lessons Completed Today</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-people-fill text-primary fs-1"></i>
+                            <h4 class="mt-2">{{ total_students }}</h4>
+                            <p class="text-muted">Active Students</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-book-fill text-info fs-1"></i>
+                            <h4 class="mt-2">{{ my_lessons }}</h4>
+                            <p class="text-muted">Your Created Lessons</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    width: 2px;
+    height: 20px;
+    background: #dee2e6;
+}
+</style>
+
+<!-- Add Quiz Modal -->
+<div class="modal fade" id="addQuizModal" tabindex="-1" aria-labelledby="addQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8, #28a745); color: white;">
+                <h5 class="modal-title" id="addQuizModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Quiz
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quizForm">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="quizTitle" class="form-label">
+                                    <i class="bi bi-card-text me-1"></i>Quiz Title
+                                </label>
+                                <input type="text" class="form-control" id="quizTitle" placeholder="Enter quiz title..." required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="quizType" class="form-label">
+                                    <i class="bi bi-tag me-1"></i>Quiz Type
+                                </label>
+                                <select class="form-select" id="quizType" required>
+                                    <option value="quick">Quick Quiz</option>
+                                    <option value="assignment">Assignment</option>
+                                    <option value="practice">Practice</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quizDescription" class="form-label">
+                            <i class="bi bi-chat-text me-1"></i>Description
+                        </label>
+                        <textarea class="form-control" id="quizDescription" rows="3" placeholder="Brief description of the quiz..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quizDuration" class="form-label">
+                                    <i class="bi bi-clock me-1"></i>Duration (minutes)
+                                </label>
+                                <input type="number" class="form-control" id="quizDuration" min="1" max="180" value="30">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quizDifficulty" class="form-label">
+                                    <i class="bi bi-bar-chart me-1"></i>Difficulty Level
+                                </label>
+                                <select class="form-select" id="quizDifficulty">
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="quizRandomize">
+                            <label class="form-check-label" for="quizRandomize">
+                                <i class="bi bi-shuffle me-1"></i>Randomize question order
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="quizShowResults" checked>
+                            <label class="form-check-label" for="quizShowResults">
+                                <i class="bi bi-eye me-1"></i>Show results immediately after completion
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveQuiz()">
+                    <i class="bi bi-check me-1"></i>Create Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Quiz Management Functions
+function createQuickQuiz() {
+    document.getElementById('quizType').value = 'quick';
+    const modal = new bootstrap.Modal(document.getElementById('addQuizModal'));
+    modal.show();
+}
+
+function createAssignmentQuiz() {
+    document.getElementById('quizType').value = 'assignment';
+    const modal = new bootstrap.Modal(document.getElementById('addQuizModal'));
+    modal.show();
+}
+
+function createPracticeQuiz() {
+    document.getElementById('quizType').value = 'practice';
+    const modal = new bootstrap.Modal(document.getElementById('addQuizModal'));
+    modal.show();
+}
+
+function saveQuiz() {
+    const title = document.getElementById('quizTitle').value;
+    const type = document.getElementById('quizType').value;
+    const description = document.getElementById('quizDescription').value;
+    const duration = document.getElementById('quizDuration').value;
+    const difficulty = document.getElementById('quizDifficulty').value;
+    const randomize = document.getElementById('quizRandomize').checked;
+    const showResults = document.getElementById('quizShowResults').checked;
+    
+    if (!title) {
+        alert('Please enter a quiz title.');
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/create-quiz/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            title: title,
+            quiz_type: type,
+            description: description,
+            duration: duration,
+            difficulty: difficulty,
+            randomize_questions: randomize,
+            show_results: showResults
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modalElement = document.getElementById('addQuizModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            
+            document.getElementById('quizForm').reset();
+            showNotification('Quiz created successfully!', 'success');
+            
+            // Refresh the page to show the new quiz
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showNotification('Error creating quiz: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error creating quiz. Please try again.', 'error');
+    });
+}
+
+function editQuiz(quizId) {
+    // Redirect to quiz edit page
+    window.location.href = '/edit-quiz/' + quizId + '/';
+}
+
+function publishQuiz(quizId) {
+    if (confirm('Are you sure you want to publish this quiz to students?')) {
+        fetch('/publish-quiz/' + quizId + '/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Quiz published successfully!', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showNotification('Error publishing quiz: ' + data.error, 'error');
+            }
+        });
+    }
+}
+
+function deleteQuiz(quizId) {
+    // Redirect to confirmation page instead of immediate deletion
+    window.location.href = '/delete-quiz/' + quizId + '/';
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>
+
+{% endblock %}

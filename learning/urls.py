@@ -11,7 +11,9 @@ urlpatterns = [
     
     # Dashboards
     path('student/', views.student_dashboard, name='student_dashboard'),
-    path('teacher/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/', views.teacher_home, name='teacher_home'),
+    path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/reports/', views.teacher_reports, name='teacher_reports'),
     path('parent/', views.parent_dashboard, name='parent_dashboard'),
     path('analytics/', views.analytics_page, name='analytics'),
     path('parents/parent-dashboard-test/', views.parent_dashboard, name='parent_dashboard_test'),
@@ -36,10 +38,13 @@ urlpatterns = [
     # Lessons
     path('lesson/<int:lesson_id>/', views.lesson_detail, name='lesson_detail'),
     path('lesson/<int:lesson_id>/download/', views.download_lesson, name='download_lesson'),
+    path('lesson/<int:lesson_id>/view/', views.view_lesson_file, name='view_lesson_file'),
     path('lesson/<int:lesson_id>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
     
     # Quiz
     path('quiz/<int:quiz_id>/submit/', views.submit_quiz, name='submit_quiz'),
+    path('quiz/<int:quiz_id>/take/', views.take_quiz, name='take_quiz'),
+    path('quiz-result/<int:attempt_id>/', views.quiz_result, name='quiz_result'),
     
     # PWA
     path('manifest.json', views.manifest, name='manifest'),
@@ -54,6 +59,17 @@ urlpatterns = [
     path('panel/lessons/', views.custom_admin_lessons, name='custom_admin_lessons'),
     path('panel/lessons/add/', views.custom_admin_add_lesson, name='custom_admin_add_lesson'),
     path('panel/students/', views.custom_admin_students, name='custom_admin_students'),
+    path('panel/student/<int:student_id>/', views.student_detail_view, name='student_detail_view'),
+    path('send-message/', views.send_message, name='send_message'),
+    
+    # Quiz Management
+    path('create-quiz/', views.create_quiz, name='create_quiz'),
+    path('create-quick-quiz/', views.create_quick_quiz, name='create_quick_quiz'),
+    path('schedule-quiz/', views.schedule_quiz, name='schedule_quiz'),
+    path('publish-quiz/<int:quiz_id>/', views.publish_quiz, name='publish_quiz'),
+    path('delete-quiz/<int:quiz_id>/', views.delete_quiz, name='delete_quiz'),
+    path('delete-lesson/<int:lesson_id>/', views.delete_lesson, name='delete_lesson'),
+    path('edit-quiz/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
     
     # Student, Parent, Teacher CRUD
     path('students/', views.student_list, name='student_list'),

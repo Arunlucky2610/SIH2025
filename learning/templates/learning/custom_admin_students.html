@@ -348,7 +348,7 @@
 
 {% block content %}
 <div class="admin-container">
-    <a href="{% url 'custom_admin_dashboard' %}" class="back-btn">
+    <a href="{% url 'teacher_dashboard' %}" class="back-btn">
         <i class="bi bi-arrow-left"></i>
         Back to Dashboard
     </a>
@@ -531,8 +531,8 @@
     }
     
     function messageStudent(studentId) {
-        // Open messaging modal or redirect to messaging page
-        alert('Messaging feature coming soon!');
+        // Redirect to student detail page where messaging feature is available
+        window.location.href = '/panel/student/' + studentId + '/#message';
     }
     
     function exportReport() {
