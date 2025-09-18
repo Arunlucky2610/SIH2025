@@ -92,9 +92,9 @@
     }
     
     .back-btn {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: white !important;
+        color: #667eea !important;
+        border: 1px solid white;
         border-radius: 10px;
         padding: 0.5rem 1rem;
         text-decoration: none;
@@ -102,12 +102,102 @@
         align-items: center;
         gap: 0.5rem;
         transition: all 0.3s ease;
+        font-weight: 500;
     }
     
     .back-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        color: white;
+        background: #f8f9fa !important;
+        color: #667eea !important;
         text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-outline-light-custom {
+        background: white !important;
+        color: #667eea !important;
+        border: 1px solid white !important;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-light-custom:hover {
+        background: #f8f9fa !important;
+        color: #667eea !important;
+        border-color: #f8f9fa !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Message sent animation - Toast style like login page */
+    .message-sent-animation {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+        z-index: 10000;
+        text-align: left;
+        animation: toastSlideIn 3s ease-in-out;
+        opacity: 0;
+        transform: translateX(100%);
+        min-width: 300px;
+        border-left: 4px solid #ffffff;
+    }
+    
+    @keyframes toastSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        10% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        90% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+    
+    .message-sent-animation .check-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        display: inline-block;
+        vertical-align: middle;
+        animation: checkPulse 0.6s ease-in-out 0.2s;
+    }
+    
+    @keyframes checkPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .message-sent-animation .message-content {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    
+    .message-sent-animation .message-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .message-sent-animation .message-text {
+        font-size: 0.875rem;
+        margin: 0;
+        opacity: 0.9;
+        line-height: 1.2;
     }
     
     .lesson-type-card {
@@ -155,7 +245,7 @@
                             <i class="bi bi-arrow-left"></i>
                             Back to Students
                         </a>
-                        <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#messageModal">
+                        <button type="button" class="btn btn-outline-light-custom" data-bs-toggle="modal" data-bs-target="#messageModal">
                             <i class="bi bi-chat-dots me-2"></i>
                             Send Message
                         </button>
@@ -478,8 +568,8 @@ function sendMessage() {
             // Reset form
             document.getElementById('messageForm').reset();
             
-            // Show success notification
-            showNotification('Message sent successfully!', 'success');
+            // Show animated message sent notification
+            showMessageSentAnimation();
         } else {
             showNotification('Error sending message: ' + data.error, 'error');
         }
@@ -509,6 +599,29 @@ function showNotification(message, type) {
             notification.remove();
         }
     }, 5000);
+}
+
+function showMessageSentAnimation() {
+    // Create the animated toast message element
+    const messageAnimation = document.createElement('div');
+    messageAnimation.className = 'message-sent-animation';
+    messageAnimation.innerHTML = `
+        <i class="bi bi-check-circle-fill check-icon"></i>
+        <div class="message-content">
+            <div class="message-title">Message Sent</div>
+            <div class="message-text">Your message has been delivered.</div>
+        </div>
+    `;
+    
+    // Add to body
+    document.body.appendChild(messageAnimation);
+    
+    // Remove after animation completes (3 seconds)
+    setTimeout(() => {
+        if (messageAnimation.parentNode) {
+            messageAnimation.remove();
+        }
+    }, 3000);
 }
 </script>
 
