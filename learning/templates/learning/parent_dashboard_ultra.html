@@ -1,410 +1,541 @@
 {% extends 'learning/base.html' %}
-{% load static %}
 
-{% block title %}Parent Dashboard - Ultra Modern{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/ultra-modern.css' %}">
-{% endblock %}
+{% block title %}Parent Dashboard - Rural Digital Learning{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- MEGA HERO WELCOME SECTION -->
-    <div class="hero-welcome cosmic-fade-in">
-        <div class="hero-content">
-            <div class="greeting-emoji" id="greeting-emoji">👋</div>
-            <h1 class="mega-greeting" id="dynamic-greeting">
-                <span id="greeting-text">Good Day, {{ user.first_name|default:user.username }}!</span>
-            </h1>
-            <p class="hero-subtitle" id="hero-subtitle">
-                Welcome back to your command center! Monitor your children's learning journey with our advanced analytics and real-time insights.
-            </p>
-            <div class="time-display">
-                <span class="time-icon" id="time-icon">⭐</span>
-                <span id="current-time">{% now "l, F j, Y \a\t g:i A" %}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ENHANCED ANALYTICS SECTION -->
-    <div class="mega-stats">
-        <div class="mega-stat-card cosmic-fade-in analytics-overview-card">
-            <div class="analytics-header">
-                <div class="mega-stat-icon">👪</div>
-                <div class="analytics-badge">Overview</div>
-            </div>
-            <div class="mega-stat-number">{{ children_count|default:0 }}</div>
-            <div class="mega-stat-label">Active Children</div>
-            <div class="analytics-subtitle">Enrolled in learning programs</div>
-            <div class="progress-indicator">
-                <div class="progress-bar" style="width: 100%"></div>
-            </div>
-        </div>
-        
-        <div class="mega-stat-card cosmic-fade-in analytics-lessons-card">
-            <div class="analytics-header">
-                <div class="mega-stat-icon">📖</div>
-                <div class="analytics-badge">Lessons</div>
-            </div>
-            <div class="mega-stat-number">{{ total_assignments|default:0 }}</div>
-            <div class="mega-stat-label">Total Lessons</div>
-            <div class="analytics-subtitle">Across all subjects</div>
-            <div class="progress-indicator">
-                <div class="progress-bar" style="width: 85%"></div>
-            </div>
-        </div>
-        
-        <div class="mega-stat-card cosmic-fade-in analytics-progress-card">
-            <div class="analytics-header">
-                <div class="mega-stat-icon">🎯</div>
-                <div class="analytics-badge">Progress</div>
-            </div>
-            <div class="mega-stat-number">{{ completed_assignments|default:0 }}</div>
-            <div class="mega-stat-label">Completed Lessons</div>
-            <div class="analytics-subtitle">
-                {% if total_assignments > 0 %}
-                    {{ completed_assignments|floatformat:0 }}/{{ total_assignments }} lessons done
-                {% else %}
-                    Ready to start learning
-                {% endif %}
-            </div>
-            <div class="progress-indicator">
-                {% if total_assignments > 0 %}
-                    <div class="progress-bar" style="width: 75%"></div>
-                {% else %}
-                    <div class="progress-bar" style="width: 0%"></div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="mega-stat-card cosmic-fade-in analytics-detailed-card" onclick="window.location.href='/parents/analytics/'">
-            <div class="analytics-header">
-                <div class="mega-stat-icon">📊</div>
-                <div class="analytics-badge">Detailed</div>
-            </div>
-            <div class="mega-stat-number">📈</div>
-            <div class="mega-stat-label">View Analytics</div>
-            <div class="analytics-subtitle">Detailed progress & time tracking</div>
-            <div class="analytics-cta">
-                <span>Click to explore</span>
-                <span>→</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- NOTIFICATIONS SECTION -->
-    {% if notification_count > 0 %}
-    <div class="notification-bar cosmic-fade-in">
-        <div class="notification-content">
-            <div class="notification-icon">🔔</div>
-            <div class="notification-text">
-                <strong>You have {{ notification_count }} new notification{{ notification_count|pluralize }}</strong>
-                <p>Stay updated with your children's learning progress and school announcements.</p>
-            </div>
-            <a href="{% url 'notifications' %}" class="quantum-btn">
-                <span>View All</span>
-                <span>👁️</span>
-            </a>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- ULTRA ACTION CARDS SECTION -->
-    <div class="ultra-actions">
-        <div class="ultra-action-card cosmic-fade-in">
-            <div class="ultra-action-icon">🎯</div>
-            <h3 class="ultra-action-title">Set Learning Goals</h3>
-            <p class="ultra-action-desc">Create personalized learning objectives and track milestone achievements</p>
-            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
-                <span>Set Goals</span>
-                <span>🚀</span>
-            </a>
-        </div>
-
-        <div class="ultra-action-card cosmic-fade-in">
-            <div class="ultra-action-icon">💬</div>
-            <h3 class="ultra-action-title">Teacher Communication</h3>
-            <p class="ultra-action-desc">Connect with educators and get real-time updates on your child's progress</p>
-            <a href="{% url 'teacher_communication_dashboard' %}" class="quantum-btn" style="margin-top: 1rem;">
-                <span>Message</span>
-                <span>✉️</span>
-            </a>
-        </div>
-
-        <div class="ultra-action-card cosmic-fade-in">
-            <div class="ultra-action-icon">📱</div>
-            <h3 class="ultra-action-title">Mobile App</h3>
-            <p class="ultra-action-desc">Download our mobile app for on-the-go monitoring and instant notifications</p>
-            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
-                <span>Download</span>
-                <span>📲</span>
-            </a>
-        </div>
-
-        <div class="ultra-action-card cosmic-fade-in">
-            <div class="ultra-action-icon">⚙️</div>
-            <h3 class="ultra-action-title">Notification Settings</h3>
-            <p class="ultra-action-desc">Customize your notification preferences and alert frequencies</p>
-            <a href="{% url 'notification_settings' %}" class="quantum-btn" style="margin-top: 1rem;">
-                <span>Configure</span>
-                <span>🔧</span>
-            </a>
-        </div>
-
-        <div class="ultra-action-card cosmic-fade-in">
-            <div class="ultra-action-icon">📅</div>
-            <h3 class="ultra-action-title">Study Schedule</h3>
-            <p class="ultra-action-desc">Plan and organize study sessions with our intelligent scheduling system</p>
-            <a href="#" class="quantum-btn" style="margin-top: 1rem;">
-                <span>Schedule</span>
-                <span>📋</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- ENHANCED CHILDREN PROGRESS SECTION -->
-    {% if children_progress %}
-    <div class="children-section cosmic-fade-in">
-        <div class="section-header">
-            <h2 class="section-title">
-                <span class="title-icon">🎓</span>
-                Children's Learning Journey
-            </h2>
-            <p class="section-subtitle">Track your children's academic progress and achievements</p>
-        </div>
-        
-        <div class="children-grid">
-            {% for child in children_progress %}
-            <div class="enhanced-child-card cosmic-fade-in">
-                <!-- Child Profile Header -->
-                <div class="child-profile-header">
-                    <div class="profile-avatar">
-                        <div class="avatar-image">{{ child.child.first_name|first|upper }}{{ child.child.last_name|first|upper }}</div>
-                        <div class="online-indicator"></div>
-                    </div>
-                    <div class="profile-info">
-                        <h3 class="student-name">{{ child.child.first_name }} {{ child.child.last_name }}</h3>
-                        <p class="student-grade">{{ child.profile.grade|default:"Grade Not Set" }}</p>
-                        <div class="student-status">
-                            {% if child.progress_percentage >= 80 %}
-                                <span class="status-badge excellent">🌟 Excellent Progress</span>
-                            {% elif child.progress_percentage >= 60 %}
-                                <span class="status-badge good">📈 Good Progress</span>
-                            {% elif child.progress_percentage >= 40 %}
-                                <span class="status-badge average">⚡ Making Progress</span>
-                            {% else %}
-                                <span class="status-badge needs-attention">🎯 Needs Attention</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Overview -->
-                <div class="progress-overview">
-                    <div class="progress-circle-container">
-                        <div class="circular-progress" data-percentage="{{ child.progress_percentage }}">
-                            <div class="circle-bg">
-                                <div class="circle-fill" style="--percentage: {{ child.progress_percentage }}%"></div>
-                                <div class="circle-inner">
-                                    <span class="percentage-text">{{ child.progress_percentage|floatformat:0 }}%</span>
-                                    <span class="percentage-label">Complete</span>
+<div class="container-fluid" style="background-color: #ffffff; min-height: 100vh;">
+    <!-- Enhanced Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
+                <!-- Background decoration -->
+                <div class="position-absolute" style="top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                <div class="position-absolute" style="bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                
+                <div class="row align-items-center position-relative">
+                    <div class="col-lg-8">
+                        <div class="text-white">
+                            <h1 class="display-5 fw-bold mb-3 fade-in-up">
+                                Hey {{ user.first_name|default:user.username|lower }}! 👋
+                            </h1>
+                            <p class="lead mb-2 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
+                                Role: <span class="badge bg-white bg-opacity-90 text-dark fw-semibold">Parent</span>
+                                {% if user.userprofile.child_name %}
+                                    <span class="badge bg-white bg-opacity-90 text-dark fw-semibold ms-2">Parent of {{ user.userprofile.child_name }}</span>
+                                {% endif %}
+                            </p>
+                            <p class="lead mb-4 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
+                                Perfect time to check your children's learning progress and achievements
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 fade-in-up" style="animation-delay: 0.2s;">
+                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
+                                    <i class="bi bi-calendar me-1"></i> 
+                                    Sep 17 Today
+                                </div>
+                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
+                                    <i class="bi bi-people me-1"></i> 
+                                    {{ children_count|default:0 }} Children
+                                </div>
+                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
+                                    <i class="bi bi-graph-up me-1"></i> 
+                                    {{ completed_assignments|default:0 }}% Progress
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="progress-stats">
-                        <div class="stat-box">
-                            <div class="stat-number">{{ child.completed_lessons }}</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-divider">of</div>
-                        <div class="stat-box">
-                            <div class="stat-number">{{ child.total_lessons }}</div>
-                            <div class="stat-label">Total Lessons</div>
+                    <div class="col-lg-4 text-end">
+                        <div class="position-relative">
+                            <i class="bi bi-person-hearts text-white opacity-25" style="font-size: 8rem;"></i>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <div class="bg-white rounded-circle p-3 shadow-lg">
+                                    <i class="bi bi-people-fill text-primary fs-2"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Performance Metrics -->
-                <div class="performance-metrics">
-                    <div class="metric-card">
-                        <div class="metric-icon">📊</div>
-                        <div class="metric-details">
-                            <span class="metric-value">{{ child.avg_score|floatformat:1 }}</span>
-                            <span class="metric-label">Average Score</span>
-                        </div>
-                        <div class="metric-trend">
-                            {% if child.avg_score >= 80 %}
-                                <span class="trend-up">📈</span>
-                            {% elif child.avg_score >= 60 %}
-                                <span class="trend-stable">➡️</span>
-                            {% else %}
-                                <span class="trend-down">📉</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-icon">🔥</div>
-                        <div class="metric-details">
-                            <span class="metric-value">{{ child.current_streak|default:0 }}</span>
-                            <span class="metric-label">Day Streak</span>
-                        </div>
-                        <div class="streak-indicator">
-                            {% if child.current_streak >= 7 %}
-                                <span class="streak-fire">🔥🔥🔥</span>
-                            {% elif child.current_streak >= 3 %}
-                                <span class="streak-fire">🔥🔥</span>
-                            {% elif child.current_streak >= 1 %}
-                                <span class="streak-fire">🔥</span>
-                            {% else %}
-                                <span class="streak-none">⭐</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-icon">⏱️</div>
-                        <div class="metric-details">
-                            <span class="metric-value">{{ child.weekly_time_hours }}h</span>
-                            <span class="metric-label">This Week</span>
-                        </div>
-                        <div class="time-badge">
-                            {% if child.weekly_time_hours >= 10 %}
-                                <span class="time-excellent">💪</span>
-                            {% elif child.weekly_time_hours >= 5 %}
-                                <span class="time-good">👍</span>
-                            {% else %}
-                                <span class="time-low">🎯</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Summary -->
-                <div class="activity-summary">
-                    <h4 class="activity-title">📚 Recent Activity</h4>
-                    <div class="activity-stats">
-                        <div class="activity-item">
-                            <span class="activity-icon">✅</span>
-                            <span class="activity-text">{{ child.weekly_lessons }} lessons completed this week</span>
-                        </div>
-                        <div class="activity-item">
-                            <span class="activity-icon">📖</span>
-                            <span class="activity-text">
-                                {% if child.recent_progress %}
-                                    Last activity: {{ child.recent_progress.0.started_at|timesince }} ago
-                                {% else %}
-                                    No recent activity
-                                {% endif %}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="child-actions">
-                    <button class="action-btn primary" onclick="viewChildDetails('{{ child.child.id }}')">
-                        <span class="btn-icon">�️</span>
-                        <span class="btn-text">View Details</span>
-                    </button>
-                    <button class="action-btn secondary" onclick="messageTeacher('{{ child.child.id }}')">
-                        <span class="btn-icon">💬</span>
-                        <span class="btn-text">Message Teacher</span>
-                    </button>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
-    {% else %}
-    <div class="empty-state cosmic-fade-in">
-        <div class="empty-illustration">
-            <div class="empty-icon">�‍👩‍👧‍👦</div>
-            <div class="empty-sparkles">✨</div>
-        </div>
-        <h3 class="empty-title">No Children Linked</h3>
-        <p class="empty-description">You haven't added any children to your account yet. Contact your school administrator to link your children's accounts and start tracking their learning journey.</p>
-        <button class="empty-action-btn" onclick="contactSupport()">
-            <span>📞 Contact Support</span>
-        </button>
-    </div>
-    {% endif %}
 
-    <!-- QUICK ACTIONS FOOTER -->
-    <div class="quick-actions cosmic-fade-in">
-        <a href="{% url 'notifications' %}" class="quick-action">
-            <span class="action-icon">🔔</span>
-            <span class="action-text">Notifications</span>
-        </a>
-        <a href="{% url 'notification_settings' %}" class="quick-action">
-            <span class="action-icon">⚙️</span>
-            <span class="action-text">Settings</span>
-        </a>
-        <a href="/parents/analytics/" class="quick-action">
-            <span class="action-icon">📊</span>
-            <span class="action-text">Analytics</span>
-        </a>
-        <a href="{% url 'logout' %}" class="quick-action">
-            <span class="action-icon">🚪</span>
-            <span class="action-text">Logout</span>
-        </a>
-    </div>
-
-    <!-- AI CHAT ASSISTANT -->
-    <div id="chatAssistant" class="chat-assistant">
-        <div id="chatToggle" class="chat-toggle" onclick="toggleChat()">
-            <div class="teacher-avatar">
-                <div class="avatar-img">👩‍🏫</div>
-                <div class="status-dot"></div>
+    <!-- Main Dashboard Cards -->
+    <div class="mb-5">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="text-dark fw-bold mb-4 d-flex align-items-center">
+                    <i class="bi bi-speedometer2 me-2 text-primary fs-4"></i>
+                    <span>Quick Overview</span>
+                </h3>
             </div>
-            <div class="chat-notification" id="chatNotification">1</div>
+        </div>
+        <div class="row g-4">
+            <!-- Current Activity Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-graph-up-arrow text-primary fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-primary mb-2">{{ current_activity|default:3 }}</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Current Activities</p>
+                        <p class="text-muted small mb-0">Active learning sessions</p>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Learning Hours Card -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" style="width: 60px; height: 60px;">
+                            <i class="bi bi-clock-history text-success fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-success mb-2">{{ learning_hours|default:24 }}h</h3>
+                    <p class="card-title text-dark fw-semibold mb-2">Learning Hours</p>
+                    <p class="text-muted small mb-0">Total time this month</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Assignments Card -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" style="width: 60px; height: 60px;">
+                            <i class="bi bi-check-circle-fill text-warning fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-warning mb-2">{{ completed_assignments|default:87 }}%</h3>
+                    <p class="card-title text-dark fw-semibold mb-2">Assignments Done</p>
+                    <p class="text-muted small mb-0">Completion rate</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Score Card -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10" style="width: 60px; height: 60px;">
+                            <i class="bi bi-trophy-fill text-info fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-info mb-2">{{ performance_score|default:85 }}%</h3>
+                    <p class="card-title text-dark fw-semibold mb-2">Performance</p>
+                    <p class="text-muted small mb-0">Overall progress</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Parent Tools & Resources -->
+    <div class="mb-5">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="text-dark fw-bold mb-4 d-flex align-items-center">
+                    <i class="bi bi-tools me-2 text-primary fs-4"></i>
+                    <span>Parent Tools</span>
+                </h3>
+            </div>
         </div>
         
-        <div id="chatWindow" class="chat-window">
-            <div class="chat-header">
-                <div class="teacher-info">
-                    <div class="teacher-avatar-small">👩‍🏫</div>
-                    <div class="teacher-details">
-                        <h4>Ms. Sarah</h4>
-                        <p>AI Learning Assistant</p>
-                    </div>
-                </div>
-                <button class="chat-minimize" onclick="toggleChat()">−</button>
-            </div>
+        <!-- Parent Tools Grid - 4 Equal Columns -->
+        <div class="row g-4">
             
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot-message">
-                    <div class="message-avatar">👩‍🏫</div>
-                    <div class="message-content">
-                        <p>Hello! I'm Ms. Sarah, your AI learning assistant. I'm here to help you with your children's education. How can I assist you today?</p>
-                        <span class="message-time">Just now</span>
+            <!-- Teacher Communication Card -->
+            <div class="col-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-chat-dots text-primary fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-primary mb-2">💬</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Teacher Communication</p>
+                        <p class="text-muted small mb-0">Connect with educators</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="chat-suggestions">
-                <button class="suggestion-btn" onclick="sendSuggestion('How is my child performing?')">
-                    📊 Check Performance
-                </button>
-                <button class="suggestion-btn" onclick="sendSuggestion('Study tips for better grades')">
-                    💡 Study Tips
-                </button>
-                <button class="suggestion-btn" onclick="sendSuggestion('Homework help strategies')">
-                    📚 Homework Help
-                </button>
+
+            <!-- Notifications Card -->
+            <div class="col-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-bell text-success fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-success mb-2">🔔</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Notifications</p>
+                        <p class="text-muted small mb-0">Manage preferences</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Card -->
+            <div class="col-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white" style="cursor: pointer;" onclick="window.location.href='{% url 'analytics' %}'">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-bar-chart text-warning fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-warning mb-2">📊</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Analytics</p>
+                        <p class="text-muted small mb-0">View progress reports</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Schedule Card -->
+            <div class="col-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-calendar3 text-info fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-info mb-2">📅</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Study Schedule</p>
+                        <p class="text-muted small mb-0">Plan learning sessions</p>
+                    </div>
+                </div>
             </div>
             
-            <div class="chat-input-container">
-                <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about your child's learning..." maxlength="200">
-                <button id="sendButton" class="send-button" onclick="sendMessage()">
-                    <span class="send-icon">📤</span>
+        </div>
+    </div>
+    <!-- Floating Teacher Assistant Button -->
+    <div class="position-fixed bottom-0 end-0 m-4" style="z-index: 1050;">
+        <button class="btn rounded-circle shadow-lg" 
+                style="width: 50px; height: 50px; border: none; background: linear-gradient(135deg, #4F46E5, #7C3AED);" 
+                data-bs-toggle="modal" 
+                data-bs-target="#teacherChatModal"
+                title="Chat with Teacher">
+    <!-- Floating Chat Icon -->
+    <div class="position-fixed bottom-0 end-0 m-4" style="z-index: 1050;">
+        <button class="btn rounded-circle shadow-lg" 
+                style="width: 50px; height: 50px; border: none; background: linear-gradient(135deg, #ff6b9d, #c44569);" 
+                onclick="toggleChatWindow()"
+                title="Chat with Sarah">
+            <span class="text-white" style="font-size: 24px;">👩‍🏫</span>
+        </button>
+    </div>
+    
+    <!-- Floating Chat Window -->
+    <div id="chatWindow" class="position-fixed shadow-lg rounded-3 bg-white" 
+         style="width: 300px; height: 400px; bottom: 80px; right: 20px; z-index: 1049; display: none; border: 1px solid #dee2e6;">
+        
+        <!-- Chat Header -->
+        <div class="p-3 text-white rounded-top" style="background: linear-gradient(135deg, #ff6b9d, #c44569);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <span class="me-2" style="font-size: 20px;">👩‍🏫</span>
+                    <small class="fw-semibold">Sarah</small>
+                </div>
+                <button class="btn btn-sm text-white p-0" onclick="toggleChatWindow()" style="border: none; background: none;">
+                    <i class="bi bi-x-lg"></i>
                 </button>
+            </div>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div class="p-3" style="height: 320px; overflow-y: auto;">
+            <div class="mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="me-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                        <span style="font-size: 16px;">👩‍🏫</span>
+                    </div>
+                    <div class="bg-light rounded-3 p-2 flex-grow-1">
+                        <small class="text-dark">Hi! I'm Sarah, your learning assistant. How can I help you today?</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChatWindow() {
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+                chatWindow.style.display = 'block';
+            } else {
+                chatWindow.style.display = 'none';
+            }
+        }
+    </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scheduleModalLabel">
+                        <i class="bi bi-calendar-check text-info me-2"></i>Create Study Schedule
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="scheduleDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="scheduleDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="scheduleTime" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="scheduleTime">
+                        </div>
+                        <div class="mb-3">
+                            <label for="scheduleSubject" class="form-label">Subject</label>
+                            <select class="form-select" id="scheduleSubject">
+                                <option value="">Select Subject</option>
+                                <option value="math">Mathematics</option>
+                                <option value="science">Science</option>
+                                <option value="english">English</option>
+                                <option value="history">History</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="scheduleDuration" class="form-label">Duration (minutes)</label>
+                            <select class="form-select" id="scheduleDuration">
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info">Create Schedule</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Enhanced Progress Circle Styles */
+.progress-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        #007bff calc(var(--percentage) * 3.6deg),
+        #e9ecef calc(var(--percentage) * 3.6deg)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+}
+
+.progress-circle::before {
+    content: '';
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.progress-circle span {
+    position: relative;
+    z-index: 1;
+    font-weight: 700;
+}
+
+/* Dashboard Card Enhanced Hover Effects */
+.dashboard-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    border-color: rgba(0,123,255,0.2);
+}
+
+/* Text Enhancement */
+.text-dark {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+.card-title {
+    color: #34495e !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem;
+}
+
+/* Fade in animation */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Button Styles */
+.btn {
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+/* Analytics Cards Enhancement */
+.bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.bg-light:hover {
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+/* Chat styles */
+.ai-message {
+    margin-bottom: 15px;
+}
+
+.user-message {
+    margin-bottom: 15px;
+}
+
+.user-message .d-flex {
+    flex-direction: row-reverse;
+}
+
+.user-message .bg-primary {
+    background-color: #007bff !important;
+    color: white;
+}
+
+/* Professional Icon Styling */
+.rounded-circle {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover .rounded-circle {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .dashboard-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-circle::before {
+        width: 45px;
+        height: 45px;
+    }
+}
+</style>
+
+<script>
+// AI Chat functionality
+document.getElementById('sendMessage')?.addEventListener('click', function() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        // Add user message
+        const chatContainer = document.querySelector('.chat-container');
+        const userMessage = `
+            <div class="user-message mb-3">
+                <div class="d-flex">
+                    <div class="bg-primary rounded-3 p-3 flex-grow-1">
+                        <p class="mb-0 text-white">${message}</p>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 ms-3">
+                        <i class="bi bi-person text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatContainer.innerHTML += userMessage;
+        
+        // Simulate AI response
+        setTimeout(() => {
+            const aiResponse = `
+                <div class="ai-message mb-3">
+                    <div class="d-flex">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                            <i class="bi bi-robot text-success"></i>
+                        </div>
+                        <div class="bg-light rounded-3 p-3 flex-grow-1">
+                            <p class="mb-0">I understand you're asking about "${message}". Let me help you with that!</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatContainer.innerHTML += aiResponse;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1000);
+        
+        input.value = '';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+});
+
+// Enter key support for chat
+document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('sendMessage').click();
+    }
+});
+</script>
+
+            <span class="action-text">Logout</span>
+        </a>
+    </div>
 
 <script>
 // Update time and greeting every second
@@ -568,171 +699,56 @@ function closeNotification(element) {
     }, 300);
 }
 
-// Add CSS for notifications
-const notificationStyles = document.createElement('style');
-notificationStyles.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    .notification-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-    
-    .notification-close {
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-        color: var(--text-secondary);
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-    }
-    
-    .notification-close:hover {
-        background: rgba(0, 0, 0, 0.1);
-        color: var(--text-primary);
-    }
-`;
-document.head.appendChild(notificationStyles);
-
-// Initialize circular progress animations
-document.addEventListener('DOMContentLoaded', function() {
-    const progressCircles = document.querySelectorAll('.circular-progress');
-    progressCircles.forEach(circle => {
-        const percentage = circle.dataset.percentage;
-        const circleBg = circle.querySelector('.circle-bg');
-        if (circleBg) {
-            circleBg.style.setProperty('--percentage', percentage);
-        }
-    });
-});
-
-// Chat Assistant Functions
-let isChatOpen = false;
-let chatMessages = [];
-
-function toggleChat() {
-    const chatWindow = document.getElementById('chatWindow');
-    const chatNotification = document.getElementById('chatNotification');
-    
-    isChatOpen = !isChatOpen;
-    
-    if (isChatOpen) {
-        chatWindow.classList.add('active');
-        chatNotification.style.display = 'none';
-    } else {
-        chatWindow.classList.remove('active');
-    }
-}
-
-function sendMessage() {
+// AI Chat functionality
+document.getElementById('sendMessage')?.addEventListener('click', function() {
     const input = document.getElementById('chatInput');
     const message = input.value.trim();
     
-    if (!message) return;
-    
-    addUserMessage(message);
-    input.value = '';
-    
-    // Simulate AI response
-    setTimeout(() => {
-        generateAIResponse(message);
-    }, 1000);
-}
-
-function sendSuggestion(message) {
-    addUserMessage(message);
-    
-    // Simulate AI response
-    setTimeout(() => {
-        generateAIResponse(message);
-    }, 1000);
-}
-
-function addUserMessage(message) {
-    const messagesContainer = document.getElementById('chatMessages');
-    const messageElement = document.createElement('div');
-    messageElement.className = 'message user-message';
-    
-    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    
-    messageElement.innerHTML = `
-        <div class="message-avatar">👤</div>
-        <div class="message-content">
-            <p>${message}</p>
-            <span class="message-time">${currentTime}</span>
-        </div>
-    `;
-    
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function addBotMessage(message) {
-    const messagesContainer = document.getElementById('chatMessages');
-    const messageElement = document.createElement('div');
-    messageElement.className = 'message bot-message';
-    
-    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    
-    messageElement.innerHTML = `
-        <div class="message-avatar">👩‍🏫</div>
-        <div class="message-content">
-            <p>${message}</p>
-            <span class="message-time">${currentTime}</span>
-        </div>
-    `;
-    
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function generateAIResponse(userMessage) {
-    const responses = {
-        'How is my child performing?': "Based on the latest data, your children are doing wonderfully! Aarav has completed 78% of his lessons with excellent scores, while Priya is at 65% completion with consistent improvement. Both are spending quality time on their studies and showing great progress in their respective subjects.",
+    if (message) {
+        // Add user message
+        const chatContainer = document.querySelector('.chat-container');
+        const userMessage = `
+            <div class="user-message mb-3">
+                <div class="d-flex">
+                    <div class="bg-primary rounded-3 p-3 flex-grow-1">
+                        <p class="mb-0 text-white">${message}</p>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 ms-3">
+                        <i class="bi bi-person text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatContainer.innerHTML += userMessage;
         
-        'Study tips for better grades': "Here are some proven study tips: 1) Create a consistent study schedule, 2) Use active learning techniques like flashcards and practice problems, 3) Take regular breaks using the Pomodoro technique, 4) Find a quiet, dedicated study space, and 5) Review material regularly instead of cramming. Would you like specific tips for any subject?",
+        // Simulate AI response
+        setTimeout(() => {
+            const aiResponse = `
+                <div class="ai-message mb-3">
+                    <div class="d-flex">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                            <i class="bi bi-robot text-success"></i>
+                        </div>
+                        <div class="bg-light rounded-3 p-3 flex-grow-1">
+                            <p class="mb-0">I understand you're asking about "${message}". Let me help you with that!</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatContainer.innerHTML += aiResponse;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1000);
         
-        'Homework help strategies': "Great question! Here are effective homework strategies: 1) Break large assignments into smaller tasks, 2) Set up a homework routine at the same time daily, 3) Remove distractions like phones and TV, 4) Use timers to stay focused, and 5) Celebrate completed tasks. I can also help connect you with subject-specific tutors if needed.",
-        
-        'default': "I understand you're asking about your child's education. As an AI learning assistant, I can help with study strategies, performance analysis, homework guidance, and connecting you with teachers. Could you be more specific about what you'd like to know?"
-    };
-    
-    const response = responses[userMessage] || responses['default'];
-    
-    // Simulate typing delay
-    setTimeout(() => {
-        addBotMessage(response);
-    }, 800);
-}
+        input.value = '';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+});
 
 // Enter key support for chat
-document.addEventListener('DOMContentLoaded', function() {
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('sendMessage').click();
     }
 });
 </script>
-
-{% endblock %}
+{% endblock content %}

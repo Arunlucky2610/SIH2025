@@ -1,0 +1,584 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Analytics - Rural Education Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{% static 'css/ultra-modern.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        *, *::before, *::after {
+            text-shadow: none !important;
+            box-shadow: none;
+        }
+        
+        h1, h2, h3, h4, h5, h6, p, span, div, small {
+            text-shadow: none !important;
+        }
+        
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .analytics-card *, .analytics-card *::before, .analytics-card *::after {
+            text-shadow: none !important;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-modern {
+            height: 12px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-modern {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+        
+        .progress-bar-modern::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .chart-bar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 4px 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .chart-bar:hover {
+            transform: scaleY(1.05);
+            filter: brightness(1.1);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .achievement-item {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .achievement-item:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+            transform: translateX(5px);
+        }
+        
+        .text-dark-modern {
+            color: #2d3748 !important;
+            font-weight: 600;
+            text-shadow: none;
+        }
+        
+        .text-muted-modern {
+            color: #718096 !important;
+            text-shadow: none;
+        }
+        
+        .navbar-dark {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-modern {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .btn-modern:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+        
+        .display-1-modern {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+        
+        .badge-modern {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Force remove all text shadows */
+        .navbar *, .card *, .badge *, .btn *, .progress *, .achievement-item * {
+            text-shadow: none !important;
+        }
+        
+        /* Override any Bootstrap or external CSS text shadows */
+        .text-white, .text-dark, .text-muted, .text-primary, .text-success, .text-warning, .text-info {
+            text-shadow: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'parent_dashboard' %}">
+                <i class="bi bi-mortarboard-fill me-2 fs-4"></i>
+                <span>Rural Education</span>
+            </a>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'parent_dashboard' %}" class="btn btn-modern">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-5">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header Section -->
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold text-white mb-3" style="text-shadow: none;">Learning Analytics</h1>
+                    <p class="lead text-white opacity-75" style="text-shadow: none;">Comprehensive progress tracking and insights</p>
+                </div>
+
+                <!-- Analytics Dashboard -->
+                <div class="row g-4">
+                    <!-- Subject Progress Card -->
+                    <div class="col-lg-6">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-graph-up text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1">Subject Progress</h4>
+                                    <p class="text-muted-modern mb-0">Overall academic performance</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced Progress Bars -->
+                            <div class="space-y-4">
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calculator text-primary me-2"></i>
+                                            <span class="fw-semibold text-dark-modern">Mathematics</span>
+                                        </div>
+                                        <span class="badge bg-primary badge-modern">78%</span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern" style="width: 78%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-book text-success me-2"></i>
+                                            <span class="fw-semibold text-dark-modern">English</span>
+                                        </div>
+                                        <span class="badge bg-success badge-modern">92%</span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-success" style="width: 92%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-flask text-info me-2"></i>
+                                            <span class="fw-semibold text-dark-modern">Science</span>
+                                        </div>
+                                        <span class="badge bg-info badge-modern">85%</span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-info" style="width: 85%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-globe text-warning me-2"></i>
+                                            <span class="fw-semibold text-dark-modern">Social Studies</span>
+                                        </div>
+                                        <span class="badge bg-warning badge-modern">71%</span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-warning" style="width: 71%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Activity Chart -->
+                    <div class="col-lg-6">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-bar-chart text-success fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1">Weekly Activity</h4>
+                                    <p class="text-muted-modern mb-0">Daily learning engagement</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Interactive Chart -->
+                            <div class="row text-center g-2">
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 75%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Mon</div>
+                                    <div class="text-muted-modern small">2.1h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 60%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Tue</div>
+                                    <div class="text-muted-modern small">1.8h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 90%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Wed</div>
+                                    <div class="text-muted-modern small">2.5h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 45%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Thu</div>
+                                    <div class="text-muted-modern small">1.3h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 80%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Fri</div>
+                                    <div class="text-muted-modern small">2.2h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 65%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Sat</div>
+                                    <div class="text-muted-modern small">1.9h</div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                            <div class="chart-bar position-absolute bottom-0 w-100" style="height: 30%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fw-semibold text-dark-modern small">Sun</div>
+                                    <div class="text-muted-modern small">0.9h</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Achievements -->
+                    <div class="col-lg-4">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-trophy text-warning fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1">Recent Achievements</h4>
+                                    <p class="text-muted-modern mb-0">Latest milestones</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="achievement-item rounded-3 p-3 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning bg-opacity-20 rounded-circle p-2 me-3">
+                                            <i class="bi bi-trophy-fill text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark-modern">Math Quiz Master</div>
+                                            <small class="text-muted-modern">Scored 95% in Algebra</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="achievement-item rounded-3 p-3 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-20 rounded-circle p-2 me-3">
+                                            <i class="bi bi-star-fill text-success"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark-modern">Reading Streak</div>
+                                            <small class="text-muted-modern">7 days in a row</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="achievement-item rounded-3 p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info bg-opacity-20 rounded-circle p-2 me-3">
+                                            <i class="bi bi-lightning-fill text-info"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark-modern">Quick Learner</div>
+                                            <small class="text-muted-modern">Completed 3 lessons today</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Study Time Tracking -->
+                    <div class="col-lg-4">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-clock text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1">Study Time</h4>
+                                    <p class="text-muted-modern mb-0">This week's progress</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mb-4">
+                                <div class="display-1-modern mb-2">12.5</div>
+                                <div class="text-muted-modern fw-semibold">Hours</div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="metric-card rounded-3 p-3 text-center">
+                                        <div class="fw-bold text-dark-modern fs-4">85%</div>
+                                        <small class="text-muted-modern">Goal Achieved</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card rounded-3 p-3 text-center">
+                                        <div class="fw-bold text-dark-modern fs-4">2.1</div>
+                                        <small class="text-muted-modern">Avg per day</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Trends -->
+                    <div class="col-lg-4">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-trending-up text-success fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1">Performance Trends</h4>
+                                    <p class="text-muted-modern mb-0">Recent improvements</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-semibold text-dark-modern">Quiz Scores</span>
+                                        <span class="badge bg-success badge-modern">
+                                            <i class="bi bi-arrow-up me-1"></i>+12%
+                                        </span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-success" style="width: 88%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-semibold text-dark-modern">Assignment Completion</span>
+                                        <span class="badge bg-primary badge-modern">
+                                            <i class="bi bi-arrow-up me-1"></i>+8%
+                                        </span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-primary" style="width: 92%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-semibold text-dark-modern">Study Consistency</span>
+                                        <span class="badge bg-warning badge-modern">
+                                            <i class="bi bi-arrow-down me-1"></i>-3%
+                                        </span>
+                                    </div>
+                                    <div class="progress-modern">
+                                        <div class="progress-bar-modern bg-warning" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enhanced JavaScript for Interactions -->
+    <script>
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+        
+        // Animate progress bars on load
+        window.addEventListener('load', function() {
+            const progressBars = document.querySelectorAll('.progress-bar-modern');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 1.5s ease-in-out';
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // Animate chart bars
+            const chartBars = document.querySelectorAll('.chart-bar');
+            chartBars.forEach((bar, index) => {
+                const height = bar.style.height;
+                bar.style.height = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'height 1s ease-in-out';
+                    bar.style.height = height;
+                }, 500 + (index * 100));
+            });
+        });
+        
+        // Add hover effects for achievement items
+        document.querySelectorAll('.achievement-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px) scale(1.02)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0) scale(1)';
+            });
+        });
+        
+        // Add click effects for analytics cards
+        document.querySelectorAll('.analytics-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+        
+        // Dynamic time update
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            // You can add a time display element if needed
+            console.log('Current time:', timeString);
+        }
+        
+        // Update time every minute
+        setInterval(updateTime, 60000);
+        updateTime();
+    </script>
+</body>
+</html>

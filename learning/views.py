@@ -678,6 +678,25 @@ def parent_analytics(request):
 
 
 @login_required
+def analytics_page(request):
+    """Dedicated analytics page for detailed learning insights"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'parent':
+        messages.error(request, 'Access denied')
+        return redirect('home')
+    
+    # Get children (students linked to this parent)
+    children = UserProfile.objects.filter(parent=profile)
+    
+    context = {
+        'profile': profile,
+        'children_count': len(children),
+    }
+    
+    return render(request, 'learning/analytics.html', context)
+
+
+@login_required
 def notifications_view(request):
     """View all notifications for parent"""
     if request.user.userprofile.role != 'parent':

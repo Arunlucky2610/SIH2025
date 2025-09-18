@@ -13,6 +13,7 @@ urlpatterns = [
     path('student/', views.student_dashboard, name='student_dashboard'),
     path('teacher/', views.teacher_dashboard, name='teacher_dashboard'),
     path('parent/', views.parent_dashboard, name='parent_dashboard'),
+    path('analytics/', views.analytics_page, name='analytics'),
     path('parents/parent-dashboard-test/', views.parent_dashboard, name='parent_dashboard_test'),
     path('parents/ultra-dashboard/', views.parent_dashboard, name='parent_dashboard_ultra'),
     path('parents/analytics/', views.parent_analytics, name='parent_analytics'),
