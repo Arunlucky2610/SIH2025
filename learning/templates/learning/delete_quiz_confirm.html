@@ -189,22 +189,25 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: new URLSearchParams(new FormData(deleteForm))
         })
-        .then(response => {
-            if (response.redirected) {
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 // Show success popup before redirecting
                 showQuizDeletedAnimation();
                 
-                // Redirect after animation
+                // Redirect after animation with forced refresh
                 setTimeout(() => {
-                    window.location.href = response.url;
+                    // Add timestamp to prevent caching
+                    const timestamp = new Date().getTime();
+                    window.location.href = data.redirect_url + '?refresh=' + timestamp;
                 }, 2000);
             } else {
                 // Reset button on error
                 deleteButton.disabled = false;
                 deleteButton.innerHTML = originalButtonContent;
-                alert('Error deleting quiz. Please try again.');
+                alert('Error deleting quiz: ' + (data.message || 'Unknown error'));
             }
-        })
+        }))
         .catch(error => {
             // Reset button on error
             deleteButton.disabled = false;

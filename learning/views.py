@@ -1865,17 +1865,21 @@ def delete_quiz(request, quiz_id):
             logger.info(f"Successfully deleted quiz: {quiz_title}")
             logger.info(f"Quiz exists after deletion: {QuizContainer.objects.filter(id=quiz_id).exists()}")
             
-            # Redirect back to teacher home page with cache busting
-            from django.http import HttpResponseRedirect
-            from django.urls import reverse
-            import time
-            redirect_url = reverse('teacher_home') + f'?t={int(time.time())}'
-            return HttpResponseRedirect(redirect_url)
+            # Return JSON response for AJAX handling
+            from django.http import JsonResponse
+            return JsonResponse({
+                'success': True,
+                'message': 'Quiz deleted successfully',
+                'redirect_url': '/teacher/'
+            })
             
         except Exception as e:
             logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
-            messages.error(request, f'Error deleting quiz: {str(e)}')
-            return redirect('teacher_home')
+            from django.http import JsonResponse
+            return JsonResponse({
+                'success': False,
+                'message': f'Error deleting quiz: {str(e)}'
+            })
 
 @login_required
 def delete_lesson(request, lesson_id):
