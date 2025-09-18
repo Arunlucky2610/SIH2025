@@ -180,11 +180,19 @@
                         </div>
                     {% else %}
                         <div class="text-center py-4">
-                            <i class="bi bi-inbox text-muted fs-1"></i>
-                            <p class="text-muted mt-2">No recent quiz activity</p>
-                            <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-sm btn-primary">
-                                Create Lesson
-                            </a>
+                            <div class="mb-3">
+                                <i class="bi bi-lightbulb text-warning fs-1"></i>
+                            </div>
+                            <h6 class="text-dark mb-2">Ready to Engage Your Students?</h6>
+                            <p class="text-muted mb-3 small">Create interactive quizzes and lessons to make learning exciting!</p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a href="{% url 'create_quiz' %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-circle me-1"></i>Create Quiz
+                                </a>
+                                <a href="{% url 'custom_admin_add_lesson' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-book me-1"></i>Add Lesson
+                                </a>
+                            </div>
                         </div>
                     {% endif %}
                 </div>

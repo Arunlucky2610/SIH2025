@@ -1738,49 +1738,87 @@ def send_message(request):
 @login_required
 def create_quiz(request):
     """Create a new quiz"""
+    # Check permission first
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    if user_profile.role != 'teacher':
+        messages.error(request, 'Only teachers can create quizzes.')
+        return redirect('teacher_dashboard')
+    
     if request.method == 'POST':
         try:
-            import json
-            
-            # Parse JSON data
-            data = json.loads(request.body)
-            title = data.get('title')
-            quiz_type = data.get('quiz_type')
-            description = data.get('description', '')
-            duration = data.get('duration', 30)
-            difficulty = data.get('difficulty', 'medium')
-            randomize_questions = data.get('randomize_questions', False)
-            show_results = data.get('show_results', True)
-            
-            # Check permission
-            user_profile = get_object_or_404(UserProfile, user=request.user)
-            if user_profile.role != 'teacher':
-                return JsonResponse({'success': False, 'error': 'Only teachers can create quizzes'})
-            
-            # Create quiz (you may need to create a Quiz model)
-            from .models import QuizContainer
-            quiz = QuizContainer.objects.create(
-                title=title,
-                description=description,
-                quiz_type=quiz_type,
-                duration=duration,
-                difficulty=difficulty,
-                randomize_questions=randomize_questions,
-                show_results=show_results,
-                created_by=request.user,
-                is_active=False  # Start as draft
-            )
-            
-            return JsonResponse({
-                'success': True, 
-                'message': 'Quiz created successfully',
-                'quiz_id': quiz.id
-            })
-            
+            # Check if it's an AJAX request with JSON data
+            if request.content_type == 'application/json':
+                import json
+                # Parse JSON data for AJAX requests
+                data = json.loads(request.body)
+                title = data.get('title')
+                quiz_type = data.get('quiz_type')
+                description = data.get('description', '')
+                duration = data.get('duration', 30)
+                difficulty = data.get('difficulty', 'medium')
+                randomize_questions = data.get('randomize_questions', False)
+                show_results = data.get('show_results', True)
+                
+                # Create quiz
+                from .models import QuizContainer
+                quiz = QuizContainer.objects.create(
+                    title=title,
+                    description=description,
+                    quiz_type=quiz_type,
+                    duration=duration,
+                    difficulty=difficulty,
+                    randomize_questions=randomize_questions,
+                    show_results=show_results,
+                    created_by=request.user,
+                    is_active=True  # Create as active quiz
+                )
+                
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Quiz created successfully',
+                    'quiz_id': quiz.id
+                })
+            else:
+                # Handle regular form submission
+                title = request.POST.get('quiz_title')
+                quiz_type = request.GET.get('type', 'quick')
+                description = request.POST.get('quiz_description', '')
+                duration = int(request.POST.get('quiz_duration', 30))
+                
+                if not title:
+                    messages.error(request, 'Quiz title is required.')
+                    return redirect('create_quiz')
+                
+                # Create quiz
+                from .models import QuizContainer
+                quiz = QuizContainer.objects.create(
+                    title=title,
+                    description=description,
+                    quiz_type=quiz_type,
+                    duration=duration,
+                    difficulty='medium',
+                    randomize_questions=False,
+                    show_results=True,
+                    created_by=request.user,
+                    is_active=True  # Create as active quiz
+                )
+                
+                messages.success(request, f'Quiz "{title}" created successfully!')
+                return redirect('teacher_home')
+                
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'error': str(e)})
+            else:
+                messages.error(request, f'Error creating quiz: {str(e)}')
+                return redirect('create_quiz')
     
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    # Handle GET request - show quiz creation form
+    context = {
+        'quiz_type': request.GET.get('type', 'quick'),  # Default to quick quiz
+        'user_profile': user_profile
+    }
+    return render(request, 'learning/create_quiz.html', context)
 
 @login_required
 def publish_quiz(request, quiz_id):
