@@ -16,6 +16,7 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         margin: 2rem auto;
         max-width: 900px;
+        color: #000000 !important; /* Force black text */
     }
     
     .result-header {
@@ -49,21 +50,25 @@
         border-radius: 15px;
         padding: 2rem;
         margin: 2rem;
+        color: #000000 !important; /* Force black text */
+    }
+        margin: 2rem;
     }
     
     .stat-item {
         text-align: center;
         padding: 1rem;
+        color: #000000 !important; /* Force black text */
     }
     
     .stat-number {
         font-size: 2rem;
         font-weight: bold;
-        color: #667eea;
+        color: #667eea !important;
     }
     
     .stat-label {
-        color: #6c757d;
+        color: #000000 !important; /* Force black text */
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -75,6 +80,7 @@
         border-radius: 10px;
         padding: 1.5rem;
         margin-bottom: 1rem;
+        color: #000000 !important; /* Force black text */
     }
     
     .question-review.correct {
@@ -89,17 +95,18 @@
         padding: 0.5rem 1rem;
         border-radius: 8px;
         margin: 0.25rem 0;
+        color: #000000 !important; /* Force black text */
     }
     
     .answer-option.correct {
         background: #d4edda;
-        color: #155724;
+        color: #155724 !important;
         border: 1px solid #c3e6cb;
     }
     
     .answer-option.incorrect {
         background: #f8d7da;
-        color: #721c24;
+        color: #721c24 !important;
         border: 1px solid #f5c6cb;
     }
     
@@ -124,6 +131,24 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         color: white;
+    }
+    
+    /* Force all text to be black for visibility */
+    .result-container h1, .result-container h2, .result-container h3, 
+    .result-container h4, .result-container h5, .result-container h6,
+    .result-container p, .result-container div, .result-container span,
+    .result-container strong, .result-container small {
+        color: #000000 !important;
+    }
+    
+    /* Exception for white text in header */
+    .result-header, .result-header * {
+        color: white !important;
+    }
+    
+    /* Exception for badge colors */
+    .badge.bg-success, .badge.bg-danger {
+        color: white !important;
     }
 </style>
 {% endblock %}
