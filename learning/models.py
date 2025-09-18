@@ -95,6 +95,31 @@ class Lesson(models.Model):
     
     def __str__(self):
         return f"{self.title} ({self.language})"
+    
+    def get_embed_url(self):
+        """Convert YouTube URL to embeddable format"""
+        if not self.video_url:
+            return None
+        
+        # Handle different YouTube URL formats
+        url = self.video_url
+        
+        # Extract video ID from various YouTube URL formats
+        video_id = None
+        
+        if 'youtube.com/watch?v=' in url:
+            video_id = url.split('watch?v=')[1].split('&')[0]
+        elif 'youtu.be/' in url:
+            video_id = url.split('youtu.be/')[1].split('?')[0]
+        elif 'youtube.com/embed/' in url:
+            # Already in embed format
+            return url
+        
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+        
+        # If not a YouTube URL, return original URL
+        return url
 
 # Track student progress on lessons
 class ModuleProgress(models.Model):
