@@ -149,98 +149,72 @@
             </div>
             
             <div class="text-center">
-                <form method="post" class="d-inline" id="deleteForm" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-delete-confirm me-3" id="deleteButton">
-                        <i class="bi bi-trash me-2"></i>Delete Quiz
-                    </button>
-                </form>
+                <!-- Use button instead of form to avoid any form submission issues -->
+                <button type="button" class="btn btn-delete-confirm me-3" id="deleteButton" onclick="deleteQuizConfirm()">
+                    <i class="bi bi-trash me-2"></i>Delete Quiz
+                </button>
                 
                 <a href="{% url 'teacher_home' %}" class="btn btn-cancel">
                     <i class="bi bi-x me-2"></i>Cancel
                 </a>
+                
+                <!-- Hidden form for CSRF token -->
+                <form style="display: none;" id="hiddenForm">
+                    {% csrf_token %}
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('JavaScript loaded and DOM ready');
-    const deleteForm = document.getElementById('deleteForm');
+function deleteQuizConfirm() {
+    console.log('Delete button clicked');
+    
     const deleteButton = document.getElementById('deleteButton');
+    const originalButtonContent = deleteButton.innerHTML;
     
-    if (!deleteForm) {
-        console.error('Delete form not found!');
-        return;
-    }
+    // Show loading state
+    deleteButton.disabled = true;
+    deleteButton.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Deleting...';
     
-    if (!deleteButton) {
-        console.error('Delete button not found!');
-        return;
-    }
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    console.log('Form and button found, adding event listener');
+    // Create form data
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrfToken);
     
-    deleteForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Form submission prevented, starting AJAX request');
-        
-        // Show loading state
-        const originalButtonContent = deleteButton.innerHTML;
-        deleteButton.disabled = true;
-        deleteButton.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Deleting...';
-        
-        // Get CSRF token
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        console.log('CSRF token:', csrfToken);
-        
-        // Send delete request
-        fetch('', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: new URLSearchParams(new FormData(deleteForm))
-        })
-        .then(response => {
-            console.log('Response received:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('JSON data:', data);
-            if (data.success) {
-                // Show success popup before redirecting
-                showQuizDeletedAnimation();
-                
-                // Redirect after animation with forced refresh
-                setTimeout(() => {
-                    // Add timestamp to prevent caching
-                    const timestamp = new Date().getTime();
-                    window.location.href = data.redirect_url + '?refresh=' + timestamp;
-                }, 2000);
-            } else {
-                // Reset button on error
-                deleteButton.disabled = false;
-                deleteButton.innerHTML = originalButtonContent;
-                alert('Error deleting quiz: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            // Reset button on error
+    // Send AJAX request
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response:', data);
+        if (data.success) {
+            showQuizDeletedAnimation();
+            setTimeout(() => {
+                window.location.href = data.redirect_url + '?t=' + Date.now();
+            }, 2000);
+        } else {
+            alert('Error: ' + data.message);
             deleteButton.disabled = false;
             deleteButton.innerHTML = originalButtonContent;
-            console.error('Error:', error);
-            alert('Error deleting quiz. Please try again.');
-        });
-        
-        return false; // Extra safety to prevent form submission
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting quiz. Please try again.');
+        deleteButton.disabled = false;
+        deleteButton.innerHTML = originalButtonContent;
     });
-    });
-});
+}
 
 function showQuizDeletedAnimation() {
     // Create the animated toast message element
