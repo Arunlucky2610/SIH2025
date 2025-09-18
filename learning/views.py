@@ -1839,6 +1839,15 @@ def delete_quiz(request, quiz_id):
     
     elif request.method == 'POST':
         try:
+            # Double-check that quiz still exists and user has permission
+            if not QuizContainer.objects.filter(id=quiz_id, created_by=request.user).exists():
+                logger.error(f"Quiz {quiz_id} not found or user {request.user.id} lacks permission")
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Quiz not found or you do not have permission to delete it'
+                })
+            
             logger.info(f"Starting deletion of quiz {quiz_id}")
             quiz_title = quiz.title
             
@@ -1874,11 +1883,14 @@ def delete_quiz(request, quiz_id):
             })
             
         except Exception as e:
+            import traceback
             logger.error(f"Error deleting quiz {quiz_id}: {str(e)}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             from django.http import JsonResponse
             return JsonResponse({
                 'success': False,
-                'message': f'Error deleting quiz: {str(e)}'
+                'message': f'Error deleting quiz: {str(e)}',
+                'error_type': type(e).__name__
             })
 
 @login_required

@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': csrfToken
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json'
             },
             body: new URLSearchParams(new FormData(deleteForm))
         })
