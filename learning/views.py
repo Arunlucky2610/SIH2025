@@ -1778,6 +1778,67 @@ def delete_quiz(request, quiz_id):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
+def delete_lesson(request, lesson_id):
+    """Delete a lesson"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"delete_lesson view called - Method: {request.method}, User: {request.user.id}, Lesson ID: {lesson_id}")
+    
+    if request.method == 'POST':
+        try:
+            logger.info(f"Starting deletion of lesson {lesson_id}")
+            
+            # Check permission
+            user_profile = get_object_or_404(UserProfile, user=request.user)
+            if user_profile.role != 'teacher':
+                logger.warning(f"Non-teacher user {request.user.id} attempted to delete lesson {lesson_id}")
+                return JsonResponse({'success': False, 'error': 'Only teachers can delete lessons'})
+            
+            # Get and delete lesson
+            logger.info(f"Fetching lesson {lesson_id}")
+            lesson = get_object_or_404(Lesson, id=lesson_id)
+            
+            # Check if teacher is the creator of this lesson
+            if lesson.created_by != request.user:
+                logger.warning(f"Teacher {request.user.id} attempted to delete lesson {lesson_id} created by {lesson.created_by.id}")
+                return JsonResponse({'success': False, 'error': 'You can only delete lessons you created'})
+            
+            lesson_title = lesson.title
+            
+            logger.info(f"Deleting lesson: {lesson_title}")
+            
+            # Manual cascade delete for better performance and control
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Delete related records first to avoid cascade overhead
+                lesson.student_progress.all().delete()
+                lesson.quizzes.all().delete() 
+                lesson.downloads.all().delete()
+                
+                # Also delete any LearningActivity records
+                from .models import LearningActivity
+                LearningActivity.objects.filter(lesson=lesson).delete()
+                
+                # Finally delete the lesson itself
+                lesson.delete()
+                
+            logger.info(f"Successfully deleted lesson: {lesson_title}")
+            
+            return JsonResponse({
+                'success': True, 
+                'message': f'Lesson "{lesson_title}" deleted successfully'
+            })
+            
+        except Exception as e:
+            logger.error(f"Error deleting lesson {lesson_id}: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    logger.warning(f"Invalid request method {request.method} for lesson deletion")
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
 def edit_quiz(request, quiz_id):
     """Edit quiz page"""
     user_profile = get_object_or_404(UserProfile, user=request.user)

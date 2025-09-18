@@ -66,6 +66,7 @@ urlpatterns = [
     path('schedule-quiz/', views.schedule_quiz, name='schedule_quiz'),
     path('publish-quiz/<int:quiz_id>/', views.publish_quiz, name='publish_quiz'),
     path('delete-quiz/<int:quiz_id>/', views.delete_quiz, name='delete_quiz'),
+    path('delete-lesson/<int:lesson_id>/', views.delete_lesson, name='delete_lesson'),
     path('edit-quiz/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
     
     # Student, Parent, Teacher CRUD

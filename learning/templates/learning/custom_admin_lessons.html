@@ -283,6 +283,17 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
+    
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -307,7 +318,7 @@
     {% if lessons %}
         <div class="lessons-grid">
             {% for lesson in lessons %}
-                <div class="lesson-card">
+                <div class="lesson-card" data-lesson-id="{{ lesson.id }}">
                     <div class="lesson-header">
                         <div class="lesson-type-badge">{{ lesson.get_lesson_type_display }}</div>
                         <h3 class="lesson-title">{{ lesson.title }}</h3>
@@ -409,33 +420,72 @@
 </div>
 
 <script>
-// Delete confirmation functionality
-let lessonToDelete = null;
-
-function showDeleteConfirmation(lessonId, lessonTitle) {
-    lessonToDelete = lessonId;
-    document.getElementById('lessonTitle').textContent = `"${lessonTitle}" and all its content will be permanently deleted.`;
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing delete functionality');
     
-    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    modal.show();
-}
+    // Delete confirmation functionality
+    let lessonToDelete = null;
 
-document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-    if (lessonToDelete) {
-        // Here you would implement the actual delete functionality
-        // For now, we'll show a toast notification
-        showDeleteSuccessToast();
+    function showDeleteConfirmation(lessonId, lessonTitle) {
+        console.log('showDeleteConfirmation called with:', lessonId, lessonTitle);
+        lessonToDelete = lessonId;
+        document.getElementById('lessonTitle').textContent = `"${lessonTitle}" and all its content will be permanently deleted.`;
         
-        // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-        modal.hide();
+        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        modal.show();
+    }
+
+    // Make functions global so they can be called from onclick handlers
+    window.showDeleteConfirmation = showDeleteConfirmation;
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        console.log('Delete button clicked, lessonToDelete:', lessonToDelete);
         
-        // Reset
-        lessonToDelete = null;
+        if (lessonToDelete) {
+            console.log('Starting simple delete request for lesson:', lessonToDelete);
+            
+            // Get CSRF token
+            const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            console.log('Using CSRF token:', csrfToken);
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page.');
+                return;
+            }
+            
+            // Simple fetch request
+            fetch(`/delete-lesson/${lessonToDelete}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            }
+        })
+        .then(response => {
+            console.log('Delete response status:', response.status);
+            console.log('Delete response ok:', response.ok);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Delete response data:', data);
+            if (data.success) {
+                alert('Lesson deleted successfully!');
+                location.reload(); // Simple reload for now
+            } else {
+                alert('Delete failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            alert('Request failed: ' + error.message);
+        });
+    } else {
+        console.error('No lesson selected for deletion');
+        alert('No lesson selected for deletion');
     }
 });
 
-function showDeleteSuccessToast() {
+function showDeleteSuccessToast(message = 'Lesson deleted successfully!') {
     // Create toast notification
     const toast = document.createElement('div');
     toast.className = 'toast align-items-center text-white bg-success border-0';
@@ -444,7 +494,7 @@ function showDeleteSuccessToast() {
         <div class="d-flex">
             <div class="toast-body">
                 <i class="bi bi-check-circle me-2"></i>
-                Lesson deleted successfully!
+                ${message}
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
@@ -456,6 +506,46 @@ function showDeleteSuccessToast() {
     
     toast.addEventListener('hidden.bs.toast', () => toast.remove());
 }
+
+function showErrorToast(message) {
+    // Create error toast notification
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-danger border-0';
+    toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1055; min-width: 300px;';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+
+// CSRF token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+});
 </script>
 
 {% endblock %}

@@ -130,6 +130,16 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
+    /* Loading spinner animation */
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
     /* Message sent animation - Toast style like login page */
     .message-sent-animation {
         position: fixed;
@@ -142,7 +152,7 @@
         box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
         z-index: 10000;
         text-align: left;
-        animation: toastSlideIn 3s ease-in-out;
+        animation: toastSlideIn 4s ease-in-out;
         opacity: 0;
         transform: translateX(100%);
         min-width: 300px;
@@ -154,11 +164,11 @@
             opacity: 0;
             transform: translateX(100%);
         }
-        10% {
+        8% {
             opacity: 1;
             transform: translateX(0);
         }
-        90% {
+        92% {
             opacity: 1;
             transform: translateX(0);
         }
@@ -539,6 +549,12 @@ function sendMessage() {
         return;
     }
     
+    // Get send button and show loading state
+    const sendButton = document.querySelector('[onclick="sendMessage()"]');
+    const originalButtonContent = sendButton.innerHTML;
+    sendButton.disabled = true;
+    sendButton.innerHTML = '<i class="bi bi-arrow-clockwise spin me-1"></i>Sending...';
+    
     // Get CSRF token
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
@@ -559,8 +575,12 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
+        // Reset button state
+        sendButton.disabled = false;
+        sendButton.innerHTML = originalButtonContent;
+        
         if (data.success) {
-            // Show success message
+            // Close the modal first
             const modalElement = document.getElementById('messageModal');
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
@@ -568,13 +588,19 @@ function sendMessage() {
             // Reset form
             document.getElementById('messageForm').reset();
             
-            // Show animated message sent notification
-            showMessageSentAnimation();
+            // Show animated message sent notification with slight delay for better UX
+            setTimeout(() => {
+                showMessageSentAnimation();
+            }, 300);
         } else {
             showNotification('Error sending message: ' + data.error, 'error');
         }
     })
     .catch(error => {
+        // Reset button state on error
+        sendButton.disabled = false;
+        sendButton.innerHTML = originalButtonContent;
+        
         console.error('Error:', error);
         showNotification('Error sending message. Please try again.', 'error');
     });
@@ -608,20 +634,20 @@ function showMessageSentAnimation() {
     messageAnimation.innerHTML = `
         <i class="bi bi-check-circle-fill check-icon"></i>
         <div class="message-content">
-            <div class="message-title">Message Sent</div>
-            <div class="message-text">Your message has been delivered.</div>
+            <div class="message-title">✅ Message Sent Successfully!</div>
+            <div class="message-text">Your message has been delivered to the student.</div>
         </div>
     `;
     
     // Add to body
     document.body.appendChild(messageAnimation);
     
-    // Remove after animation completes (3 seconds)
+    // Remove after animation completes (4 seconds for better visibility)
     setTimeout(() => {
         if (messageAnimation.parentNode) {
             messageAnimation.remove();
         }
-    }, 3000);
+    }, 4000);
 }
 </script>
 
