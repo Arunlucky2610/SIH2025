@@ -166,11 +166,25 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('JavaScript loaded and DOM ready');
     const deleteForm = document.getElementById('deleteForm');
     const deleteButton = document.getElementById('deleteButton');
     
+    if (!deleteForm) {
+        console.error('Delete form not found!');
+        return;
+    }
+    
+    if (!deleteButton) {
+        console.error('Delete button not found!');
+        return;
+    }
+    
+    console.log('Form and button found, adding event listener');
+    
     deleteForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        console.log('Form submission prevented, starting AJAX request');
         
         // Show loading state
         const originalButtonContent = deleteButton.innerHTML;
@@ -179,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get CSRF token
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        console.log('CSRF token:', csrfToken);
         
         // Send delete request
         fetch('', {
@@ -189,8 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: new URLSearchParams(new FormData(deleteForm))
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
         .then(data => {
+            console.log('JSON data:', data);
             if (data.success) {
                 // Show success popup before redirecting
                 showQuizDeletedAnimation();
@@ -207,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteButton.innerHTML = originalButtonContent;
                 alert('Error deleting quiz: ' + (data.message || 'Unknown error'));
             }
-        }))
+        })
         .catch(error => {
             // Reset button on error
             deleteButton.disabled = false;
