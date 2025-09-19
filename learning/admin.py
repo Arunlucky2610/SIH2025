@@ -9,7 +9,8 @@ from datetime import timedelta
 from .models import (UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, 
                      LessonDownload, LoginSession, LearningStreak, WeeklyProgress, 
                      MonthlyProgress, SubjectPerformance, LearningActivity,
-                     Student, Parent, Teacher)
+                     Student, Parent, Teacher, QuizContainer, QuizContainerAttempt)
+from .notification_models import NotificationSettings, ParentNotification, NotificationTemplate
 from .teacher_communication_models import (
     TeacherAssignment, TeacherMessage, TeacherAvailability,
     ConversationThread, TeacherProfile
@@ -479,10 +480,53 @@ class TeacherAvailabilityAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('teacher')
+
+
+# Add missing model admin registrations
+@admin.register(QuizContainer)
+class QuizContainerAdmin(admin.ModelAdmin):
+    list_display = ['title', 'quiz_type', 'created_by', 'is_active', 'duration', 'created_at']
+    list_filter = ['quiz_type', 'is_active', 'created_at']
+    search_fields = ['title', 'description', 'created_by__username']
+    readonly_fields = ['created_at']
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('user__userprofile')
+        return super().get_queryset(request).select_related('created_by')
 
+@admin.register(QuizContainerAttempt)
+class QuizContainerAttemptAdmin(admin.ModelAdmin):
+    list_display = ['student', 'quiz_container', 'score', 'total_questions', 'is_completed', 'started_at']
+    list_filter = ['is_completed', 'started_at', 'quiz_container__quiz_type']
+    search_fields = ['student__username', 'quiz_container__title']
+    readonly_fields = ['started_at', 'completed_at']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('student', 'quiz_container')
+
+@admin.register(ParentNotification)
+class ParentNotificationAdmin(admin.ModelAdmin):
+    list_display = ['parent', 'notification_type', 'title', 'status', 'created_at']
+    list_filter = ['notification_type', 'status', 'created_at']
+    search_fields = ['parent__user__username', 'title', 'message']
+    readonly_fields = ['created_at']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('parent__user')
+
+@admin.register(NotificationSettings)
+class NotificationSettingsAdmin(admin.ModelAdmin):
+    list_display = ['parent', 'lesson_completion', 'streak_milestones', 'weekly_summary']
+    list_filter = ['lesson_completion', 'streak_milestones', 'weekly_summary']
+    search_fields = ['parent__username']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('parent')
+
+@admin.register(NotificationTemplate)
+class NotificationTemplateAdmin(admin.ModelAdmin):
+    list_display = ['notification_type', 'title_template', 'message_template']
+    list_filter = ['notification_type']
+    search_fields = ['notification_type', 'title_template']
 
 # Register Student model
 @admin.register(Student)

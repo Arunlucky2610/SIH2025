@@ -95,6 +95,76 @@ class Lesson(models.Model):
     
     def __str__(self):
         return f"{self.title} ({self.language})"
+    
+    def get_embed_url(self):
+        """Convert YouTube URL to embeddable format"""
+        if not self.video_url:
+            return None
+        
+        # Handle different YouTube URL formats
+        url = self.video_url
+        
+        # Extract video ID from various YouTube URL formats
+        video_id = None
+        
+        if 'youtube.com/watch?v=' in url:
+            video_id = url.split('watch?v=')[1].split('&')[0]
+        elif 'youtu.be/' in url:
+            video_id = url.split('youtu.be/')[1].split('?')[0]
+        elif 'youtube.com/embed/' in url:
+            # Already in embed format
+            return url
+        
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+        
+        # If not a YouTube URL, return original URL
+        return url
+    
+    def get_file_type(self):
+        """Get file type for display purposes"""
+        if not self.file:
+            return None
+        
+        import os
+        file_extension = os.path.splitext(self.file.name)[1].lower()
+        
+        file_types = {
+            '.pdf': 'PDF Document',
+            '.doc': 'Word Document',
+            '.docx': 'Word Document',
+            '.ppt': 'PowerPoint',
+            '.pptx': 'PowerPoint',
+            '.xls': 'Excel Spreadsheet',
+            '.xlsx': 'Excel Spreadsheet',
+            '.txt': 'Text File',
+            '.jpg': 'Image',
+            '.jpeg': 'Image',
+            '.png': 'Image',
+            '.gif': 'Image',
+            '.svg': 'Image',
+        }
+        
+        return file_types.get(file_extension, 'File')
+    
+    def is_viewable_online(self):
+        """Check if file can be viewed online"""
+        if not self.file:
+            return False
+        
+        import os
+        file_extension = os.path.splitext(self.file.name)[1].lower()
+        viewable_extensions = ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif', '.svg']
+        
+        return file_extension in viewable_extensions
+    
+    def get_filename(self):
+        """Get just the filename without path"""
+        if not self.file:
+            return None
+        
+        import os
+        return os.path.basename(self.file.name)
 
 # Track student progress on lessons
 class ModuleProgress(models.Model):
@@ -114,7 +184,8 @@ class ModuleProgress(models.Model):
 
 # Quiz model for assessment
 class Quiz(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quizzes')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quizzes', null=True, blank=True)
+    quiz_container = models.ForeignKey('QuizContainer', on_delete=models.CASCADE, related_name='quiz_questions', null=True, blank=True)
     question = models.TextField()
     option_a = models.CharField(max_length=200)
     option_b = models.CharField(max_length=200)
@@ -131,10 +202,15 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     
     class Meta:
-        ordering = ['lesson', 'order']
+        ordering = ['lesson', 'quiz_container', 'order']
     
     def __str__(self):
-        return f"Quiz for {self.lesson.title}: {self.question[:50]}..."
+        if self.lesson:
+            return f"Quiz for {self.lesson.title}: {self.question[:50]}..."
+        elif self.quiz_container:
+            return f"Quiz for {self.quiz_container.title}: {self.question[:50]}..."
+        else:
+            return f"Quiz: {self.question[:50]}..."
 
 # Track quiz attempts
 class QuizAttempt(models.Model):
@@ -151,9 +227,63 @@ class QuizAttempt(models.Model):
     
     class Meta:
         unique_together = ['student', 'quiz']
+
+# Track quiz container attempts (overall quiz sessions)
+class QuizContainerAttempt(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quiz_container_attempts')
+    quiz_container = models.ForeignKey('QuizContainer', on_delete=models.CASCADE, related_name='attempts')
+    score = models.PositiveIntegerField(default=0)
+    total_questions = models.PositiveIntegerField(default=0)
+    percentage = models.FloatField(default=0.0)
+    started_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.quiz_container.title} ({self.percentage}%)"
     
     def __str__(self):
         return f"{self.student.username} - {self.quiz.question[:30]}... ({'Correct' if self.is_correct else 'Incorrect'})"
+
+# Quiz Container for managing complete quizzes
+class QuizContainer(models.Model):
+    QUIZ_TYPES = [
+        ('quick', 'Quick Quiz'),
+        ('assignment', 'Assignment'),
+        ('practice', 'Practice'),
+    ]
+    
+    DIFFICULTY_LEVELS = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    quiz_type = models.CharField(max_length=20, choices=QUIZ_TYPES, default='quick')
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_LEVELS, default='medium')
+    duration = models.PositiveIntegerField(default=30, help_text="Duration in minutes")
+    randomize_questions = models.BooleanField(default=False)
+    show_results = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_quizzes')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_quiz_type_display()})"
+    
+    @property
+    def question_count(self):
+        """Return the number of questions in this quiz"""
+        return self.quiz_questions.count()
 
 # Download tracking for offline capability
 class LessonDownload(models.Model):

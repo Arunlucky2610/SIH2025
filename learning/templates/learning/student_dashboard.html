@@ -157,6 +157,116 @@
         </div>
     </div>
     
+    <!-- Quiz Section (Simplified) -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card dashboard-card border-0 shadow-lg">
+                <div class="card-header bg-white border-0 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1 fw-bold text-info">
+                                <i class="bi bi-question-circle-fill me-2"></i> 
+                                Available Quizzes
+                            </h4>
+                            <p class="text-muted mb-0">Test your knowledge and track your progress</p>
+                        </div>
+                        <div class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
+                            {{ available_quizzes|length }} quiz{{ available_quizzes|length|pluralize:"es" }} available
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if available_quizzes %}
+                        <div class="row g-4">
+                            {% for quiz in available_quizzes %}
+                                <div class="col-lg-6 col-xl-4">
+                                    <div class="card quiz-card border-0 shadow-sm h-100">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div class="bg-info bg-opacity-10 rounded-circle p-2">
+                                                    <i class="bi bi-lightning-fill text-info"></i>
+                                                </div>
+                                                <span class="badge bg-primary rounded-pill">
+                                                    Quiz
+                                                </span>
+                                            </div>
+                                            
+                                            <h5 class="fw-bold mb-2">{{ quiz.title }}</h5>
+                                            {% if quiz.description %}
+                                                <p class="text-muted small mb-3">{{ quiz.description|truncatechars:80 }}</p>
+                                            {% endif %}
+                                            
+                                            <div class="d-flex justify-content-between align-items-center text-sm text-muted mb-3">
+                                                <span><i class="bi bi-question-circle me-1"></i>{{ quiz.question_count }} question{{ quiz.question_count|pluralize }}</span>
+                                                {% if quiz.duration_minutes %}
+                                                    <span><i class="bi bi-clock me-1"></i>{{ quiz.duration_minutes }} min</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Check if user has attempted this quiz -->
+                                            {% for attempt in quiz_attempts %}
+                                                {% if attempt.quiz_container.id == quiz.id %}
+                                                    <div class="mb-3">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <small class="text-muted">Previous Score</small>
+                                                            <small class="fw-bold text-{% if attempt.percentage >= 70 %}success{% else %}warning{% endif %}">{{ attempt.percentage|floatformat:0 }}%</small>
+                                                        </div>
+                                                        <div class="progress" style="height: 6px;">
+                                                            <div class="progress-bar bg-{% if attempt.percentage >= 70 %}success{% else %}warning{% endif %}" style="width: {{ attempt.percentage }}%"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-grid gap-2">
+                                                        <a href="{% url 'quiz_result' attempt.id %}" class="btn btn-outline-info btn-sm">
+                                                            <i class="bi bi-eye me-1"></i>View Results
+                                                        </a>
+                                                        {% if attempt.percentage < 70 %}
+                                                            <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-warning btn-sm">
+                                                                <i class="bi bi-arrow-clockwise me-1"></i>Retake Quiz
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                {% else %}
+                                                    <div class="d-grid">
+                                                        <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-info">
+                                                            <i class="bi bi-play-circle me-2"></i>Start Quiz
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            {% empty %}
+                                                <div class="d-grid">
+                                                    <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-info">
+                                                        <i class="bi bi-play-circle me-2"></i>Start Quiz
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0 pt-0 px-4 pb-4">
+                                            <small class="text-muted">
+                                                <i class="bi bi-person me-1"></i>Created by {{ quiz.created_by.username }}
+                                                <span class="ms-2">
+                                                    <i class="bi bi-calendar3 me-1"></i>{{ quiz.created_at|date:"M d" }}
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-question-circle text-secondary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h5 class="fw-bold text-secondary mb-2">No Quizzes Available</h5>
+                            <p class="text-muted">New quizzes will appear here when your teachers create them.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Enhanced Lessons Section -->
     <div class="row">
         <div class="col-lg-8 mb-4">

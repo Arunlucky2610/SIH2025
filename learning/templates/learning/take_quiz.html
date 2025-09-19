@@ -1,0 +1,321 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz_container.title }} - Rural Digital Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .quiz-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin: 2rem auto;
+        max-width: 900px;
+    }
+    
+    .quiz-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        text-align: center;
+    }
+    
+    .question-card {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .question-number {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+    
+    .question-text {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+    
+    .option-item {
+        background: white;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .option-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.1);
+    }
+    
+    .option-item input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .option-item input[type="radio"]:checked + .option-content {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .option-content {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .option-label {
+        background: #6c757d;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .option-item input[type="radio"]:checked + .option-content .option-label {
+        background: white;
+        color: #667eea;
+    }
+    
+    .quiz-navigation {
+        background: white;
+        padding: 2rem;
+        border-radius: 0 0 20px 20px;
+        text-align: center;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .btn-submit-quiz {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 3rem;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit-quiz:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .quiz-info {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transition: width 0.3s ease;
+    }
+    
+    .option-text {
+        color: #000 !important;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    
+    /* Ensure option text remains visible when selected */
+    .option-item input[type="radio"]:checked + .option-content .option-text {
+        color: white !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="display-5 fw-bold mb-2">
+                <i class="bi bi-question-circle-fill me-3"></i>{{ quiz_container.title }}
+            </h1>
+            {% if quiz_container.description %}
+            <p class="lead mb-0">{{ quiz_container.description }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="p-4">
+            <div class="quiz-info">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="mb-1"><i class="bi bi-info-circle me-2"></i>Quiz Information</h6>
+                        <small class="text-muted">
+                            Total Questions: {{ questions.count }} | 
+                            Type: {{ quiz_container.get_quiz_type_display }} |
+                            {% if quiz_container.duration_minutes %}Duration: {{ quiz_container.duration_minutes }} minutes{% endif %}
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <small class="text-muted">Progress: <span id="progress-text">0/{{ questions.count }}</span></small>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post" id="quizForm">
+                {% csrf_token %}
+                
+                {% for question in questions %}
+                <div class="question-card">
+                    <div class="question-number">
+                        Question {{ forloop.counter }}
+                    </div>
+                    <div class="question-text">
+                        {{ question.question }}
+                    </div>
+                    
+                    <div class="options-list">
+                        <label class="option-item" for="q{{ question.id }}_a">
+                            <input type="radio" name="question_{{ question.id }}" value="A" id="q{{ question.id }}_a" onchange="updateProgress()">
+                            <div class="option-content">
+                                <div class="option-label">A</div>
+                                <div class="option-text">{{ question.option_a }}</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" for="q{{ question.id }}_b">
+                            <input type="radio" name="question_{{ question.id }}" value="B" id="q{{ question.id }}_b" onchange="updateProgress()">
+                            <div class="option-content">
+                                <div class="option-label">B</div>
+                                <div class="option-text">{{ question.option_b }}</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" for="q{{ question.id }}_c">
+                            <input type="radio" name="question_{{ question.id }}" value="C" id="q{{ question.id }}_c" onchange="updateProgress()">
+                            <div class="option-content">
+                                <div class="option-label">C</div>
+                                <div class="option-text">{{ question.option_c }}</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" for="q{{ question.id }}_d">
+                            <input type="radio" name="question_{{ question.id }}" value="D" id="q{{ question.id }}_d" onchange="updateProgress()">
+                            <div class="option-content">
+                                <div class="option-label">D</div>
+                                <div class="option-text">{{ question.option_d }}</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="quiz-navigation">
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-lg me-3">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-submit-quiz" onclick="return confirmSubmit()">
+                        <i class="bi bi-check-circle me-2"></i>Submit Quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const totalQuestions = {{ questions.count }};
+
+function updateProgress() {
+    const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+    const percentage = (answeredQuestions / totalQuestions) * 100;
+    
+    document.getElementById('progress-text').textContent = `${answeredQuestions}/${totalQuestions}`;
+    document.getElementById('progress-fill').style.width = `${percentage}%`;
+}
+
+function confirmSubmit() {
+    const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+    
+    if (answeredQuestions < totalQuestions) {
+        const unanswered = totalQuestions - answeredQuestions;
+        return confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit?`);
+    }
+    
+    return confirm('Are you sure you want to submit your quiz? You cannot change your answers after submission.');
+}
+
+// Auto-save functionality (optional)
+function autoSave() {
+    const formData = new FormData(document.getElementById('quizForm'));
+    const answers = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (key.startsWith('question_')) {
+            answers[key] = value;
+        }
+    }
+    
+    localStorage.setItem('quiz_{{ quiz_container.id }}_answers', JSON.stringify(answers));
+}
+
+// Load saved answers on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedAnswers = localStorage.getItem('quiz_{{ quiz_container.id }}_answers');
+    if (savedAnswers) {
+        const answers = JSON.parse(savedAnswers);
+        for (let [key, value] of Object.entries(answers)) {
+            const radio = document.querySelector(`input[name="${key}"][value="${value}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+        updateProgress();
+    }
+    
+    // Add auto-save on change
+    document.getElementById('quizForm').addEventListener('change', autoSave);
+});
+
+// Clear saved answers on successful submission
+document.getElementById('quizForm').addEventListener('submit', function() {
+    localStorage.removeItem('quiz_{{ quiz_container.id }}_answers');
+});
+</script>
+{% endblock %}
