@@ -12,25 +12,58 @@
     padding: 2rem;
     border-radius: 20px;
     margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
 .teacher-info-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 20px;
-    padding: 1.5rem;
+    padding: 0;
     margin-bottom: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.teacher-info-header {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.teacher-info-content {
+    padding: 1.5rem 2rem;
 }
 
 .message-form-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 20px;
-    padding: 2rem;
+    padding: 0;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.message-form-header {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.message-form-content {
+    padding: 2rem;
 }
 
 .form-group {
@@ -39,8 +72,7 @@
 
 .form-label {
     font-weight: 600;
-    color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: #2c3e50 !important;
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -197,54 +229,59 @@ textarea.form-control {
         <!-- Teacher Information -->
         <div class="col-lg-4">
             <div class="teacher-info-card">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="teacher-avatar">
-                        {{ teacher.first_name.0|default:teacher.username.0|upper }}
+                <h5 class="teacher-info-header">👩‍🏫 Teacher Information</h5>
+                <div class="teacher-info-content">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="teacher-avatar">
+                            {{ teacher.first_name.0|default:teacher.username.0|upper }}
+                        </div>
+                        <div class="teacher-details">
+                            <h5 class="mb-1">{{ teacher.get_full_name|default:teacher.username }}</h5>
+                            <p class="text-muted mb-0">{{ teacher.email|default:"No email available" }}</p>
+                        </div>
                     </div>
-                    <div class="teacher-details">
-                        <h5 class="mb-1">{{ teacher.get_full_name|default:teacher.username }}</h5>
-                        <p class="text-muted mb-0">{{ teacher.email|default:"No email available" }}</p>
+
+                    {% if teacher_profile.bio %}
+                    <div class="mb-3">
+                        <h6>About:</h6>
+                        <p class="text-muted small">{{ teacher_profile.bio }}</p>
                     </div>
-                </div>
+                    {% endif %}
 
-                {% if teacher_profile.bio %}
-                <div class="mb-3">
-                    <h6>About:</h6>
-                    <p class="text-muted small">{{ teacher_profile.bio }}</p>
-                </div>
-                {% endif %}
-
-                <div class="mb-3">
-                    <h6>Subjects:</h6>
-                    <div class="subject-tags">
-                        {% for assignment in teacher_assignments %}
-                            <span class="subject-tag">{{ assignment.get_subject_display }}</span>
-                        {% endfor %}
+                    <div class="mb-3">
+                        <h6>Subjects:</h6>
+                        <div class="subject-tags">
+                            {% for assignment in teacher_assignments %}
+                                <span class="subject-tag">{{ assignment.get_subject_display }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
 
-                {% if teacher_profile.response_time_hours %}
-                <div class="mb-3">
-                    <h6>Response Time:</h6>
-                    <p class="text-muted small">
-                        <i class="fas fa-clock"></i> Usually responds within {{ teacher_profile.response_time_hours }} hours
-                    </p>
-                </div>
-                {% endif %}
+                    {% if teacher_profile.response_time_hours %}
+                    <div class="mb-3">
+                        <h6>Response Time:</h6>
+                        <p class="text-muted small">
+                            <i class="fas fa-clock"></i> Usually responds within {{ teacher_profile.response_time_hours }} hours
+                        </p>
+                    </div>
+                    {% endif %}
 
-                {% if teacher_profile.preferred_contact_time %}
-                <div class="mb-3">
-                    <h6>Best Time to Contact:</h6>
-                    <p class="text-muted small">{{ teacher_profile.preferred_contact_time }}</p>
+                    {% if teacher_profile.preferred_contact_time %}
+                    <div class="mb-3">
+                        <h6>Best Time to Contact:</h6>
+                        <p class="text-muted small">{{ teacher_profile.preferred_contact_time }}</p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
 
         <!-- Message Form -->
         <div class="col-lg-8">
             <div class="message-form-card">
-                <form method="post" id="messageForm">
+                <h5 class="message-form-header">✉️ Compose Message</h5>
+                <div class="message-form-content">
+                    <form method="post" id="messageForm">
                     {% csrf_token %}
                     
                     <div class="form-group">
@@ -322,6 +359,7 @@ textarea.form-control {
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
     </div>

@@ -17,6 +17,8 @@ urlpatterns = [
     path('parents/parent-dashboard-test/', views.parent_dashboard, name='parent_dashboard_test'),
     path('parents/ultra-dashboard/', views.parent_dashboard, name='parent_dashboard_ultra'),
     path('parents/analytics/', views.parent_analytics, name='parent_analytics'),
+    path('study-schedule/', views.study_schedule, name='study_schedule'),
+    path('student-schedule/', views.student_schedule, name='student_schedule'),
     
     # Notifications (for parents)
     path('notifications/', views.notifications_view, name='notifications'),

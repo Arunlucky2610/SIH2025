@@ -12,6 +12,7 @@
     padding: 2rem;
     border-radius: 20px;
     margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
 .conversation-container {
@@ -37,24 +38,26 @@
 }
 
 .message.sent .message-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
     color: white;
     margin-left: 3rem;
     margin-right: 0;
+    box-shadow: 0 4px 15px rgba(74, 105, 189, 0.3);
 }
 
 .message.received .message-content {
     background: #f8f9fa;
-    color: #333;
+    color: #2c3e50;
     margin-right: 3rem;
     margin-left: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .message-avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,10 +66,12 @@
     font-weight: bold;
     margin: 0 1rem;
     flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
 .message.sent .message-avatar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
+    box-shadow: 0 4px 15px rgba(74, 105, 189, 0.3);
 }
 
 .message-content {
@@ -94,13 +99,19 @@
 .message-time {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.8) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message.received .message-time {
+    color: #7f8c8d !important;
 }
 
 .message-text {
     line-height: 1.6;
     color: #ffffff !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message.received .message-text {
+    color: #2c3e50 !important;
 }
 
 .message-priority {
@@ -113,22 +124,38 @@
 }
 
 .priority-high {
-    background: #fff3cd;
-    color: #856404;
+    background: #f39c12;
+    color: white;
 }
 
 .priority-urgent {
-    background: #f8d7da;
-    color: #721c24;
+    background: #e74c3c;
+    color: white;
 }
 
 .reply-form {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 20px;
-    padding: 2rem;
+    padding: 0;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.reply-form-header {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.reply-form-content {
+    padding: 2rem;
 }
 
 .form-control {
@@ -142,13 +169,13 @@
 }
 
 .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: #27ae60;
+    box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
     background: white;
 }
 
 .reply-btn {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
     color: white;
     padding: 0.75rem 2rem;
     border: none;
@@ -156,16 +183,17 @@
     font-weight: 600;
     transition: all 0.3s ease;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
 .reply-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
 }
 
 .conversation-info {
-    background: #f8f9fa;
-    border-left: 4px solid #667eea;
+    background: rgba(74, 105, 189, 0.1);
+    border-left: 4px solid #4a69bd;
     padding: 1rem;
     border-radius: 0 10px 10px 0;
     margin-bottom: 2rem;
@@ -192,7 +220,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -220,19 +248,22 @@
 }
 
 .quick-reply-btn {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid #667eea;
-    color: #667eea;
+    background: rgba(74, 105, 189, 0.1);
+    border: 2px solid #4a69bd;
+    color: #4a69bd;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .quick-reply-btn:hover {
-    background: #667eea;
+    background: #4a69bd;
     color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 105, 189, 0.3);
 }
 
 .conversation-actions {
@@ -248,28 +279,46 @@
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .resolve-btn {
-    background: #28a745;
+    background: #27ae60;
     color: white;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.resolve-btn:hover {
+    background: #229954;
+    transform: translateY(-1px);
 }
 
 .archive-btn {
     background: #6c757d;
     color: white;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.archive-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
 }
 
 .priority-btn {
-    background: #ffc107;
-    color: #212529;
+    background: #f39c12;
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.priority-btn:hover {
+    background: #e67e22;
+    transform: translateY(-1px);
 }
 
 .character-counter {
     text-align: right;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.8) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: #7f8c8d !important;
     margin-top: 0.5rem;
 }
 </style>
@@ -358,50 +407,51 @@
 
     <!-- Reply Form -->
     <div class="reply-form">
-        <h5><i class="fas fa-reply"></i> Reply to this conversation</h5>
-        
-        <!-- Quick Replies -->
-        <div class="quick-replies">
-            <button class="quick-reply-btn" onclick="insertQuickReply('Thank you for the update!')">
-                Thank you for the update!
-            </button>
-            <button class="quick-reply-btn" onclick="insertQuickReply('Could we schedule a meeting to discuss this further?')">
-                Schedule a meeting
-            </button>
-            <button class="quick-reply-btn" onclick="insertQuickReply('I understand. Please keep me informed.')">
-                Understood
-            </button>
-            <button class="quick-reply-btn" onclick="insertQuickReply('What can I do to help with this at home?')">
-                How can I help?
-            </button>
-        </div>
-        
-        <form method="post" id="replyForm">
-            {% csrf_token %}
-            <div class="form-group mb-3">
-                <textarea class="form-control" 
-                          id="replyContent" 
-                          name="content" 
-                          placeholder="Type your reply here..."
-                          maxlength="2000"
-                          required></textarea>
-                <div class="character-counter">
-                    <span id="content-count">0</span>/2000 characters
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle"></i>
-                        Your reply will be sent to all participants in this conversation
-                    </small>
-                </div>
-                <button type="submit" class="reply-btn">
-                    <i class="fas fa-paper-plane"></i> Send Reply
+        <h5 class="reply-form-header"><i class="fas fa-reply"></i> Reply to this conversation</h5>
+        <div class="reply-form-content">
+            <!-- Quick Replies -->
+            <div class="quick-replies">
+                <button class="quick-reply-btn" onclick="insertQuickReply('Thank you for the update!')">
+                    Thank you for the update!
+                </button>
+                <button class="quick-reply-btn" onclick="insertQuickReply('Could we schedule a meeting to discuss this further?')">
+                    Schedule a meeting
+                </button>
+                <button class="quick-reply-btn" onclick="insertQuickReply('I understand. Please keep me informed.')">
+                    Understood
+                </button>
+                <button class="quick-reply-btn" onclick="insertQuickReply('What can I do to help with this at home?')">
+                    How can I help?
                 </button>
             </div>
-        </form>
+            
+            <form method="post" id="replyForm">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <textarea class="form-control" 
+                              id="replyContent" 
+                              name="content" 
+                              placeholder="Type your reply here..."
+                              maxlength="2000"
+                              required></textarea>
+                    <div class="character-counter">
+                        <span id="content-count">0</span>/2000 characters
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Your reply will be sent to all participants in this conversation
+                        </small>
+                    </div>
+                    <button type="submit" class="reply-btn">
+                        <i class="fas fa-paper-plane"></i> Send Reply
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

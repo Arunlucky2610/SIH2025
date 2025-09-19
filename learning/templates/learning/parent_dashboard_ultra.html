@@ -2,53 +2,122 @@
 
 {% block title %}Parent Dashboard - Rural Digital Learning{% endblock %}
 
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    @keyframes orbit {
+        0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+        100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+    }
+    
+    @keyframes orbit-reverse {
+        0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+        100% { transform: rotate(-360deg) translateX(20px) rotate(360deg); }
+    }
+    
+    @keyframes orbit-slow {
+        0% { transform: translateY(-50%) rotate(0deg) translateX(22px) rotate(0deg); }
+        100% { transform: translateY(-50%) rotate(360deg) translateX(22px) rotate(-360deg); }
+    }
+    
+    .parent-icon-container {
+        transition: all 0.3s ease;
+    }
+    
+    .parent-icon-container:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid" style="background-color: #ffffff; min-height: 100vh;">
     <!-- Enhanced Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="position-relative overflow-hidden rounded-4 p-5" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
-                <!-- Background decoration -->
-                <div class="position-absolute" style="top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                <div class="position-absolute" style="bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+            <div class="position-relative overflow-hidden rounded-4 p-0" style="background: transparent !important;">
                 
-                <div class="row align-items-center position-relative">
-                    <div class="col-lg-8">
-                        <div class="text-white">
-                            <h1 class="display-5 fw-bold mb-3 fade-in-up">
-                                Hey {{ user.first_name|default:user.username|lower }}! 👋
-                            </h1>
-                            <p class="lead mb-2 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
-                                Role: <span class="badge bg-white bg-opacity-90 text-dark fw-semibold">Parent</span>
-                                {% if user.userprofile.child_name %}
-                                    <span class="badge bg-white bg-opacity-90 text-dark fw-semibold ms-2">Parent of {{ user.userprofile.child_name }}</span>
-                                {% endif %}
-                            </p>
-                            <p class="lead mb-4 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
-                                Perfect time to check your children's learning progress and achievements
-                            </p>
-                            <div class="d-flex flex-wrap gap-3 fade-in-up" style="animation-delay: 0.2s;">
-                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
-                                    <i class="bi bi-calendar me-1"></i> 
-                                    Sep 17 Today
-                                </div>
-                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
-                                    <i class="bi bi-people me-1"></i> 
-                                    {{ children_count|default:0 }} Children
-                                </div>
-                                <div class="badge bg-white bg-opacity-90 text-dark fw-semibold rounded-pill px-3 py-2">
-                                    <i class="bi bi-graph-up me-1"></i> 
-                                    {{ completed_assignments|default:0 }}% Progress
+                <div class="row align-items-center position-relative g-0">
+                    <div class="col-12" style="background: transparent !important;">
+                        <div class="d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: #ffffff !important; padding: 3rem 2rem; border-radius: 1rem; min-height: 200px; border: none; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+                            <div class="flex-grow-1">
+                                <h1 class="display-4 fw-bold mb-3 fade-in-up text-white">
+                                    Hey {{ user.first_name|default:user.username|lower }}! 👋
+                                </h1>
+                                <p class="lead mb-2 fade-in-up text-white" style="animation-delay: 0.1s;">
+                                    Role: <span style="color: #fef3c7 !important; font-weight: 600;">Parent</span>
+                                    {% if user.userprofile.child_name %}
+                                        <span style="color: #fef3c7 !important; font-weight: 600;" class="ms-2">Parent of {{ user.userprofile.child_name }}</span>
+                                    {% endif %}
+                                </p>
+                                <p class="lead mb-4 fade-in-up text-white" style="animation-delay: 0.1s;">
+                                    Perfect time to check your children's learning progress and achievements
+                                </p>
+                                <div class="d-flex flex-wrap gap-3 fade-in-up" style="animation-delay: 0.2s;">
+                                    <div class="px-3 py-2 rounded-pill d-inline-flex align-items-center" style="background: #f8f9fa !important; border: 1px solid #e9ecef; color: #2c3e50 !important; font-weight: 600;">
+                                        <i class="bi bi-calendar me-2" style="color: #4F46E5;"></i> 
+                                        Sep 17 Today
+                                    </div>
+                                    <div class="px-3 py-2 rounded-pill d-inline-flex align-items-center" style="background: #f8f9fa !important; border: 1px solid #e9ecef; color: #2c3e50 !important; font-weight: 600;">
+                                        <i class="bi bi-people me-2" style="color: #10b981;"></i> 
+                                        {{ children_count|default:0 }} Children
+                                    </div>
+                                    <div class="px-3 py-2 rounded-pill d-inline-flex align-items-center" style="background: #f8f9fa !important; border: 1px solid #e9ecef; color: #2c3e50 !important; font-weight: 600;">
+                                        <i class="bi bi-graph-up me-2" style="color: #f59e0b;"></i> 
+                                        {{ completed_assignments|default:0 }}% Progress
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 text-end">
-                        <div class="position-relative">
-                            <i class="bi bi-person-hearts text-white opacity-25" style="font-size: 8rem;"></i>
-                            <div class="position-absolute top-50 start-50 translate-middle">
-                                <div class="bg-white rounded-circle p-3 shadow-lg">
-                                    <i class="bi bi-people-fill text-primary fs-2"></i>
+                            <!-- Professional Parent Dashboard Icon -->
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="position-relative d-inline-block">
+                                    <!-- Main Professional Icon Container -->
+                                    <div class="parent-icon-container" style="animation: float 3s ease-in-out infinite;">
+                                        <div class="rounded-circle p-3 shadow-lg position-relative d-flex align-items-center justify-content-center" style="background: #ffffff !important; border: 2px solid #e9ecef; width: 80px; height: 80px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                                            <!-- Central Dashboard Icon -->
+                                            <i class="bi bi-speedometer2" style="font-size: 2.2rem; animation: pulse 2s ease-in-out infinite; color: #4F46E5;"></i>
+                                            
+                                            <!-- Orbiting Elements -->
+                                            <div class="position-absolute" style="top: -6px; right: -6px; animation: orbit 4s linear infinite;">
+                                                <div class="rounded-circle p-1 d-flex align-items-center justify-content-center" style="background: #4F46E5 !important; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); width: 20px; height: 20px;">
+                                                    <i class="bi bi-graph-up text-white" style="font-size: 0.7rem;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="position-absolute" style="bottom: -6px; left: -6px; animation: orbit-reverse 3s linear infinite;">
+                                                <div class="rounded-circle p-1 d-flex align-items-center justify-content-center" style="background: #10b981 !important; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); width: 20px; height: 20px;">
+                                                    <i class="bi bi-mortarboard text-white" style="font-size: 0.7rem;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="position-absolute" style="top: 50%; right: -10px; transform: translateY(-50%); animation: orbit-slow 5s linear infinite;">
+                                                <div class="rounded-circle p-1 d-flex align-items-center justify-content-center" style="background: #f59e0b !important; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); width: 18px; height: 18px;">
+                                                    <i class="bi bi-people text-white" style="font-size: 0.6rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Floating Achievement Badge -->
+                                    <div class="position-absolute" style="top: -8px; left: -8px; animation: bounce 2s ease-in-out infinite;">
+                                        <div class="rounded-circle p-1 d-flex align-items-center justify-content-center" style="background: #7C3AED !important; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3); width: 24px; height: 24px;">
+                                            <i class="bi bi-award-fill text-white" style="font-size: 0.9rem;"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -58,20 +127,30 @@
         </div>
     </div>
 
-    <!-- Main Dashboard Cards -->
-    <div class="mb-5">
-        <div class="row">
+    <!-- Parent Tools Section -->
+    <div class="container-fluid px-4 mb-5">
+        <!-- Section Header -->
+        <div class="row mb-4">
             <div class="col-12">
-                <h3 class="text-dark fw-bold mb-4 d-flex align-items-center">
-                    <i class="bi bi-speedometer2 me-2 text-primary fs-4"></i>
-                    <span>Quick Overview</span>
-                </h3>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h2 class="fw-bold text-dark mb-2">🛠️ Parent Tools</h2>
+                        <p class="text-muted mb-0">Essential tools and insights for monitoring your child's learning journey</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row g-4">
+        
+        <!-- Stats Cards Row -->
+        <div class="row g-4 mb-4">
             <!-- Current Activity Card -->
             <div class="col-xl-3 col-lg-6 col-md-6">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="glass-card stats-card rounded-4 h-100">
                     <div class="card-body p-4 text-center">
                         <div class="mb-3">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 60px; height: 60px;">
@@ -85,76 +164,77 @@
                 </div>
             </div>
 
-        <!-- Learning Hours Card -->
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
-                <div class="card-body p-4 text-center">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" style="width: 60px; height: 60px;">
-                            <i class="bi bi-clock-history text-success fs-3"></i>
+            <!-- Learning Hours Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stats-card rounded-4 h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-clock-history text-success fs-3"></i>
+                            </div>
                         </div>
+                        <h3 class="fw-bold text-success mb-2">{{ learning_hours|default:24 }}h</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Learning Hours</p>
+                        <p class="text-muted small mb-0">Total time this month</p>
                     </div>
-                    <h3 class="fw-bold text-success mb-2">{{ learning_hours|default:24 }}h</h3>
-                    <p class="card-title text-dark fw-semibold mb-2">Learning Hours</p>
-                    <p class="text-muted small mb-0">Total time this month</p>
+                </div>
+            </div>
+
+            <!-- Completed Assignments Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stats-card rounded-4 h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-check-circle text-warning fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-warning mb-2">{{ assignments_done|default:87 }}%</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Assignments Done</p>
+                        <p class="text-muted small mb-0">Completion rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stats-card rounded-4 h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10" style="width: 60px; height: 60px;">
+                                <i class="bi bi-trophy text-info fs-3"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-info mb-2">{{ performance|default:85 }}%</h3>
+                        <p class="card-title text-dark fw-semibold mb-2">Performance</p>
+                        <p class="text-muted small mb-0">Overall progress</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Completed Assignments Card -->
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
-                <div class="card-body p-4 text-center">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" style="width: 60px; height: 60px;">
-                            <i class="bi bi-check-circle-fill text-warning fs-3"></i>
-                        </div>
-                    </div>
-                    <h3 class="fw-bold text-warning mb-2">{{ completed_assignments|default:87 }}%</h3>
-                    <p class="card-title text-dark fw-semibold mb-2">Assignments Done</p>
-                    <p class="text-muted small mb-0">Completion rate</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Performance Score Card -->
-        <div class="col-xl-3 col-lg-6 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
-                <div class="card-body p-4 text-center">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10" style="width: 60px; height: 60px;">
-                            <i class="bi bi-trophy-fill text-info fs-3"></i>
-                        </div>
-                    </div>
-                    <h3 class="fw-bold text-info mb-2">{{ performance_score|default:85 }}%</h3>
-                    <p class="card-title text-dark fw-semibold mb-2">Performance</p>
-                    <p class="text-muted small mb-0">Overall progress</p>
-                </div>
-            </div>
-        </div>
-        </div>
-    </div>
-
-
-
-
-    <!-- Parent Tools & Resources -->
-    <div class="mb-5">
-        <div class="row">
+        <!-- Action Tools Section -->
+        <div class="row mb-3">
             <div class="col-12">
-                <h3 class="text-dark fw-bold mb-4 d-flex align-items-center">
-                    <i class="bi bi-tools me-2 text-primary fs-4"></i>
-                    <span>Parent Tools</span>
-                </h3>
+                <h4 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+                    Quick Actions
+                </h4>
             </div>
         </div>
         
-        <!-- Parent Tools Grid - 4 Equal Columns -->
         <div class="row g-4">
-            
             <!-- Teacher Communication Card -->
-            <div class="col-3">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card quick-action-card rounded-4 h-100 position-relative" onclick="startConversation()" style="cursor: pointer;">
+                    <!-- Unread Messages Badge -->
+                    {% if unread_messages_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 10;">
+                        {{ unread_messages_count }}
+                        <span class="visually-hidden">unread messages</span>
+                    </span>
+                    {% endif %}
+                    
                     <div class="card-body p-4 text-center">
                         <div class="mb-3">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 60px; height: 60px;">
@@ -162,15 +242,15 @@
                             </div>
                         </div>
                         <h3 class="fw-bold text-primary mb-2">💬</h3>
-                        <p class="card-title text-dark fw-semibold mb-2">Teacher Communication</p>
-                        <p class="text-muted small mb-0">Connect with educators</p>
+                        <p class="card-title text-dark fw-semibold mb-2" style="color: #2c3e50 !important;">Teacher Communication</p>
+                        <p class="text-muted small mb-0" style="color: #6c757d !important;">Start the conversation</p>
                     </div>
                 </div>
             </div>
 
             <!-- Notifications Card -->
-            <div class="col-3">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card quick-action-card rounded-4 h-100">
                     <div class="card-body p-4 text-center">
                         <div class="mb-3">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" style="width: 60px; height: 60px;">
@@ -185,8 +265,8 @@
             </div>
 
             <!-- Analytics Card -->
-            <div class="col-3">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white" style="cursor: pointer;" onclick="window.location.href='{% url 'analytics' %}'">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card quick-action-card analytics-card rounded-4 h-100" style="cursor: pointer;">
                     <div class="card-body p-4 text-center">
                         <div class="mb-3">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" style="width: 60px; height: 60px;">
@@ -201,8 +281,8 @@
             </div>
 
             <!-- Study Schedule Card -->
-            <div class="col-3">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card quick-action-card rounded-4 h-100" onclick="navigateToSchedule()" style="cursor: pointer;">
                     <div class="card-body p-4 text-center">
                         <div class="mb-3">
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10" style="width: 60px; height: 60px;">
@@ -215,32 +295,71 @@
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
-    <!-- Floating Teacher Assistant Button -->
-    <div class="position-fixed bottom-0 end-0 m-4" style="z-index: 1050;">
-        <button class="btn rounded-circle shadow-lg" 
-                style="width: 50px; height: 50px; border: none; background: linear-gradient(135deg, #4F46E5, #7C3AED);" 
-                data-bs-toggle="modal" 
-                data-bs-target="#teacherChatModal"
-                title="Chat with Teacher">
+
+    <!-- Smart Home Context Panel (for existing navbar Home button) -->
+    <div id="smartHomePanel" class="position-fixed shadow-lg rounded-4 d-none" 
+         style="top: 80px; left: 50%; transform: translateX(-50%); width: 380px; max-height: 80vh; overflow-y: auto; z-index: 1050; 
+                background: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(25px) !important;
+                -webkit-backdrop-filter: blur(25px) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;">
+        
+        <!-- Dynamic Header -->
+        <div class="p-4 text-white rounded-top-4" id="smartHomeHeader" 
+             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="mb-1 fw-bold" id="timeGreeting">Good Morning!</h6>
+                    <small id="currentTime" class="opacity-75"></small>
+                </div>
+                <button class="btn btn-sm text-white p-1" onclick="toggleSmartHome()" style="border: none; background: none;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Breadcrumb Navigation -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" style="background: none; padding: 0;">
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-white text-decoration-none opacity-75" onclick="navigateTo('dashboard')">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white" aria-current="page" id="currentPageBreadcrumb">
+                        Parent Dashboard
+                    </li>
+                </ol>
+            </nav>
+        </div>
+        
+        <!-- Dynamic Content -->
+        <div class="p-4" id="smartHomeContent">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
     <!-- Floating Chat Icon -->
     <div class="position-fixed bottom-0 end-0 m-4" style="z-index: 1050;">
-        <button class="btn rounded-circle shadow-lg" 
-                style="width: 50px; height: 50px; border: none; background: linear-gradient(135deg, #ff6b9d, #c44569);" 
-                onclick="toggleChatWindow()"
-                title="Chat with Sarah">
-            <span class="text-white" style="font-size: 24px;">👩‍🏫</span>
+        <button class="btn rounded-circle shadow-lg p-3" onclick="toggleChatWindow()" 
+                style="width: 60px; height: 60px; 
+                       background: rgba(255, 255, 255, 0.25) !important;
+                       backdrop-filter: blur(25px) !important;
+                       -webkit-backdrop-filter: blur(25px) !important;
+                       border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(255, 255, 255, 0.2) inset !important;
+                       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;">
+            <span style="font-size: 24px;">👩‍🏫</span>
         </button>
     </div>
-    
-    <!-- Floating Chat Window -->
+
+    <!-- Chat Window -->
     <div id="chatWindow" class="position-fixed shadow-lg rounded-3 bg-white" 
          style="width: 300px; height: 400px; bottom: 80px; right: 20px; z-index: 1049; display: none; border: 1px solid #dee2e6;">
         
         <!-- Chat Header -->
-        <div class="p-3 text-white rounded-top" style="background: linear-gradient(135deg, #ff6b9d, #c44569);">
+        <div class="p-3 text-white rounded-top" style="background: #c44569 !important; border-bottom: 1px solid #dee2e6;">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <span class="me-2" style="font-size: 20px;">👩‍🏫</span>
@@ -265,69 +384,132 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        function toggleChatWindow() {
-            const chatWindow = document.getElementById('chatWindow');
-            if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-                chatWindow.style.display = 'block';
-            } else {
-                chatWindow.style.display = 'none';
-            }
-        }
-    </script>
-                        </div>
-                    </div>
-                </div>
+        
+        <!-- Chat Input -->
+        <div class="p-3 border-top">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Type your message..." style="border-radius: 20px 0 0 20px;">
+                <button class="btn btn-primary" type="button" style="border-radius: 0 20px 20px 0;">
+                    <i class="bi bi-send"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Schedule Modal -->
-    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="scheduleModalLabel">
-                        <i class="bi bi-calendar-check text-info me-2"></i>Create Study Schedule
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Quick Message Dialog -->
+    <div class="modal fade" id="quickMessageDialog" tabindex="-1" aria-labelledby="quickMessageLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
+                <!-- Header -->
+                <div class="modal-header text-white position-relative" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white bg-opacity-20 p-2 me-3">
+                            <i class="bi bi-chat-dots text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0" id="quickMessageLabel">💬 New Message</h5>
+                            <small class="opacity-75">Send a quick message to your child's teacher</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="scheduleDate" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="scheduleDate">
+                
+                <!-- Body -->
+                <div class="modal-body p-4">
+                    <!-- Quick Buttons -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary">🎯 Quick Topics</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickMessage('progress')">
+                                📈 Progress Check
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuickMessage('homework')">
+                                📚 Homework Help
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="setQuickMessage('behavior')">
+                                😊 Behavior Update
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="setQuickMessage('meeting')">
+                                📅 Schedule Meeting
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label for="scheduleTime" class="form-label">Time</label>
-                            <input type="time" class="form-control" id="scheduleTime">
+                    </div>
+                    
+                    <!-- Teacher Selection -->
+                    <div class="mb-3">
+                        <label for="quickTeacher" class="form-label fw-semibold">👨‍🏫 Select Teacher</label>
+                        <select class="form-select" id="quickTeacher" required>
+                            <option value="">Choose teacher...</option>
+                            <option value="sarah">🧑‍🏫 Ms. Sarah Johnson (Class Teacher)</option>
+                            <option value="david">📐 Mr. David Wilson (Mathematics)</option>
+                            <option value="emily">🧪 Dr. Emily Chen (Science)</option>
+                            <option value="rachel">📖 Ms. Rachel Smith (English)</option>
+                            <option value="robert">🏛️ Mr. Robert Davis (History)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Message Subject -->
+                    <div class="mb-3">
+                        <label for="quickSubject" class="form-label fw-semibold">📝 Subject</label>
+                        <input type="text" class="form-control" id="quickSubject" 
+                               placeholder="What's this about?" maxlength="100">
+                        <div class="form-text">
+                            <small class="text-muted">Brief topic description</small>
                         </div>
-                        <div class="mb-3">
-                            <label for="scheduleSubject" class="form-label">Subject</label>
-                            <select class="form-select" id="scheduleSubject">
-                                <option value="">Select Subject</option>
-                                <option value="math">Mathematics</option>
-                                <option value="science">Science</option>
-                                <option value="english">English</option>
-                                <option value="history">History</option>
-                            </select>
+                    </div>
+                    
+                    <!-- Message Content -->
+                    <div class="mb-3">
+                        <label for="quickMessage" class="form-label fw-semibold">💬 Your Message</label>
+                        <textarea class="form-control" id="quickMessage" rows="4" 
+                                  placeholder="Type your message here..." 
+                                  maxlength="500" required></textarea>
+                        <div class="form-text d-flex justify-content-between">
+                            <small class="text-muted">
+                                <i class="bi bi-lightbulb me-1"></i>Be clear and specific for better responses
+                            </small>
+                            <small class="text-muted">
+                                <span id="charCount">0</span>/500
+                            </small>
                         </div>
-                        <div class="mb-3">
-                            <label for="scheduleDuration" class="form-label">Duration (minutes)</label>
-                            <select class="form-select" id="scheduleDuration">
-                                <option value="30">30 minutes</option>
-                                <option value="45">45 minutes</option>
-                                <option value="60">1 hour</option>
-                                <option value="90">1.5 hours</option>
-                            </select>
+                    </div>
+                    
+                    <!-- Priority -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">⏱️ Priority</label>
+                        <div class="d-flex gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="priority" id="normalPriority" value="normal" checked>
+                                <label class="form-check-label" for="normalPriority">
+                                    <span class="badge bg-success">Normal</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="priority" id="highPriority" value="high">
+                                <label class="form-check-label" for="highPriority">
+                                    <span class="badge bg-warning">High</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="priority" id="urgentPriority" value="urgent">
+                                <label class="form-check-label" for="urgentPriority">
+                                    <span class="badge bg-danger">Urgent</span>
+                                </label>
+                            </div>
                         </div>
-                    </form>
+                        <small class="text-muted">Normal: 24-48hrs | High: 24hrs | Urgent: ASAP</small>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-info">Create Schedule</button>
+                
+                <!-- Footer -->
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="sendQuickMessage()">
+                        <i class="bi bi-send me-1"></i>Send Message
+                    </button>
                 </div>
             </div>
         </div>
@@ -368,6 +550,370 @@
     font-weight: 700;
 }
 
+/* Chat button styling - white round circle */
+.chat-btn {
+    background: #ffffff !important;
+    border: none !important;
+    outline: none !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.chat-btn:hover,
+.chat-btn:focus,
+.chat-btn:active,
+.chat-btn:visited {
+    background: #ffffff !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.2) !important;
+    transform: scale(1.05);
+}
+
+/* Ensure completely uniform white background - no differences */
+.container-fluid {
+    background: #ffffff !important;
+}
+
+body {
+    background: #ffffff !important;
+}
+
+.row {
+    background: #ffffff !important;
+}
+
+.col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12,
+.col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12,
+.col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12,
+.col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12,
+.col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
+    background: #ffffff !important;
+}
+
+/* Parent Tool Cards Enhanced Styling */
+/* Enhanced Unified Dashboard Styling */
+.glass-card {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(30px) !important;
+    -webkit-backdrop-filter: blur(30px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 
+                0 4px 12px rgba(255, 255, 255, 0.4) inset,
+                0 2px 8px rgba(79, 70, 229, 0.1) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-height: 180px !important;
+    position: relative;
+}
+
+/* Add subtle border glow for better visibility */
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        rgba(79, 70, 229, 0.1), 
+        rgba(255, 255, 255, 0.2), 
+        rgba(79, 70, 229, 0.1));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.7;
+}
+
+/* Stats cards have enhanced hover effects for better visibility */
+.glass-card.stats-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 
+                0 5px 15px rgba(255, 255, 255, 0.4) inset,
+                0 0 20px rgba(79, 70, 229, 0.2) !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Enhanced Quick Action Cards with Better Hover Animations */
+.quick-action-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transform-origin: center;
+}
+
+.quick-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s;
+    z-index: 1;
+}
+
+.quick-action-card:hover::before {
+    left: 100%;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-10px) scale(1.03) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 
+                0 15px 25px rgba(255, 255, 255, 0.5) inset,
+                0 0 40px rgba(79, 70, 229, 0.4) !important;
+    background: rgba(255, 255, 255, 0.65) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+}
+
+.quick-action-card:hover .card-body {
+    transform: translateZ(20px);
+}
+
+.quick-action-card:hover .rounded-circle {
+    transform: scale(1.2) rotate(10deg);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    animation: bounce-glow 0.6s ease-in-out;
+}
+
+@keyframes bounce-glow {
+    0%, 100% { 
+        transform: scale(1.2) rotate(10deg);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+    50% { 
+        transform: scale(1.3) rotate(15deg);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(79, 70, 229, 0.5);
+    }
+}
+
+.quick-action-card:hover h3 {
+    animation: text-glow 0.3s ease-in-out;
+    text-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+}
+
+@keyframes text-glow {
+    0% { text-shadow: none; }
+    100% { text-shadow: 0 0 10px rgba(79, 70, 229, 0.5); }
+}
+
+.quick-action-card:hover .card-title {
+    color: #2c3e50 !important;
+    font-weight: 800 !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Ripple effect on click */
+.quick-action-card:active {
+    transform: translateY(-8px) scale(0.98) !important;
+    transition: transform 0.1s ease;
+}
+
+/* Staggered animation for quick action cards */
+.quick-action-card:nth-child(1) { animation-delay: 0.1s; }
+.quick-action-card:nth-child(2) { animation-delay: 0.2s; }
+.quick-action-card:nth-child(3) { animation-delay: 0.3s; }
+.quick-action-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Schedule Modal Specific Styling */
+.schedule-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.schedule-item {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(23, 162, 184, 0.2);
+}
+
+.schedule-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.2);
+    background: rgba(23, 162, 184, 0.15) !important;
+}
+
+.schedule-item .btn-outline-danger {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.schedule-item:hover .btn-outline-danger {
+    opacity: 1;
+}
+
+/* Enhanced form styling for schedule modal */
+#scheduleModal .form-control,
+#scheduleModal .form-select {
+    border: 2px solid rgba(23, 162, 184, 0.2);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+#scheduleModal .form-control:focus,
+#scheduleModal .form-select:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Template buttons styling */
+#scheduleModal .btn-outline-primary,
+#scheduleModal .btn-outline-success,
+#scheduleModal .btn-outline-warning {
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+#scheduleModal .btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+#scheduleModal .btn-outline-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+}
+
+#scheduleModal .btn-outline-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Custom scrollbar for schedule container */
+.schedule-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.schedule-container::-webkit-scrollbar-track {
+    background: rgba(23, 162, 184, 0.1);
+    border-radius: 10px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb {
+    background: rgba(23, 162, 184, 0.5);
+    border-radius: 10px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(23, 162, 184, 0.7);
+}
+
+/* Notification styling */
+.alert.position-fixed {
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: none;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Card content styling */
+.glass-card .card-body {
+    background: transparent !important;
+    border: none !important;
+    padding: 1.5rem !important;
+}
+
+/* Equal height for all cards */
+.glass-card {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.glass-card .card-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.glass-card .card-body {
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+}
+
+.parent-tool-card {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.parent-tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.parent-tool-card:hover::before {
+    opacity: 1;
+}
+
+.parent-tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Glassmorphism effect for all cards */
+.card.parent-tool-card {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+}
+
+/* Enhanced card content visibility */
+.parent-tool-card .card-body {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 1rem !important;
+}
+
+.parent-tool-card .card-title,
+.parent-tool-card h3,
+.parent-tool-card p {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.parent-tool-card .card-body {
+    position: relative;
+    z-index: 2;
+}
+
+.parent-tool-card:hover .rounded-circle {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
 /* Dashboard Card Enhanced Hover Effects */
 .dashboard-card {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -381,16 +927,75 @@
     border-color: rgba(0,123,255,0.2);
 }
 
-/* Text Enhancement */
+/* Enhanced Text Visibility */
 .text-dark {
-    color: #2c3e50 !important;
-    font-weight: 600;
+    color: #1a202c !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8) !important;
 }
 
 .card-title {
-    color: #34495e !important;
+    color: #2d3748 !important;
+    font-weight: 800 !important;
+    font-size: 1.15rem !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+    letter-spacing: 0.5px;
+}
+
+/* Enhanced Stats Display */
+.glass-card h1 {
+    color: #1a202c !important;
+    font-weight: 900 !important;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9) !important;
+    font-size: 2.5rem !important;
+}
+
+.glass-card h3 {
+    color: #2d3748 !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+.glass-card .small, .glass-card small {
+    color: #4a5568 !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Card content visibility enhancement */
+.glass-card .card-body {
+    position: relative;
+    z-index: 2;
+}
+
+/* Enhanced Icon Visibility */
+.glass-card .rounded-circle {
+    background: rgba(79, 70, 229, 0.15) !important;
+    border: 2px solid rgba(79, 70, 229, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2),
+                0 2px 8px rgba(255, 255, 255, 0.3) inset !important;
+}
+
+.glass-card i {
+    color: #4c51bf !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+    font-weight: 900 !important;
+}
+
+/* Enhanced Button Contrast */
+.glass-card .btn {
+    background: rgba(79, 70, 229, 0.9) !important;
+    border: 2px solid rgba(79, 70, 229, 1) !important;
+    color: white !important;
     font-weight: 700 !important;
-    font-size: 1.1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4) !important;
+}
+
+.glass-card .btn:hover {
+    background: rgba(79, 70, 229, 1) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
 }
 
 /* Fade in animation */
@@ -407,28 +1012,31 @@
     }
 }
 
-/* Enhanced Button Styles */
+/* Enhanced Button Styles with Better Visibility */
 .btn {
-    font-weight: 600;
+    font-weight: 700 !important;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
 .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
 }
 
-/* Analytics Cards Enhancement */
+/* Analytics Cards Enhancement with Better Contrast */
 .bg-light {
-    background-color: #f8f9fa !important;
-    border: 1px solid rgba(0,0,0,0.05);
+    background: rgba(248, 250, 252, 0.95) !important;
+    border: 2px solid rgba(79, 70, 229, 0.1) !important;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px) !important;
 }
 
 .bg-light:hover {
-    background-color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    border: 2px solid rgba(79, 70, 229, 0.2) !important;
     transform: translateY(-2px);
 }
 
@@ -476,10 +1084,529 @@
         width: 45px;
         height: 45px;
     }
+    
+    .professional-navbar {
+        padding: 0.75rem 0;
+    }
+    
+    .nav-menu {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .nav-item {
+        width: 100%;
+    }
+    
+    .quick-actions {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Conversation Modal Enhancements */
+.modal-lg .card {
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.modal-lg .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-color: var(--bs-primary);
+}
+
+.modal-lg .card.border-primary:hover {
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.modal-lg .card.border-success:hover {
+    border-color: var(--bs-success) !important;
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.modal-lg .card.border-warning:hover {
+    border-color: var(--bs-warning) !important;
+    background-color: rgba(255, 193, 7, 0.05);
+}
+
+.modal-lg .card.border-info:hover {
+    border-color: var(--bs-info) !important;
+    background-color: rgba(13, 202, 240, 0.05);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+.toast {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 </style>
 
 <script>
+// Smart Home Context-Aware Functionality for Existing Navbar Home Button
+function getTimeOfDay() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 21) return 'evening';
+    return 'night';
+}
+
+function getTimeGreeting() {
+    const timeOfDay = getTimeOfDay();
+    const greetings = {
+        morning: { text: 'Good Morning! ☀️', icon: '🌅' },
+        afternoon: { text: 'Good Afternoon! ⛅', icon: '☀️' },
+        evening: { text: 'Good Evening! 🌅', icon: '🌆' },
+        night: { text: 'Good Night! 🌙', icon: '🌙' }
+    };
+    return greetings[timeOfDay];
+}
+
+function updateCurrentTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+    });
+    const dateString = now.toLocaleDateString('en-US', { 
+        weekday: 'long',
+        month: 'short', 
+        day: 'numeric' 
+    });
+    document.getElementById('currentTime').textContent = `${dateString} • ${timeString}`;
+}
+
+function getSmartHomeContent() {
+    const timeOfDay = getTimeOfDay();
+    const content = {
+        morning: {
+            title: "Start Your Day Right! 🌞",
+            items: [
+                { icon: '📚', title: 'Daily Goals', desc: 'Set learning targets for today', action: 'setGoals()' },
+                { icon: '📅', title: 'Today\'s Schedule', desc: 'Review planned activities', action: 'viewSchedule()' },
+                { icon: '☕', title: 'Morning Briefing', desc: 'Quick overview of yesterday\'s progress', action: 'showBriefing()' },
+                { icon: '🎯', title: 'Priority Tasks', desc: 'Most important tasks for today', action: 'showPriorities()' }
+            ]
+        },
+        afternoon: {
+            title: "Midday Progress Check 📊",
+            items: [
+                { icon: '📈', title: 'Progress Update', desc: 'See how your children are doing today', action: 'checkProgress()' },
+                { icon: '🔔', title: 'New Notifications', desc: '3 new updates from teachers', action: 'showNotifications()' },
+                { icon: '💬', title: 'Teacher Messages', desc: 'Recent communications', action: 'openMessages()' },
+                { icon: '⏰', title: 'Afternoon Schedule', desc: 'Upcoming activities and lessons', action: 'viewAfternoonSchedule()' }
+            ]
+        },
+        evening: {
+            title: "Evening Review 🌆",
+            items: [
+                { icon: '✅', title: 'Today\'s Achievements', desc: 'Celebrate completed tasks', action: 'showAchievements()' },
+                { icon: '📊', title: 'Daily Summary', desc: 'Learning hours and progress made', action: 'showSummary()' },
+                { icon: '👨‍👩‍👧‍👦', title: 'Family Time', desc: 'Plan evening activities together', action: 'planFamilyTime()' },
+                { icon: '📝', title: 'Tomorrow\'s Prep', desc: 'Prepare for tomorrow\'s learning', action: 'prepTomorrow()' }
+            ]
+        },
+        night: {
+            title: "Wind Down & Reflect 🌙",
+            items: [
+                { icon: '📈', title: 'Weekly Progress', desc: 'Review this week\'s learning journey', action: 'weeklyReview()' },
+                { icon: '🌟', title: 'Achievements Unlocked', desc: 'New badges and milestones', action: 'showBadges()' },
+                { icon: '💤', title: 'Sleep Schedule', desc: 'Healthy sleep habits for better learning', action: 'sleepTips()' },
+                { icon: '🎯', title: 'Next Week Goals', desc: 'Plan ahead for continued success', action: 'setWeeklyGoals()' }
+            ]
+        }
+    };
+    return content[timeOfDay];
+}
+
+function renderSmartHomeContent() {
+    const content = getSmartHomeContent();
+    const html = `
+        <div class="mb-3">
+            <h6 class="fw-bold text-primary mb-3">${content.title}</h6>
+        </div>
+        
+        <!-- Quick Navigation Section -->
+        <div class="mb-4">
+            <h6 class="fw-bold text-secondary mb-3">🧭 Quick Navigation</h6>
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(79, 70, 229, 0.1); cursor: pointer;" onclick="navigateTo('dashboard')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">📊</div>
+                            <small class="fw-semibold text-primary">Dashboard</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(16, 185, 129, 0.1); cursor: pointer;" onclick="navigateTo('analytics')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">📈</div>
+                            <small class="fw-semibold text-success">Analytics</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(245, 158, 11, 0.1); cursor: pointer;" onclick="navigateTo('messages')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">💬</div>
+                            <small class="fw-semibold text-warning">Messages</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(239, 68, 68, 0.1); cursor: pointer;" onclick="navigateTo('notifications')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">🔔</div>
+                            <small class="fw-semibold text-danger">Notifications</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(168, 85, 247, 0.1); cursor: pointer;" onclick="navigateTo('schedule')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">📅</div>
+                            <small class="fw-semibold text-purple">Schedule</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm" style="background: rgba(99, 102, 241, 0.1); cursor: pointer;" onclick="navigateTo('profile')">
+                        <div class="card-body p-2 text-center">
+                            <div style="font-size: 1.2rem;">👤</div>
+                            <small class="fw-semibold text-indigo">Profile</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context-Aware Content -->
+        <div class="mb-3">
+            <h6 class="fw-bold text-secondary mb-3">⚡ Smart Actions</h6>
+        </div>
+        <div class="row g-2">
+            ${content.items.map(item => `
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="background: rgba(255,255,255,0.7); cursor: pointer;" onclick="${item.action}">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">${item.icon}</div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">${item.title}</h6>
+                                    <small class="text-muted">${item.desc}</small>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="mt-4 p-3 rounded-3" style="background: rgba(79, 70, 229, 0.1);">
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="fw-bold text-primary">{{ children_count|default:0 }}</div>
+                    <small class="text-muted">Children</small>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold text-success">{{ learning_hours|default:24 }}h</div>
+                    <small class="text-muted">This Week</small>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold text-warning">{{ performance|default:85 }}%</div>
+                    <small class="text-muted">Progress</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Actions -->
+        <div class="mt-3 d-flex gap-2">
+            <button class="btn btn-outline-primary btn-sm" onclick="goToSection('dashboard')" style="flex: 1;">
+                <i class="bi bi-speedometer2 me-1"></i> Main Dashboard
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="goToSection('analytics')" style="flex: 1;">
+                <i class="bi bi-graph-up me-1"></i> Analytics
+            </button>
+        </div>
+        <div class="mt-2 d-flex gap-2">
+            <button class="btn btn-outline-info btn-sm" onclick="goToSection('profile')" style="flex: 1;">
+                <i class="bi bi-person me-1"></i> Profile
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="goToSection('settings')" style="flex: 1;">
+                <i class="bi bi-gear me-1"></i> Settings
+            </button>
+        </div>
+        
+        <!-- Keyboard Shortcuts Hint -->
+        <div class="mt-3 p-2 rounded-3" style="background: rgba(108, 117, 125, 0.1); border: 1px dashed rgba(108, 117, 125, 0.3);">
+            <small class="text-muted d-flex align-items-center">
+                <i class="bi bi-keyboard me-2"></i>
+                <span>Shortcuts: <kbd>Esc</kbd> Close • <kbd>1-6</kbd> Navigate • <kbd>Ctrl+H</kbd> Toggle</span>
+            </small>
+        </div>
+    `;
+    document.getElementById('smartHomeContent').innerHTML = html;
+}
+
+function toggleSmartHome() {
+    const panel = document.getElementById('smartHomePanel');
+    
+    if (panel.classList.contains('d-none')) {
+        // Show panel
+        updateSmartHome();
+        panel.classList.remove('d-none');
+        // Update navbar home icon to show it's active
+        updateNavbarHomeIcon(true);
+    } else {
+        // Hide panel
+        panel.classList.add('d-none');
+        updateNavbarHomeIcon(false);
+    }
+}
+
+function updateNavbarHomeIcon(isActive) {
+    const navHomeLink = document.querySelector('.navbar .nav-link[href*="home"]');
+    const homeIcon = navHomeLink?.querySelector('i');
+    
+    if (homeIcon) {
+        if (isActive) {
+            homeIcon.className = 'bi bi-house-fill me-1';
+            navHomeLink.style.background = 'rgba(255, 255, 255, 0.2)';
+            navHomeLink.style.borderRadius = '0.5rem';
+        } else {
+            homeIcon.className = 'bi bi-house-fill me-1';
+            navHomeLink.style.background = 'transparent';
+        }
+    }
+}
+
+function updateSmartHome() {
+    const greeting = getTimeGreeting();
+    document.getElementById('timeGreeting').textContent = greeting.text;
+    updateCurrentTime();
+    renderSmartHomeContent();
+}
+
+// Modify existing navbar Home button to show smart panel instead of navigating
+function interceptHomeButton() {
+    const homeLink = document.querySelector('.navbar .nav-link[href*="home"]');
+    if (homeLink) {
+        homeLink.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default navigation
+            toggleSmartHome();
+        });
+    }
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('smartHomePanel');
+    const homeLink = document.querySelector('.navbar .nav-link[href*="home"]');
+    
+    if (!panel.contains(e.target) && !homeLink.contains(e.target) && !panel.classList.contains('d-none')) {
+        toggleSmartHome();
+    }
+});
+
+// Keyboard shortcuts for navigation
+document.addEventListener('keydown', function(e) {
+    const panel = document.getElementById('smartHomePanel');
+    const isPanelVisible = !panel.classList.contains('d-none');
+    
+    if (isPanelVisible) {
+        switch(e.key) {
+            case 'Escape':
+                e.preventDefault();
+                toggleSmartHome();
+                break;
+            case '1':
+                e.preventDefault();
+                navigateTo('dashboard');
+                break;
+            case '2':
+                e.preventDefault();
+                navigateTo('analytics');
+                break;
+            case '3':
+                e.preventDefault();
+                navigateTo('messages');
+                break;
+            case '4':
+                e.preventDefault();
+                navigateTo('notifications');
+                break;
+            case '5':
+                e.preventDefault();
+                navigateTo('schedule');
+                break;
+            case '6':
+                e.preventDefault();
+                navigateTo('profile');
+                break;
+            case 'h':
+            case 'H':
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    toggleSmartHome();
+                }
+                break;
+        }
+    } else {
+        // Global shortcuts when panel is closed
+        if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+            e.preventDefault();
+            toggleSmartHome();
+        }
+    }
+});
+
+// Placeholder functions for smart actions
+function setGoals() { alert('Setting daily goals... (Feature coming soon!)'); }
+function viewSchedule() { alert('Viewing today\'s schedule... (Feature coming soon!)'); }
+function showBriefing() { alert('Loading morning briefing... (Feature coming soon!)'); }
+function showPriorities() { alert('Showing priority tasks... (Feature coming soon!)'); }
+function checkProgress() { alert('Checking progress... (Feature coming soon!)'); }
+function showNotifications() { alert('Loading notifications... (Feature coming soon!)'); }
+
+function navigateToSchedule() {
+    window.location.href = '/study-schedule/';
+}
+function openMessages() { window.location.href = '{% url "teacher_communication_dashboard" %}'; }
+function viewAfternoonSchedule() { alert('Viewing afternoon schedule... (Feature coming soon!)'); }
+function showAchievements() { alert('Loading achievements... (Feature coming soon!)'); }
+function showSummary() { alert('Generating daily summary... (Feature coming soon!)'); }
+function planFamilyTime() { alert('Planning family activities... (Feature coming soon!)'); }
+function prepTomorrow() { alert('Preparing tomorrow\'s plan... (Feature coming soon!)'); }
+function weeklyReview() { alert('Loading weekly review... (Feature coming soon!)'); }
+function showBadges() { alert('Showing achievement badges... (Feature coming soon!)'); }
+function sleepTips() { alert('Loading sleep schedule tips... (Feature coming soon!)'); }
+function setWeeklyGoals() { alert('Setting weekly goals... (Feature coming soon!)'); }
+
+// Enhanced navigation functions
+function navigateTo(section) {
+    toggleSmartHome(); // Close the panel first
+    
+    switch(section) {
+        case 'dashboard':
+            // Already on dashboard, just scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            break;
+        case 'analytics':
+            goToSection('analytics');
+            break;
+        case 'messages':
+            window.location.href = '{% url "teacher_communication_dashboard" %}';
+            break;
+        case 'notifications':
+            goToSection('notifications');
+            break;
+        case 'schedule':
+            goToSection('schedule');
+            break;
+        case 'profile':
+            goToSection('profile');
+            break;
+        default:
+            console.log('Navigation to', section, 'not implemented yet');
+            alert(`Navigating to ${section}... (Feature coming soon!)`);
+    }
+}
+
+function goToSection(section) {
+    switch(section) {
+        case 'dashboard':
+            // Already on parent dashboard
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            break;
+        case 'analytics':
+            // Check if analytics URL exists in your URL patterns
+            try {
+                window.location.href = '{% url "analytics" %}';
+            } catch(e) {
+                alert('Analytics page is being developed. Check back soon!');
+            }
+            break;
+        case 'profile':
+            alert('Profile management coming soon! You can currently view your role and child information in the welcome section above.');
+            break;
+        case 'settings':
+            alert('Settings page coming soon! You can currently manage notifications and communication preferences.');
+            break;
+        case 'notifications':
+            alert('Notification center coming soon! You can see unread message counts on the Teacher Communication card.');
+            break;
+        case 'schedule':
+            // Open the schedule modal if it exists
+            const scheduleModal = document.getElementById('scheduleModal');
+            if (scheduleModal) {
+                const modal = new bootstrap.Modal(scheduleModal);
+                modal.show();
+            } else {
+                alert('Schedule management coming soon!');
+            }
+            break;
+        default:
+            alert(`${section} section is being developed. Check back soon!`);
+    }
+}
+
+function goToDashboard() { 
+    toggleSmartHome(); 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function quickAnalytics() { 
+    toggleSmartHome();
+    try {
+        window.location.href = '{% url "analytics" %}';
+    } catch(e) {
+        // Scroll to analytics card if URL doesn't exist
+        const analyticsCard = document.querySelector('.analytics-card');
+        if (analyticsCard) {
+            analyticsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            analyticsCard.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                analyticsCard.style.transform = 'scale(1)';
+            }, 300);
+        } else {
+            alert('Analytics feature coming soon!');
+        }
+    }
+}
+
+// Initialize smart home functionality
+document.addEventListener('DOMContentLoaded', function() {
+    updateSmartHome();
+    interceptHomeButton(); // Override navbar Home button behavior
+    
+    // Update every minute
+    setInterval(() => {
+        updateCurrentTime();
+    }, 60000);
+});
+
 // AI Chat functionality
 document.getElementById('sendMessage')?.addEventListener('click', function() {
     const input = document.getElementById('chatInput');
@@ -531,224 +1658,212 @@ document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
         document.getElementById('sendMessage').click();
     }
 });
-</script>
 
-            <span class="action-text">Logout</span>
-        </a>
-    </div>
+// Analytics card click handler
+document.querySelector('.analytics-card')?.addEventListener('click', function() {
+    window.location.href = '{% url "analytics" %}';
+});
 
-<script>
-// Update time and greeting every second
-function updateTimeAndGreeting() {
-    const now = new Date();
-    const hour = now.getHours();
-    const userName = '{{ user.first_name|default:user.username }}';
-    
-    // Update time display
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-    };
-    const timeString = now.toLocaleDateString('en-US', options).replace(/,(\s\d{4})/, ',$1 at');
-    document.getElementById('current-time').textContent = timeString;
-    
-    // Update greeting based on time
-    let greeting, emoji, timeIcon, subtitle;
-    
-    if (hour >= 5 && hour < 12) {
-        greeting = `Good Morning, ${userName}!`;
-        emoji = '🌅';
-        timeIcon = '☀️';
-        subtitle = 'Start your day by checking your children\'s learning progress. A new day of discoveries awaits!';
-    } else if (hour >= 12 && hour < 17) {
-        greeting = `Good Afternoon, ${userName}!`;
-        emoji = '🌞';
-        timeIcon = '🌤️';
-        subtitle = 'Hope your day is going well! Time to check in on your children\'s educational journey.';
-    } else if (hour >= 17 && hour < 21) {
-        greeting = `Good Evening, ${userName}!`;
-        emoji = '🌇';
-        timeIcon = '🌆';
-        subtitle = 'Evening check-in time! See how your children performed in their studies today.';
+// Chat window toggle function
+function toggleChatWindow() {
+    const chatWindow = document.getElementById('chatWindow');
+    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+        chatWindow.style.display = 'block';
     } else {
-        greeting = `Good Night, ${userName}!`;
-        emoji = '🌙';
-        timeIcon = '✨';
-        subtitle = 'Thank you for being an engaged parent. Rest well knowing your children are learning and growing!';
-    }
-    
-    // Check if greeting has changed and add smooth transition
-    const greetingElement = document.getElementById('greeting-text');
-    const emojiElement = document.getElementById('greeting-emoji');
-    const timeIconElement = document.getElementById('time-icon');
-    const subtitleElement = document.getElementById('hero-subtitle');
-    
-    if (greetingElement.textContent !== greeting) {
-        // Add animation class
-        greetingElement.parentElement.classList.add('updating');
-        
-        // Update content with slight delay for smooth effect
-        setTimeout(() => {
-            greetingElement.textContent = greeting;
-            emojiElement.textContent = emoji;
-            timeIconElement.textContent = timeIcon;
-            subtitleElement.textContent = subtitle;
-            
-            // Remove animation class
-            greetingElement.parentElement.classList.remove('updating');
-        }, 200);
+        chatWindow.style.display = 'none';
     }
 }
 
-// Update time and greeting immediately and then every minute
-updateTimeAndGreeting();
-setInterval(updateTimeAndGreeting, 60000);
-
-// Add sparkle effects to cards
-const cards = document.querySelectorAll('.mega-stat-card, .ultra-action-card, .enhanced-child-card');
-cards.forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-8px) scale(1.02)';
-    });
+// Conversation Starter Functions
+function startConversation() {
+    const modal = new bootstrap.Modal(document.getElementById('quickMessageDialog'));
+    modal.show();
     
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
+    // Reset form
+    resetQuickMessageForm();
+}
 
-// Add click animation to quantum buttons
-const buttons = document.querySelectorAll('.quantum-btn, .action-btn');
-buttons.forEach(button => {
-    button.addEventListener('click', function(e) {
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple');
-        this.appendChild(ripple);
+function resetQuickMessageForm() {
+    document.getElementById('quickTeacher').value = '';
+    document.getElementById('quickSubject').value = '';
+    document.getElementById('quickMessage').value = '';
+    document.getElementById('normalPriority').checked = true;
+    updateCharCount();
+}
+
+function setQuickMessage(type) {
+    const messages = {
+        progress: {
+            subject: "Check on academic progress",
+            message: "Hi! I'd like to discuss how my child is doing in your class. Could you share any updates on their progress and areas where they might need support?"
+        },
+        homework: {
+            subject: "Question about homework",
+            message: "Hello! I have some questions about the current homework assignments. Could you help clarify the requirements or provide some guidance?"
+        },
+        behavior: {
+            subject: "Behavior and social development",
+            message: "Hi! I'd like to discuss my child's behavior and social interactions in class. How are they doing with classmates and following classroom rules?"
+        },
+        meeting: {
+            subject: "Request for parent-teacher meeting",
+            message: "Hello! I would like to schedule a meeting to discuss my child's overall progress. Please let me know your available times. Thank you!"
+        }
+    };
+    
+    const template = messages[type];
+    if (template) {
+        document.getElementById('quickSubject').value = template.subject;
+        document.getElementById('quickMessage').value = template.message;
+        updateCharCount();
         
+        // Visual feedback
+        const button = event.target;
+        button.style.transform = 'scale(0.95)';
         setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    });
-});
-
-// Child action functions
-function viewChildDetails(childId) {
-    // Create a modal or navigate to detailed view
-    showNotification('👁️ Opening detailed view for student...', 'info');
-    // You can implement navigation to a detailed analytics page
-    window.location.href = `/parents/analytics/?child=${childId}`;
+            button.style.transform = 'scale(1)';
+        }, 100);
+    }
 }
 
-function messageTeacher(childId) {
-    // Open messaging interface
-    showNotification('💬 Opening teacher communication...', 'info');
-    // Redirect to teacher selection page for the child
-    window.location.href = `/teacher-communication/child/${childId}/select-teacher/`;
+function updateCharCount() {
+    const message = document.getElementById('quickMessage').value;
+    const count = message.length;
+    document.getElementById('charCount').textContent = count;
+    
+    // Change color based on length
+    const charCountElement = document.getElementById('charCount');
+    if (count > 450) {
+        charCountElement.style.color = '#dc3545'; // danger
+    } else if (count > 350) {
+        charCountElement.style.color = '#fd7e14'; // warning
+    } else {
+        charCountElement.style.color = '#6c757d'; // muted
+    }
 }
 
-function contactSupport() {
-    // Open contact form or support chat
-    showNotification('📞 Connecting you to support...', 'info');
-    // You can implement support contact functionality
+function sendQuickMessage() {
+    const teacher = document.getElementById('quickTeacher').value;
+    const subject = document.getElementById('quickSubject').value;
+    const message = document.getElementById('quickMessage').value;
+    const priority = document.querySelector('input[name="priority"]:checked').value;
+    
+    // Validation
+    if (!teacher) {
+        showValidationError('Please select a teacher');
+        return;
+    }
+    
+    if (!subject.trim()) {
+        showValidationError('Please enter a subject');
+        return;
+    }
+    
+    if (!message.trim()) {
+        showValidationError('Please enter your message');
+        return;
+    }
+    
+    // Show loading state
+    const sendButton = event.target;
+    const originalText = sendButton.innerHTML;
+    sendButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Sending...';
+    sendButton.disabled = true;
+    
+    // Simulate sending
+    setTimeout(() => {
+        // Reset button
+        sendButton.innerHTML = originalText;
+        sendButton.disabled = false;
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('quickMessageDialog'));
+        modal.hide();
+        
+        // Show success notification
+        showQuickSuccessMessage();
+        
+    }, 1500);
 }
 
-// Notification system
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span>${message}</span>
-            <button class="notification-close" onclick="closeNotification(this.parentElement.parentElement)">×</button>
+function showValidationError(message) {
+    // Create error alert
+    const alertHtml = `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     `;
     
-    // Add notification styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        padding: 1rem 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-        border-left: 4px solid var(--accent-color);
-        color: var(--text-primary);
-        max-width: 300px;
-    `;
-    
-    document.body.appendChild(notification);
+    // Find modal body and prepend alert
+    const modalBody = document.querySelector('#quickMessageDialog .modal-body');
+    modalBody.insertAdjacentHTML('afterbegin', alertHtml);
     
     // Auto remove after 3 seconds
     setTimeout(() => {
-        closeNotification(notification);
+        const alert = modalBody.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
     }, 3000);
 }
 
-function closeNotification(element) {
-    element.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => {
-        element.remove();
-    }, 300);
-}
-
-// AI Chat functionality
-document.getElementById('sendMessage')?.addEventListener('click', function() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    
-    if (message) {
-        // Add user message
-        const chatContainer = document.querySelector('.chat-container');
-        const userMessage = `
-            <div class="user-message mb-3">
+function showQuickSuccessMessage() {
+    // Create success notification
+    const notificationHtml = `
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            <div class="toast show align-items-center text-white bg-success border-0" role="alert">
                 <div class="d-flex">
-                    <div class="bg-primary rounded-3 p-3 flex-grow-1">
-                        <p class="mb-0 text-white">${message}</p>
+                    <div class="toast-body">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Message Sent!</strong> Your teacher will respond within 24-48 hours.
                     </div>
-                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 ms-3">
-                        <i class="bi bi-person text-primary"></i>
-                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.parentElement.parentElement.remove()"></button>
                 </div>
             </div>
-        `;
-        chatContainer.innerHTML += userMessage;
-        
-        // Simulate AI response
-        setTimeout(() => {
-            const aiResponse = `
-                <div class="ai-message mb-3">
-                    <div class="d-flex">
-                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                            <i class="bi bi-robot text-success"></i>
-                        </div>
-                        <div class="bg-light rounded-3 p-3 flex-grow-1">
-                            <p class="mb-0">I understand you're asking about "${message}". Let me help you with that!</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            chatContainer.innerHTML += aiResponse;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, 1000);
-        
-        input.value = '';
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', notificationHtml);
+    
+    // Auto remove notification after 5 seconds
+    setTimeout(() => {
+        const notification = document.querySelector('.position-fixed .toast');
+        if (notification && notification.parentElement) {
+            notification.parentElement.remove();
+        }
+    }, 5000);
+    
+    // Optional: Navigate to teacher communication dashboard after a delay
+    setTimeout(() => {
+        if (confirm('Would you like to view your messages in the Teacher Communication dashboard?')) {
+            window.location.href = '{% url "teacher_communication_dashboard" %}';
+        }
+    }, 2000);
+}
+
+// Add character counter event listener
+document.addEventListener('DOMContentLoaded', function() {
+    updateSmartHome();
+    interceptHomeButton();
+    initializeProfessionalNavigation();
+    
+    // Character counter for message textarea
+    const messageTextarea = document.getElementById('quickMessage');
+    if (messageTextarea) {
+        messageTextarea.addEventListener('input', updateCharCount);
     }
+    
+    // Update every minute
+    setInterval(() => {
+        updateCurrentTime();
+    }, 60000);
 });
 
-// Enter key support for chat
-document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        document.getElementById('sendMessage').click();
-    }
-});
+
 </script>
+
+<!-- Additional spacing for better layout -->
+<div class="mb-5 pb-4"></div>
+
 {% endblock content %}

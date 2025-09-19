@@ -13,17 +13,19 @@
     border-radius: 20px;
     margin-bottom: 2rem;
     text-align: center;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
 .communication-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 20px;
-    padding: 2rem;
+    padding: 0;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .communication-card:hover {
@@ -31,20 +33,42 @@
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
 }
 
+.card-header-solid {
+    background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
+    color: white !important;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-content {
+    padding: 2rem;
+}
+
 .child-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white !important;
     border-radius: 15px;
     margin-bottom: 1rem;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.child-card h4, .child-card p {
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .child-card:hover {
     transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
 }
 
 .child-info h4 {
@@ -67,43 +91,117 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 .contact-teacher-btn:hover {
     background: white;
-    color: #f5576c;
+    color: #e74c3c;
     text-decoration: none;
+    transform: scale(1.05);
 }
 
 .conversation-preview {
-    border-left: 4px solid #667eea;
-    padding-left: 1rem;
+    border-left: 4px solid #4a69bd;
+    padding: 1rem;
     margin-bottom: 1rem;
+    background: rgba(74, 105, 189, 0.05);
+    border-radius: 0 10px 10px 0;
+    transition: all 0.3s ease;
+}
+
+.conversation-preview:hover {
+    background: rgba(74, 105, 189, 0.1);
+    transform: translateX(5px);
 }
 
 .conversation-title {
     font-weight: 600;
-    color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: #2c3e50 !important;
     margin-bottom: 0.5rem;
+}
+
+.conversation-title a {
+    color: #2c3e50 !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 600;
+}
+
+.conversation-title a:hover {
+    color: #4a69bd !important;
 }
 
 .conversation-meta {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: #7f8c8d !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-weight: 500;
+}
+
+.conversation-meta span {
+    color: #34495e !important;
+}
+
+/* Ensure text visibility in both light and dark themes */
+.conversation-title,
+.conversation-title a {
+    color: #2c3e50 !important;
+}
+
+.conversation-meta,
+.conversation-meta span {
+    color: #7f8c8d !important;
+}
+
+/* Gradient theme adjustments */
+body.gradient-theme .conversation-title,
+body.gradient-theme .conversation-title a {
+    color: #2c3e50 !important;
+}
+
+body.gradient-theme .conversation-meta,
+body.gradient-theme .conversation-meta span {
+    color: #7f8c8d !important;
+}
+
+/* Alert styling improvements */
+.alert-info {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+    border: none !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3) !important;
+}
+
+.alert-info i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Enhanced text visibility */
+.text-muted {
+    color: #6c757d !important;
+    font-weight: 500 !important;
+}
+
+body.white-theme .text-muted {
+    color: #6c757d !important;
 }
 
 .unread-badge {
-    background: #ff4757;
+    background: #e74c3c;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
 }
 
 .action-buttons {
@@ -115,7 +213,7 @@
 .action-btn {
     flex: 1;
     padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
     color: white;
     border: none;
     border-radius: 15px;
@@ -123,11 +221,12 @@
     text-decoration: none;
     text-align: center;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 105, 189, 0.3);
 }
 
 .action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(74, 105, 189, 0.4);
     color: white;
     text-decoration: none;
 }
@@ -140,22 +239,96 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
     color: white;
     padding: 1.5rem;
     border-radius: 15px;
     text-align: center;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
 }
 
 .stat-number {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
     font-size: 0.9rem;
     opacity: 0.9;
+}
+
+.help-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.help-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.help-content {
+    padding: 2rem;
+}
+
+.help-content h6 {
+    color: #000000;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.help-content ul li {
+    color: #000000;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.help-content ul li::marker {
+    color: #000000;
+}
+
+/* Gradient mode specific styling for help content */
+body.gradient-theme .help-content h6 {
+    color: #000000 !important;
+}
+
+body.gradient-theme .help-content ul li {
+    color: #000000 !important;
+}
+
+body.gradient-theme .help-content ul li::marker {
+    color: #000000 !important;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 {% endblock %}
@@ -187,59 +360,63 @@
         <!-- Children List -->
         <div class="col-lg-6">
             <div class="communication-card">
-                <h3>👶 Your Children</h3>
-                <p class="text-muted mb-4">Select a child to communicate with their teachers</p>
-                
-                {% if children %}
-                    {% for child in children %}
-                    <div class="child-card">
-                        <div class="child-info">
-                            <h4>{{ child.user.get_full_name|default:child.user.username }}</h4>
-                            <p>{{ child.user.email|default:"No email provided" }}</p>
+                <h3 class="card-header-solid">👶 Your Children</h3>
+                <div class="card-content">
+                    <p class="text-muted mb-4">Select a child to communicate with their teachers</p>
+                    
+                    {% if children %}
+                        {% for child in children %}
+                        <div class="child-card">
+                            <div class="child-info">
+                                <h4>{{ child.user.get_full_name|default:child.user.username }}</h4>
+                                <p>{{ child.user.email|default:"No email provided" }}</p>
+                            </div>
+                            <a href="{% url 'select_teacher' child_id=child.user.id %}" class="contact-teacher-btn">
+                                Contact Teachers
+                            </a>
                         </div>
-                        <a href="{% url 'select_teacher' child_id=child.user.id %}" class="contact-teacher-btn">
-                            Contact Teachers
-                        </a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        No children found in your account. Please contact the administrator to link your children's accounts.
-                    </div>
-                {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            No children found in your account. Please contact the administrator to link your children's accounts.
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
         <!-- Recent Conversations -->
         <div class="col-lg-6">
             <div class="communication-card">
-                <h3>💬 Recent Conversations</h3>
-                <p class="text-muted mb-4">Your latest conversations with teachers</p>
-                
-                {% if recent_conversations %}
-                    {% for conversation in recent_conversations %}
-                    <div class="conversation-preview">
-                        <div class="conversation-title">
-                            <a href="{% url 'conversation_detail' thread_id=conversation.id %}" style="text-decoration: none; color: inherit;">
-                                {{ conversation.subject }}
-                            </a>
+                <h3 class="card-header-solid">💬 Recent Conversations</h3>
+                <div class="card-content">
+                    <p class="text-muted mb-4">Your latest conversations with teachers</p>
+                    
+                    {% if recent_conversations %}
+                        {% for conversation in recent_conversations %}
+                        <div class="conversation-preview">
+                            <div class="conversation-title">
+                                <a href="{% url 'conversation_detail' thread_id=conversation.id %}">
+                                    {{ conversation.subject }}
+                                </a>
+                            </div>
+                            <div class="conversation-meta">
+                                <span>About: {{ conversation.student.get_full_name|default:conversation.student.username }}</span>
+                                {% if conversation.unread_count > 0 %}
+                                <span class="unread-badge">{{ conversation.unread_count }} new</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">Last message: {{ conversation.last_message_at|timesince }} ago</small>
                         </div>
-                        <div class="conversation-meta">
-                            <span>About: {{ conversation.student.get_full_name|default:conversation.student.username }}</span>
-                            {% if conversation.unread_count > 0 %}
-                            <span class="unread-badge">{{ conversation.unread_count }} new</span>
-                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-comments"></i>
+                            No conversations yet. Start communicating with your child's teachers!
                         </div>
-                        <small class="text-muted">Last message: {{ conversation.last_message_at|timesince }} ago</small>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-comments"></i>
-                        No conversations yet. Start communicating with your child's teachers!
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -258,28 +435,30 @@
     </div>
 
     <!-- Quick Help -->
-    <div class="communication-card mt-4">
-        <h4>📋 How to Use Teacher Communication</h4>
-        <div class="row">
-            <div class="col-md-6">
-                <h6>🎯 What you can do:</h6>
-                <ul>
-                    <li>Send messages to class teachers and subject teachers</li>
-                    <li>Discuss your child's progress and performance</li>
-                    <li>Ask questions about homework and assignments</li>
-                    <li>Request parent-teacher meetings</li>
-                    <li>Get updates on classroom activities</li>
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <h6>💡 Tips for effective communication:</h6>
-                <ul>
-                    <li>Be specific about your concerns or questions</li>
-                    <li>Include your child's name in the subject line</li>
-                    <li>Be respectful and professional in your messages</li>
-                    <li>Allow 24-48 hours for teacher responses</li>
-                    <li>Use appropriate priority levels for urgent matters</li>
-                </ul>
+    <div class="help-section mt-4">
+        <h4 class="help-header">📋 How to Use Teacher Communication</h4>
+        <div class="help-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>🎯 What you can do:</h6>
+                    <ul>
+                        <li>Send messages to class teachers and subject teachers</li>
+                        <li>Discuss your child's progress and performance</li>
+                        <li>Ask questions about homework and assignments</li>
+                        <li>Request parent-teacher meetings</li>
+                        <li>Get updates on classroom activities</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>💡 Tips for effective communication:</h6>
+                    <ul>
+                        <li>Be specific about your concerns or questions</li>
+                        <li>Include your child's name in the subject line</li>
+                        <li>Be respectful and professional in your messages</li>
+                        <li>Allow 24-48 hours for teacher responses</li>
+                        <li>Use appropriate priority levels for urgent matters</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

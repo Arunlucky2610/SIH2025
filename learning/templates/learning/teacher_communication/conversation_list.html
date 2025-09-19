@@ -13,6 +13,7 @@
     border-radius: 20px;
     margin-bottom: 2rem;
     text-align: center;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
 .conversation-card {
@@ -41,21 +42,20 @@
 
 .conversation-title {
     font-weight: 600;
-    color: #ffffff !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: #2c3e50 !important;
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
 }
 
 .conversation-participants {
-    color: #667eea;
+    color: #4a69bd !important;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
 .conversation-student {
-    color: rgba(255, 255, 255, 0.9) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: #7f8c8d !important;
     font-size: 0.9rem;
 }
 
@@ -69,13 +69,30 @@
 }
 
 .last-message-time {
-    color: rgba(255, 255, 255, 0.8) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: #95a5a6 !important;
     font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Enhanced visibility for gradient theme */
+body.gradient-theme .conversation-title {
+    color: #2c3e50 !important;
+}
+
+body.gradient-theme .conversation-participants {
+    color: #4a69bd !important;
+}
+
+body.gradient-theme .conversation-student {
+    color: #7f8c8d !important;
+}
+
+body.gradient-theme .last-message-time {
+    color: #95a5a6 !important;
 }
 
 .unread-badge {
-    background: #ff4757;
+    background: #e74c3c;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;

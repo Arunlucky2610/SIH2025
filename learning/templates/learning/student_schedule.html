@@ -1,0 +1,641 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}My Study Schedule - Rural Education Platform{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Professional Typography */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #1a202c;
+    line-height: 1.6;
+}
+
+/* Clean Container */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Professional Header */
+.page-header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 10px 25px rgba(45, 55, 72, 0.15);
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.page-header p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Clean Card Design */
+.schedule-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.schedule-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Professional Calendar Grid */
+.calendar-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    padding: 1.5rem;
+    color: white;
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.calendar-nav h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.125rem;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day-header {
+    background: #f7fafc;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: #4a5568;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 0.75rem;
+    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    background: white;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: #f8fafc;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    border-left: 4px solid #4299e1;
+}
+
+.calendar-day.other-month {
+    background: #fafafa;
+    color: #a0aec0;
+}
+
+.day-number {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Schedule Items */
+.schedule-item {
+    background: #f0fff4;
+    border: 1px solid #9ae6b4;
+    border-left: 4px solid #38a169;
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+    background: #c6f6d5;
+    transform: translateX(2px);
+}
+
+.schedule-time {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.125rem;
+}
+
+.schedule-subject {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Subject Colors */
+.schedule-item.math {
+    background: #fef5e7;
+    border-color: #f6ad55;
+    border-left-color: #ed8936;
+}
+
+.schedule-item.science {
+    background: #e6fffa;
+    border-color: #81e6d9;
+    border-left-color: #38b2ac;
+}
+
+.schedule-item.english {
+    background: #ebf8ff;
+    border-color: #90cdf4;
+    border-left-color: #4299e1;
+}
+
+.schedule-item.history {
+    background: #faf5ff;
+    border-color: #c4b5fd;
+    border-left-color: #8b5cf6;
+}
+
+/* Sidebar */
+.sidebar {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.sidebar-section {
+    margin-bottom: 2rem;
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Today's Schedule */
+.today-item {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid #4299e1;
+}
+
+.today-time {
+    font-weight: 600;
+    color: #4299e1;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.today-subject {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.today-description {
+    color: #4a5568;
+    font-size: 0.875rem;
+}
+
+/* Statistics */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2d3748;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #4a5568;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Action Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    color: white;
+}
+
+.btn-secondary {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    border-color: #cbd5e0;
+    background: #f8fafc;
+    color: #2d3748;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .page-header {
+        padding: 1.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 0.5rem;
+    }
+    
+    .schedule-item {
+        font-size: 0.7rem;
+    }
+}
+
+/* Clean Typography */
+.text-xl {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.text-muted {
+    color: #718096;
+}
+
+/* Focus States */
+button:focus, .btn-primary:focus, .btn-secondary:focus {
+    outline: 2px solid #4299e1;
+    outline-offset: 2px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>My Study Schedule</h1>
+                <p>Plan your learning journey and track your progress</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="#" class="btn-secondary">
+                    <i class="bi bi-calendar-plus me-2"></i>Add Session
+                </a>
+                <a href="{% url 'parent_dashboard' %}" class="btn-primary">
+                    <i class="bi bi-house me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">24</div>
+            <div class="stat-label">Hours This Week</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Subjects</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">85%</div>
+            <div class="stat-label">Completion Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">12</div>
+            <div class="stat-label">Day Streak</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Calendar Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="calendar-container">
+                <!-- Calendar Header -->
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" id="prevMonth">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <h2 id="currentMonth">September 2025</h2>
+                        <button class="nav-btn" id="nextMonth">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar Days Header -->
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Days will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="sidebar">
+                <!-- Today's Schedule -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="bi bi-calendar-day text-primary"></i>
+                        Today's Schedule
+                    </h3>
+                    <div class="today-item">
+                        <div class="today-time">2:00 PM - 3:00 PM</div>
+                        <div class="today-subject">Mathematics</div>
+                        <div class="today-description">Algebra and linear equations</div>
+                    </div>
+                    <div class="today-item">
+                        <div class="today-time">4:00 PM - 5:00 PM</div>
+                        <div class="today-subject">Science</div>
+                        <div class="today-description">Physics - Newton's laws</div>
+                    </div>
+                    <div class="today-item">
+                        <div class="today-time">6:00 PM - 7:00 PM</div>
+                        <div class="today-subject">English</div>
+                        <div class="today-description">Literature reading</div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Sessions -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="bi bi-clock text-warning"></i>
+                        Upcoming
+                    </h3>
+                    <div style="background: #f8fafc; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+                        <div style="font-weight: 600; color: #2d3748; margin-bottom: 0.25rem;">Tomorrow</div>
+                        <div style="color: #4a5568; font-size: 0.875rem;">3 sessions scheduled</div>
+                    </div>
+                    <div style="background: #f8fafc; border-radius: 8px; padding: 1rem;">
+                        <div style="font-weight: 600; color: #2d3748; margin-bottom: 0.25rem;">This Week</div>
+                        <div style="color: #4a5568; font-size: 0.875rem;">18 sessions remaining</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="bi bi-lightning text-success"></i>
+                        Quick Actions
+                    </h3>
+                    <div class="d-grid gap-2">
+                        <button class="btn-secondary w-100">
+                            <i class="bi bi-plus-circle me-2"></i>Add Study Session
+                        </button>
+                        <button class="btn-secondary w-100">
+                            <i class="bi bi-calendar-check me-2"></i>Mark Complete
+                        </button>
+                        <button class="btn-secondary w-100">
+                            <i class="bi bi-graph-up me-2"></i>View Progress
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize calendar
+document.addEventListener('DOMContentLoaded', function() {
+    generateCalendar();
+    initializeNavigation();
+});
+
+let currentDate = new Date();
+
+function generateCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Update month display
+    document.getElementById('currentMonth').textContent = 
+        currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    // Get first day of month and days in month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const calendarGrid = document.getElementById('calendarGrid');
+    // Keep the header row
+    const headerRows = calendarGrid.querySelectorAll('.calendar-day-header');
+    calendarGrid.innerHTML = '';
+    headerRows.forEach(header => calendarGrid.appendChild(header));
+    
+    // Sample schedule data
+    const scheduleData = {
+        '2025-09-19': [
+            { time: '14:00', subject: 'Math', type: 'math', title: 'Algebra' },
+            { time: '16:00', subject: 'Science', type: 'science', title: 'Physics' },
+            { time: '18:00', subject: 'English', type: 'english', title: 'Literature' }
+        ],
+        '2025-09-20': [
+            { time: '15:00', subject: 'History', type: 'history', title: 'Ancient Rome' },
+            { time: '17:00', subject: 'Math', type: 'math', title: 'Geometry' }
+        ],
+        '2025-09-21': [
+            { time: '14:00', subject: 'Science', type: 'science', title: 'Chemistry' }
+        ]
+    };
+    
+    // Generate 42 days (6 weeks)
+    for (let i = 0; i < 42; i++) {
+        const currentDay = new Date(startDate);
+        currentDay.setDate(startDate.getDate() + i);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        
+        const isCurrentMonth = currentDay.getMonth() === month;
+        const isToday = currentDay.toDateString() === new Date().toDateString();
+        const dateStr = currentDay.toISOString().split('T')[0];
+        const daySchedule = scheduleData[dateStr] || [];
+        
+        if (!isCurrentMonth) {
+            dayElement.classList.add('other-month');
+        }
+        if (isToday) {
+            dayElement.classList.add('today');
+        }
+        
+        dayElement.innerHTML = `
+            <div class="day-number">${currentDay.getDate()}</div>
+            ${daySchedule.map(session => `
+                <div class="schedule-item ${session.type}">
+                    <div class="schedule-time">${formatTime(session.time)}</div>
+                    <div class="schedule-subject">${session.title}</div>
+                </div>
+            `).join('')}
+        `;
+        
+        calendarGrid.appendChild(dayElement);
+    }
+}
+
+function formatTime(timeStr) {
+    return new Date(`2000-01-01T${timeStr}`).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+function initializeNavigation() {
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar();
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar();
+    });
+}
+</script>
+{% endblock %}

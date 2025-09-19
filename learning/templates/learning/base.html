@@ -86,10 +86,251 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #ffffff;
             min-height: 100vh;
             line-height: 1.6;
             color: var(--text-primary);
+            transition: background 0.5s ease-in-out;
+        }
+
+        /* Gradient background theme */
+        body.gradient-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+        }
+
+        /* Ensure text visibility in gradient theme */
+        body.gradient-theme .text-dark {
+            color: #2c3e50 !important;
+        }
+
+        body.gradient-theme h1, 
+        body.gradient-theme h2, 
+        body.gradient-theme h3, 
+        body.gradient-theme h4, 
+        body.gradient-theme h5, 
+        body.gradient-theme h6 {
+            color: #2c3e50 !important;
+        }
+
+        /* Comprehensive text visibility for gradient theme */
+        body.gradient-theme p,
+        body.gradient-theme span,
+        body.gradient-theme div,
+        body.gradient-theme .card-text,
+        body.gradient-theme .card-title,
+        body.gradient-theme .fw-bold,
+        body.gradient-theme .fw-semibold,
+        body.gradient-theme .fw-normal,
+        body.gradient-theme .small,
+        body.gradient-theme .text-secondary,
+        body.gradient-theme .lead {
+            color: #2c3e50 !important;
+        }
+
+        body.gradient-theme .text-muted {
+            color: #495057 !important;
+        }
+
+        body.gradient-theme .text-primary {
+            color: #4F46E5 !important;
+        }
+
+        body.gradient-theme .text-success {
+            color: #198754 !important;
+        }
+
+        body.gradient-theme .text-warning {
+            color: #fd7e14 !important;
+        }
+
+        body.gradient-theme .text-danger {
+            color: #dc3545 !important;
+        }
+
+        body.gradient-theme .text-info {
+            color: #0dcaf0 !important;
+        }
+
+        /* Gradient theme container background adjustments */
+        body.gradient-theme .container-fluid {
+            background-color: transparent !important;
+        }
+
+        body.gradient-theme .card {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        body.gradient-theme .btn {
+            color: #2c3e50 !important;
+        }
+
+        body.gradient-theme .btn-primary {
+            color: #ffffff !important;
+        }
+
+        body.gradient-theme .btn-success {
+            color: #ffffff !important;
+        }
+
+        body.gradient-theme .btn-danger {
+            color: #ffffff !important;
+        }
+
+        body.gradient-theme .btn-warning {
+            color: #ffffff !important;
+        }
+
+        body.gradient-theme .btn-info {
+            color: #ffffff !important;
+        }
+
+        /* Additional text elements for gradient theme */
+        body.gradient-theme label,
+        body.gradient-theme .form-label,
+        body.gradient-theme .form-text,
+        body.gradient-theme .input-group-text,
+        body.gradient-theme .dropdown-item,
+        body.gradient-theme .nav-link,
+        body.gradient-theme .breadcrumb-item {
+            color: #2c3e50 !important;
+        }
+
+        /* Ensure all generic text is visible in gradient theme */
+        body.gradient-theme * {
+            color: #2c3e50 !important;
+        }
+
+        /* Override for specific colored elements that should maintain their colors */
+        body.gradient-theme .text-primary {
+            color: #4F46E5 !important;
+        }
+
+        body.gradient-theme .text-success {
+            color: #198754 !important;
+        }
+
+        body.gradient-theme .text-warning {
+            color: #fd7e14 !important;
+        }
+
+        body.gradient-theme .text-danger {
+            color: #dc3545 !important;
+        }
+
+        body.gradient-theme .text-info {
+            color: #0dcaf0 !important;
+        }
+
+        body.gradient-theme .text-white {
+            color: #ffffff !important;
+        }
+
+        body.gradient-theme .text-muted {
+            color: #495057 !important;
+        }
+
+        /* Ensure icons maintain their intended colors */
+        body.gradient-theme .bi {
+            color: inherit !important;
+        }
+
+        /* Default white theme styling */
+        body h1, 
+        body h2, 
+        body h3, 
+        body h4, 
+        body h5, 
+        body h6 {
+            color: #2c3e50 !important;
+        }
+
+        body .text-dark {
+            color: #2c3e50 !important;
+        }
+
+        body .navbar {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.95) 0%, rgba(124, 58, 237, 0.95) 50%, rgba(236, 72, 153, 0.95) 100%) !important;
+        }
+
+        /* Enhanced text visibility for all themes */
+        .text-primary {
+            color: #4F46E5 !important;
+        }
+
+        .card-title, .fw-bold, .fw-semibold {
+            font-weight: 600 !important;
+        }
+
+        /* Ensure good contrast for all text elements */
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .small {
+            color: #6c757d !important;
+        }
+
+        /* Better visibility for icons */
+        .bi {
+            opacity: 0.9;
+        }
+
+        /* Teacher Communication adjustments for default white theme */
+        .communication-card,
+        .help-section,
+        .reply-form,
+        .message-form-card,
+        .teacher-info-card {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Background toggle button */
+        .bg-toggle-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1060;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .bg-toggle-btn.gradient-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .bg-toggle-btn.gradient-active:hover {
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .bg-toggle-btn {
+                top: 80px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
         }
 
         /* Force Navbar Visibility - High Specificity */
@@ -453,11 +694,16 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Background Toggle Button - Only show on Teacher Communication pages -->
+    <button class="bg-toggle-btn" id="bgToggle" title="Toggle Background" style="display: none;">
+        🎨
+    </button>
+
     <!-- Network Status -->
     <div id="networkStatus" class="network-status d-none"></div>
 
     <!-- Enhanced Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top" style="background: transparent !important;">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}" style="color: white !important;">
                 <i class="bi bi-mortarboard-fill me-2" style="color: white !important;"></i>
@@ -525,15 +771,15 @@
     </main>
 
     <!-- Enhanced Footer -->
-    <footer class="bg-dark text-light">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5>Rural Digital Learning</h5>
-                    <p class="mb-0">Empowering rural communities through digital education</p>
+    <footer class="text-light" style="background: #1F2937 !important; color: white !important;">
+        <div class="container" style="background: transparent !important;">
+            <div class="row align-items-center" style="background: transparent !important; padding: 2rem 0;">
+                <div class="col-md-6" style="background: transparent !important;">
+                    <h5 style="color: white !important;">Rural Digital Learning</h5>
+                    <p class="mb-0" style="color: white !important;">Empowering rural communities through digital education</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <small>&copy; 2025 Rural Digital Learning. All rights reserved.</small>
+                <div class="col-md-6 text-md-end" style="background: transparent !important;">
+                    <small style="color: white !important;">&copy; 2025 Rural Digital Learning. All rights reserved.</small>
                 </div>
             </div>
         </div>
@@ -855,6 +1101,100 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Background toggle functionality - Only show on Teacher Communication pages
+        const bgToggle = document.getElementById('bgToggle');
+        const body = document.body;
+        const currentPath = window.location.pathname;
+        
+        // Check if current page is a teacher communication page
+        // All teacher communication URLs start with 'teacher-communication/'
+        const isTeacherCommPage = currentPath.includes('teacher-communication') || 
+                                 currentPath.includes('conversation') || 
+                                 currentPath.includes('select-teacher') ||
+                                 currentPath.includes('compose-message');
+        
+        console.log('Current path:', currentPath);
+        console.log('Is teacher comm page:', isTeacherCommPage);
+        
+        // Only show background toggle on teacher communication pages
+        if (isTeacherCommPage) {
+            bgToggle.style.display = 'block';
+        } else {
+            bgToggle.style.display = 'none';
+            // Reset to white background on non-teacher-communication pages
+            body.classList.remove('gradient-theme');
+        }
+        
+        // Check if user has a saved preference
+        const savedTheme = localStorage.getItem('background-theme');
+        if (savedTheme === 'gradient') {
+            body.classList.add('gradient-theme');
+            bgToggle.classList.add('gradient-active');
+            bgToggle.innerHTML = '⚪';
+            bgToggle.title = 'Switch to White Background';
+        } else {
+            // Default is white background
+            bgToggle.innerHTML = '�';
+            bgToggle.title = 'Switch to Gradient Background';
+        }
+        
+        bgToggle.addEventListener('click', function() {
+            body.classList.toggle('gradient-theme');
+            this.classList.toggle('gradient-active');
+            
+            if (body.classList.contains('gradient-theme')) {
+                this.innerHTML = '⚪';
+                this.title = 'Switch to White Background';
+                localStorage.setItem('background-theme', 'gradient');
+                
+                // Show notification
+                showNotification('🎨 Background changed to gradient - Beautiful design mode!', 'success');
+            } else {
+                this.innerHTML = '🎨';
+                this.title = 'Switch to Gradient Background';
+                localStorage.setItem('background-theme', 'white');
+                
+                // Show notification
+                showNotification('✨ Background changed to white - Perfect for presentations!', 'success');
+            }
+        });
+
+        // Enhanced notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+                z-index: 9999;
+                font-weight: 500;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+                font-size: 0.9rem;
+                backdrop-filter: blur(10px);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
     </script>
     
     {% block extra_js %}{% endblock %}

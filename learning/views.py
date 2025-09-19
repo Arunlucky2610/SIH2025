@@ -15,6 +15,7 @@ import os
 import bcrypt
 
 from .models import UserProfile, Lesson, ModuleProgress, Quiz, QuizAttempt, LessonDownload, LoginSession, Student, Parent, Teacher
+from .teacher_communication_models import TeacherMessage
 from .analytics import (
     get_progress_chart_data, get_subject_performance_data, get_learning_calendar_data,
     get_current_streak, update_all_analytics_for_student
@@ -25,6 +26,15 @@ from .mongodb_utils import (
     save_to_role_collection, check_username_exists_in_collections,
     authenticate_user_mongodb, get_user_from_role_collection
 )
+
+def get_unread_teacher_messages_count(user):
+    """Get count of unread messages from teachers for a parent"""
+    if hasattr(user, 'userprofile') and user.userprofile.role == 'parent':
+        return TeacherMessage.objects.filter(
+            recipient=user,
+            is_read=False
+        ).count()
+    return 0
 
 def home(request):
     """Landing page - redirect based on user role"""
@@ -505,9 +515,31 @@ def parent_dashboard(request):
         # Notification data
         'unread_notifications': NotificationService.get_unread_notifications(request.user)[:10],  # Latest 10
         'notification_count': NotificationService.get_unread_notifications(request.user).count(),
+        # Teacher Communication data
+        'unread_messages_count': get_unread_teacher_messages_count(request.user),
     }
     
     return render(request, 'learning/parent_dashboard_ultra.html', context)
+
+
+@login_required
+def study_schedule(request):
+    """Study schedule page for parents"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'parent':
+        messages.error(request, 'Access denied')
+        return redirect('home')
+    
+    # Get children (students linked to this parent)
+    children = UserProfile.objects.filter(parent=profile)
+    
+    context = {
+        'user': request.user,
+        'profile': profile,
+        'children': children,
+    }
+    
+    return render(request, 'learning/study_schedule.html', context)
 
 
 @login_required
@@ -1344,3 +1376,17 @@ def teacher_create(request):
         'user_profile': getattr(request.user, 'userprofile', None),
     }
     return render(request, 'learning/teacher_form.html', context)
+
+@login_required
+def student_schedule(request):
+    """Student schedule page with professional design"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.role != 'student':
+        messages.error(request, 'Access denied')
+        return redirect('home')
+
+    context = {
+        'user': request.user,
+        'profile': profile,
+    }
+    return render(request, 'learning/student_schedule.html', context)
