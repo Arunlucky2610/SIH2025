@@ -23,24 +23,24 @@
                                 {% if user.userprofile.role == 'student' and user.userprofile.grade %}
                                     <span class="badge bg-white bg-opacity-20 text-white ms-2">Grade {{ user.userprofile.grade }}</span>
                                 {% elif user.userprofile.role == 'teacher' and user.userprofile.subject %}
-                                    <span class="badge bg-white bg-opacity-20 text-white ms-2">{{ user.userprofile.subject }}</span>
+                                    <span class="badge bg-info text-white ms-2">{{ user.userprofile.subject }}</span>
                                 {% elif user.userprofile.role == 'parent' and user.userprofile.child_name %}
-                                    <span class="badge bg-white bg-opacity-20 text-white ms-2">Parent of {{ user.userprofile.child_name }}</span>
+                                    <span class="badge bg-secondary text-white ms-2">Parent of {{ user.userprofile.child_name }}</span>
                                 {% endif %}
                             </p>
                             <p class="lead mb-4 opacity-90 fade-in-up" style="animation-delay: 0.1s;">
                                 Continue your digital learning journey and master new skills today.
                             </p>
                             <div class="d-flex flex-wrap gap-3 fade-in-up" style="animation-delay: 0.2s;">
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                <div class="badge bg-primary text-white rounded-pill px-3 py-2">
                                     <i class="bi bi-calendar me-1"></i> 
                                     {{ today|date:"F d, Y" }}
                                 </div>
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                <div class="badge bg-success text-white rounded-pill px-3 py-2">
                                     <i class="bi bi-fire me-1"></i> 
                                     {{ streak|default:0 }} day streak
                                 </div>
-                                <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2">
+                                <div class="badge bg-warning text-dark rounded-pill px-3 py-2">
                                     <i class="bi bi-trophy me-1"></i> 
                                     Level {{ level|default:1 }}
                                 </div>
@@ -65,7 +65,7 @@
     <!-- Enhanced Progress Overview -->
     <div class="row mb-5">
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #e91e63 0%, #ad1457 100());">
                 <div class="card-body p-4">
                     <div class="position-relative d-inline-block mb-4">
                         <svg width="100" height="100" class="progress-ring">
@@ -81,15 +81,15 @@
                             </defs>
                         </svg>
                         <div class="position-absolute top-50 start-50 translate-middle text-center">
-                            <div class="fw-bold fs-4 text-primary">{{ progress_percentage|floatformat:0 }}%</div>
+                            <div class="fw-bold fs-4" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ progress_percentage|floatformat:0 }}%</div>
                         </div>
                     </div>
-                    <h5 class="card-title fw-bold text-primary">Overall Progress</h5>
-                    <p class="card-text text-muted mb-0">
+                    <h5 class="card-title fw-bold" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Overall Progress</h5>
+                    <p class="card-text mb-0" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
                         <strong>{{ completed_lessons }}</strong> of <strong>{{ total_lessons }}</strong> lessons completed
                     </p>
                     <div class="mt-3">
-                        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                        <div class="badge rounded-pill" style="background: rgba(255, 255, 255, 0.9) !important; color: #000000 !important; opacity: 1 !important; font-weight: bold;">
                             <i class="bi bi-graph-up me-1"></i>
                             Keep going!
                         </div>
@@ -99,15 +99,15 @@
         </div>
         
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);">
                 <div class="card-body p-4">
-                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-book-fill text-success" style="font-size: 2.5rem;"></i>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.3) !important;">
+                        <i class="bi bi-book-fill" style="font-size: 2.5rem; color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-success">Available Lessons</h5>
-                    <div class="display-4 fw-bold text-success mb-2">{{ total_lessons }}</div>
-                    <p class="card-text text-muted mb-3">Ready to explore</p>
-                    <a href="#lessons" class="btn btn-success btn-sm rounded-pill px-3">
+                    <h5 class="card-title fw-bold" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Available Lessons</h5>
+                    <div class="display-4 fw-bold mb-2" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ total_lessons }}</div>
+                    <p class="card-text mb-3" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Ready to explore</p>
+                    <a href="#lessons" class="btn btn-light btn-sm rounded-pill px-3" style="color: #000000 !important; font-weight: bold;">
                         <i class="bi bi-arrow-down me-1"></i>
                         View All
                     </a>
@@ -116,21 +116,21 @@
         </div>
         
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);">
                 <div class="card-body p-4">
-                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-trophy-fill text-warning" style="font-size: 2.5rem;"></i>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.3) !important;">
+                        <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-warning">Completed</h5>
-                    <div class="display-4 fw-bold text-warning mb-2">{{ completed_lessons }}</div>
-                    <p class="card-text text-muted mb-3">Lessons mastered</p>
+                    <h5 class="card-title fw-bold" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Completed</h5>
+                    <div class="display-4 fw-bold mb-2" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ completed_lessons }}</div>
+                    <p class="card-text mb-3" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Lessons mastered</p>
                     {% if completed_lessons > 0 %}
-                        <div class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                        <div class="badge rounded-pill" style="background: rgba(255, 255, 255, 0.9) !important; color: #000000 !important; opacity: 1 !important; font-weight: bold;">
                             <i class="bi bi-star-fill me-1"></i>
                             Great job!
                         </div>
                     {% else %}
-                        <div class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">
+                        <div class="badge rounded-pill" style="background: rgba(255, 255, 255, 0.9) !important; color: #000000 !important; opacity: 1 !important; font-weight: bold;">
                             <i class="bi bi-play me-1"></i>
                             Start learning
                         </div>
@@ -140,15 +140,15 @@
         </div>
         
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card dashboard-card text-center h-100 border-0 shadow-lg">
+            <div class="card dashboard-card text-center h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);">
                 <div class="card-body p-4">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-cloud-download-fill text-info" style="font-size: 2.5rem;"></i>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.3) !important;">
+                        <i class="bi bi-cloud-download-fill" style="font-size: 2.5rem; color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"></i>
                     </div>
-                    <h5 class="card-title fw-bold text-info">Offline Ready</h5>
-                    <div class="display-4 fw-bold text-info mb-2">{{ recent_downloads|length }}</div>
-                    <p class="card-text text-muted mb-3">Downloads available</p>
-                    <div class="badge bg-info bg-opacity-10 text-info rounded-pill">
+                    <h5 class="card-title fw-bold" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Offline Ready</h5>
+                    <div class="display-4 fw-bold mb-2" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ recent_downloads|length }}</div>
+                    <p class="card-text mb-3" style="color: #ffffff !important; opacity: 1 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Downloads available</p>
+                    <div class="badge rounded-pill" style="background: rgba(255, 255, 255, 0.9) !important; color: #000000 !important; opacity: 1 !important; font-weight: bold;">
                         <i class="bi bi-wifi-off me-1"></i>
                         Learn anywhere
                     </div>
@@ -168,7 +168,7 @@
                                 <i class="bi bi-question-circle-fill me-2"></i> 
                                 Available Quizzes
                             </h4>
-                            <p class="text-muted mb-0">Test your knowledge and track your progress</p>
+                            <p class="mb-0" style="color: #6c757d !important;">Test your knowledge and track your progress</p>
                         </div>
                         <div class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
                             {{ available_quizzes|length }} quiz{{ available_quizzes|length|pluralize:"es" }} available
