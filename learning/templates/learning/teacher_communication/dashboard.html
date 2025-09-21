@@ -115,24 +115,24 @@
 
 .conversation-title {
     font-weight: 600;
-    color: #2c3e50 !important;
+    color: white !important;
     margin-bottom: 0.5rem;
 }
 
 .conversation-title a {
-    color: #2c3e50 !important;
+    color: white !important;
     text-decoration: none;
     transition: color 0.3s ease;
     font-weight: 600;
 }
 
 .conversation-title a:hover {
-    color: #4a69bd !important;
+    color: white !important;
 }
 
 .conversation-meta {
     font-size: 0.9rem;
-    color: #7f8c8d !important;
+    color: white !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -140,29 +140,29 @@
 }
 
 .conversation-meta span {
-    color: #34495e !important;
+    color: white !important;
 }
 
 /* Ensure text visibility in both light and dark themes */
 .conversation-title,
 .conversation-title a {
-    color: #2c3e50 !important;
+    color: white !important;
 }
 
 .conversation-meta,
 .conversation-meta span {
-    color: #7f8c8d !important;
+    color: white !important;
 }
 
 /* Gradient theme adjustments */
 body.gradient-theme .conversation-title,
 body.gradient-theme .conversation-title a {
-    color: #2c3e50 !important;
+    color: white !important;
 }
 
 body.gradient-theme .conversation-meta,
 body.gradient-theme .conversation-meta span {
-    color: #7f8c8d !important;
+    color: white !important;
 }
 
 /* Alert styling improvements */
@@ -184,12 +184,12 @@ body.gradient-theme .conversation-meta span {
 
 /* Enhanced text visibility */
 .text-muted {
-    color: #6c757d !important;
+    color: white !important;
     font-weight: 500 !important;
 }
 
 body.white-theme .text-muted {
-    color: #6c757d !important;
+    color: white !important;
 }
 
 .unread-badge {
@@ -212,7 +212,7 @@ body.white-theme .text-muted {
     flex: 1;
     padding: 1rem;
     background: linear-gradient(135deg, #4a69bd 0%, #3c5aa6 100%);
-    color: white;
+    color: white !important;
     border: none;
     border-radius: 15px;
     font-weight: 600;
@@ -225,7 +225,7 @@ body.white-theme .text-muted {
 .action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(74, 105, 189, 0.4);
-    color: white;
+    color: white !important;
     text-decoration: none;
 }
 
@@ -256,11 +256,13 @@ body.white-theme .text-muted {
     font-weight: bold;
     margin-bottom: 0.5rem;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: white !important;
 }
 
 .stat-label {
     font-size: 0.9rem;
     opacity: 0.9;
+    color: white !important;
 }
 
 .help-section {
@@ -437,17 +439,17 @@ body.gradient-theme *::-moz-selection {
 
 .voice-btn:not(.secondary):not(.success) {
     background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
+    color: black !important;
 }
 
 .voice-btn.secondary {
     background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
+    color: black !important;
 }
 
 .voice-btn.success {
     background: linear-gradient(135deg, #28a745, #1e7e34);
-    color: white;
+    color: black !important;
 }
 
 .voice-btn:hover {
@@ -598,37 +600,41 @@ body.gradient-theme *::-moz-selection {
 <div class="container mt-4">
     <!-- Back to Dashboard Button (Top) -->
     <div class="mb-3">
-        <a href="{% url 'parent_dashboard' %}" class="btn btn-success" style="background: linear-gradient(135deg, #28a745, #20c997); border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+        <a href="{% url 'parent_dashboard' %}" class="btn btn-success" style="background: linear-gradient(135deg, #28a745, #20c997); border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); color: white;">
             <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
         </a>
     </div>
     
     <div class="communication-header">
-        <h1>👩‍🏫 Teacher Communication</h1>
-        <p>Connect with your child's teachers and stay involved in their learning journey</p>
+        <h1 style="color: white !important;">👩‍🏫 Teacher Communication</h1>
+        {% if request.user.userprofile.child_name %}
+            <p style="color: white !important;">Connect with {{ request.user.userprofile.child_name }}'s teachers and stay involved in their learning journey</p>
+        {% else %}
+            <p style="color: white !important;">Connect with your child's teachers and stay involved in their learning journey</p>
+        {% endif %}
     </div>
 
     <!-- Statistics -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number">{{ recent_conversations.count }}</div>
-            <div class="stat-label">Active Conversations</div>
+            <div class="stat-number" style="color: white !important;">{{ recent_conversations.count }}</div>
+            <div class="stat-label" style="color: white !important;">Active Conversations</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ unread_count }}</div>
-            <div class="stat-label">Unread Messages</div>
+            <div class="stat-number" style="color: white !important;">{{ unread_count }}</div>
+            <div class="stat-label" style="color: white !important;">Unread Messages</div>
         </div>
     </div>
 
     <!-- AI-Powered Smart Communication Features -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="communication-card">
-                <h3 class="card-header-solid">🤖 AI Smart Communication Hub</h3>
+            <div class="communication-card force-white-text">
+                <h3 class="card-header-solid" style="color: white !important;">🤖 AI Smart Communication Hub</h3>
                 <div class="card-content">
                     <!-- Quick Smart Suggestions -->
                     <div class="smart-suggestions mb-4">
-                        <h5><i class="bi bi-lightbulb-fill text-warning"></i> Smart Suggestions Based on Your Child's Progress</h5>
+                        <h5 style="color: white !important;"><i class="bi bi-lightbulb-fill text-warning"></i> Smart Suggestions Based on Your Child's Progress</h5>
                         <div class="suggestion-cards">
                             <div class="suggestion-card" onclick="fillQuickMessage('ask-math-help')">
                                 <i class="bi bi-calculator"></i>
@@ -650,7 +656,7 @@ body.gradient-theme *::-moz-selection {
 
                     <!-- Voice Message Feature -->
                     <div class="voice-message-section mb-4">
-                        <h5><i class="bi bi-mic-fill text-primary"></i> Voice Message (Speak in Your Language)</h5>
+                        <h5 style="color: white !important;"><i class="bi bi-mic-fill text-primary"></i> Voice Message (Speak in Your Language)</h5>
                         <div class="voice-controls">
                             <button class="voice-btn" id="startRecording">
                                 <i class="bi bi-mic"></i>
@@ -666,10 +672,10 @@ body.gradient-theme *::-moz-selection {
                             </button>
                         </div>
                         <div class="voice-feedback" id="voiceFeedback">
-                            <p><i class="bi bi-info-circle"></i> Click "Start Recording" to record your message in Hindi, Bengali, or any local language</p>
+                            <p style="color: white !important;"><i class="bi bi-info-circle"></i> Click "Start Recording" to record your message in Hindi, Bengali, or any local language</p>
                         </div>
                         <div class="transcription-box" id="transcriptionBox" style="display: none;">
-                            <h6>Auto-Transcribed Text:</h6>
+                            <h6 style="color: white !important;">Auto-Transcribed Text:</h6>
                             <div class="transcribed-text" id="transcribedText"></div>
                             <div class="translation" id="translationText"></div>
                         </div>
@@ -677,9 +683,9 @@ body.gradient-theme *::-moz-selection {
 
                     <!-- Language Selection -->
                     <div class="language-selection mb-4">
-                        <h5><i class="bi bi-translate text-success"></i> Language Support</h5>
+                        <h5 style="color: white !important;"><i class="bi bi-translate text-success"></i> Language Support</h5>
                         <div class="language-options">
-                            <button class="lang-btn active" data-lang="en">English</button>
+                            <button class="lang-btn" data-lang="en">English</button>
                             <button class="lang-btn" data-lang="hi">हिंदी</button>
                             <button class="lang-btn" data-lang="pa">ਪੰਜਾਬੀ</button>
                         </div>
@@ -687,15 +693,15 @@ body.gradient-theme *::-moz-selection {
 
                     <!-- Quick Message Composer -->
                     <div class="quick-composer">
-                        <h5><i class="bi bi-chat-dots text-info"></i> Quick Message Composer</h5>
+                        <h5 style="color: white !important;"><i class="bi bi-chat-dots text-info"></i> Quick Message Composer</h5>
                         <div class="message-form">
                             <textarea id="quickMessage" class="form-control mb-3" rows="4" placeholder="Type your message here or use voice recording above..."></textarea>
                             <div class="composer-actions">
-                                <button class="action-btn" onclick="translateMessage()">
+                                <button class="action-btn" onclick="translateMessage()" style="color: white !important;">
                                     <i class="bi bi-translate"></i>
                                     Auto-Translate
                                 </button>
-                                <button class="action-btn" onclick="sendQuickMessage()">
+                                <button class="action-btn" onclick="sendQuickMessage()" style="color: white !important;">
                                     <i class="bi bi-send"></i>
                                     Send Message
                                 </button>
@@ -709,17 +715,14 @@ body.gradient-theme *::-moz-selection {
 
     <!-- Action Buttons -->
     <div class="action-buttons" style="display: flex !important; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; visibility: visible;">
-        <a href="{% url 'conversation_list' %}" class="action-btn">
+        <a href="{% url 'conversation_list' %}" class="action-btn" style="color: white !important;">
             <i class="fas fa-list"></i> View All Conversations
         </a>
-        <a href="#" onclick="showComingSoon()" class="action-btn">
+        <a href="#" onclick="showComingSoon()" class="action-btn" style="color: white !important;">
             <i class="fas fa-calendar"></i> Schedule Meeting
         </a>
-        <a href="#" onclick="showComingSoon()" class="action-btn">
+        <a href="#" onclick="showComingSoon()" class="action-btn" style="color: white !important;">
             <i class="fas fa-bell"></i> Notification Settings
-        </a>
-        <a href="{% url 'parent_dashboard' %}" class="action-btn" style="background: linear-gradient(135deg, #28a745, #20c997) !important; color: white !important; display: block !important;">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
 
@@ -924,8 +927,6 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
             'en': 'English',
             'hi': 'Hindi (हिंदी)',
             'pa': 'Punjabi (ਪੰਜਾਬੀ)'
-
-            
         };
         
         document.getElementById('voiceFeedback').innerHTML = `
@@ -1157,13 +1158,71 @@ document.addEventListener('DOMContentLoaded', function() {
 function showComingSoon() {
     alert('This feature is coming soon! Stay tuned for updates.');
 }
+
+// Draggable Chatbot Functionality
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+function dragStart(e) {
+    if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+    } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+    }
+
+    if (e.target === document.getElementById("chatbotIcon")) {
+        isDragging = true;
+    }
+}
+
+function dragEnd(e) {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+}
+
+function drag(e) {
+    if (isDragging) {
+        e.preventDefault();
+        
+        if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+        } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, document.getElementById("chatbotIcon"));
+    }
+}
+
+function setTranslate(xPos, yPos, el) {
+    el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+}
+
+// Initialize draggable functionality
+document.addEventListener("DOMContentLoaded", function() {
+    const chatbotIcon = document.getElementById("chatbotIcon");
+    if (chatbotIcon) {
+        chatbotIcon.addEventListener("touchstart", dragStart, false);
+        chatbotIcon.addEventListener("touchend", dragEnd, false);
+        chatbotIcon.addEventListener("touchmove", drag, false);
+        chatbotIcon.addEventListener("mousedown", dragStart, false);
+        chatbotIcon.addEventListener("mouseup", dragEnd, false);
+        chatbotIcon.addEventListener("mousemove", drag, false);
+    }
+});
 </script>
 
-<!-- Bottom Back to Dashboard Button -->
-<div class="text-center mt-5 mb-4">
-    <a href="{% url 'parent_dashboard' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; border-radius: 15px; padding: 1rem 2rem; font-weight: 600; box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); text-decoration: none; font-size: 1.1rem;">
-        <i class="fas fa-home me-2"></i> Return to Main Dashboard
-    </a>
-</div>
-</div>
 {% endblock %}

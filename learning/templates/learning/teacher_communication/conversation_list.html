@@ -200,14 +200,17 @@ body.gradient-theme .last-message-time {
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-        <a href="{% url 'teacher_communication_dashboard' %}" class="action-btn">
-            <i class="fas fa-plus"></i> Start New Conversation
-        </a>
+        <button class="action-btn" onclick="openNewMessageModal()">
+            <i class="fas fa-plus"></i> Start New Message
+        </button>
         <button class="action-btn" onclick="markAllRead()">
             <i class="fas fa-check-double"></i> Mark All as Read
         </button>
-        <button class="action-btn" onclick="showFilters()">
-            <i class="fas fa-filter"></i> Filter Conversations
+        <button class="action-btn" onclick="showAdvancedSearch()">
+            <i class="fas fa-search"></i> Advanced Search
+        </button>
+        <button class="action-btn" onclick="exportConversations()">
+            <i class="fas fa-download"></i> Export History
         </button>
     </div>
 
@@ -231,7 +234,7 @@ body.gradient-theme .last-message-time {
     {% if conversations %}
         <div id="conversations-container">
             {% for conversation in conversations %}
-                <div class="conversation-card" onclick="openConversation({{ conversation.id }})" data-filter="all {% if conversation.unread_count > 0 %}unread{% endif %}">
+                <div class="conversation-card" data-conversation-id="{{ conversation.id }}" data-filter="all {% if conversation.unread_count > 0 %}unread{% endif %}">
                     <div class="conversation-header">
                         <div class="flex-grow-1">
                             <div class="conversation-title">
@@ -266,7 +269,7 @@ body.gradient-theme .last-message-time {
                             Last activity: {{ conversation.last_message_at|timesince }} ago
                         </div>
                         <div>
-                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); openConversation({{ conversation.id }})">
+                            <button class="btn btn-sm btn-outline-primary view-conversation-btn" data-conversation-id="{{ conversation.id }}">
                                 <i class="fas fa-eye"></i> View
                             </button>
                         </div>
@@ -370,5 +373,454 @@ setInterval(function() {
     // You can implement AJAX call to check for new messages
     // and update the conversation list without full page reload
 }, 30000);
+
+// Enhanced functionalities for SIH Demo
+// Enhanced functionalities for SIH Demo
+function openNewMessageModal() {
+    const modal = new bootstrap.Modal(document.getElementById('newMessageModal'));
+    modal.show();
+    
+    // Initialize character counter
+    const messageContent = document.getElementById('messageContent');
+    const charCount = document.getElementById('charCount');
+    
+    messageContent.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+        if (this.value.length > 1000) {
+            charCount.style.color = 'red';
+        } else {
+            charCount.style.color = '#6c757d';
+        }
+    });
+}
+
+function fillMessageTemplate(type) {
+    const messageContent = document.getElementById('messageContent');
+    const messageSubject = document.getElementById('messageSubject');
+    
+    const templates = {
+        'academic': {
+            subject: 'Academic Progress Discussion',
+            content: 'Dear Teacher,\n\nI hope this message finds you well. I would like to discuss my child\'s academic progress in your subject. I have noticed some areas where they might need additional support, and I would appreciate your guidance on how we can work together to help them improve.\n\nThank you for your dedication to our children\'s education.\n\nBest regards'
+        },
+        'meeting': {
+            subject: 'Parent-Teacher Meeting Request',
+            content: 'Dear Teacher,\n\nI hope you are doing well. I would like to schedule a parent-teacher meeting to discuss my child\'s progress and any concerns you might have. Please let me know your available time slots, and I will adjust my schedule accordingly.\n\nLooking forward to hearing from you.\n\nBest regards'
+        },
+        'homework': {
+            subject: 'Homework Support Request',
+            content: 'Dear Teacher,\n\nI hope this message finds you well. My child has been struggling with some of the recent homework assignments. Could you please provide some additional guidance or resources that might help them understand the concepts better?\n\nI would be grateful for any suggestions you might have.\n\nThank you for your support.'
+        },
+        'appreciation': {
+            subject: 'Thank You for Your Dedication',
+            content: 'Dear Teacher,\n\nI wanted to take a moment to express my sincere gratitude for your dedication and hard work in teaching my child. Your efforts have made a significant positive impact on their learning and development.\n\nThank you for being such an inspiring educator.\n\nWith appreciation'
+        }
+    };
+    
+    if (templates[type]) {
+        messageSubject.value = templates[type].subject;
+        messageContent.value = templates[type].content;
+        
+        // Update character count
+        document.getElementById('charCount').textContent = templates[type].content.length;
+    }
+}
+
+function showAdvancedSearch() {
+    const modal = new bootstrap.Modal(document.getElementById('advancedSearchModal'));
+    modal.show();
+}
+
+function applyAdvancedSearch() {
+    const searchCriteria = {
+        teacher: document.getElementById('searchTeacher').value,
+        subject: document.getElementById('searchSubject').value,
+        dateFrom: document.getElementById('dateFrom').value,
+        dateTo: document.getElementById('dateTo').value,
+        status: document.getElementById('searchStatus').value,
+        priority: document.getElementById('searchPriority').value
+    };
+    
+    // Apply search filter to conversation cards
+    const conversationCards = document.querySelectorAll('.conversation-card');
+    let visibleCount = 0;
+    
+    conversationCards.forEach(card => {
+        let shouldShow = true;
+        
+        // Apply filters based on search criteria
+        if (searchCriteria.subject && !card.textContent.toLowerCase().includes(searchCriteria.subject.toLowerCase())) {
+            shouldShow = false;
+        }
+        
+        if (searchCriteria.status === 'unread' && !card.classList.contains('unread')) {
+            shouldShow = false;
+        }
+        
+        if (shouldShow) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Show search results count
+    alert(`Found ${visibleCount} conversations matching your criteria.`);
+    
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('advancedSearchModal')).hide();
+}
+
+function sendNewMessage() {
+    const teacher = document.getElementById('teacherSelect').value;
+    const priority = document.getElementById('prioritySelect').value;
+    const subject = document.getElementById('messageSubject').value;
+    const content = document.getElementById('messageContent').value;
+    const category = document.getElementById('categorySelect').value;
+    
+    if (!teacher || !subject || !content) {
+        alert('Please fill in all required fields (Teacher, Subject, and Message).');
+        return;
+    }
+    
+    if (content.length > 1000) {
+        alert('Message is too long. Please keep it under 1000 characters.');
+        return;
+    }
+    
+    // Simulate sending message
+    const loadingBtn = event.target;
+    loadingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+    loadingBtn.disabled = true;
+    
+    setTimeout(() => {
+        alert('Message sent successfully! The teacher will be notified and will respond soon.');
+        
+        // Close modal
+        bootstrap.Modal.getInstance(document.getElementById('newMessageModal')).hide();
+        
+        // Reset form
+        document.getElementById('teacherSelect').value = '';
+        document.getElementById('messageSubject').value = '';
+        document.getElementById('messageContent').value = '';
+        document.getElementById('charCount').textContent = '0';
+        
+        // Reset button
+        loadingBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Message';
+        loadingBtn.disabled = false;
+        
+        // Add new conversation to the list (demo)
+        addNewConversationToList(teacher, subject, priority, category);
+        
+    }, 2000);
+}
+
+function addNewConversationToList(teacher, subject, priority, category) {
+    const conversationsContainer = document.getElementById('conversations-container');
+    const teacherNames = {
+        'math_teacher': 'Mrs. Sharma - Mathematics',
+        'science_teacher': 'Mr. Kumar - Science',
+        'english_teacher': 'Ms. Patel - English',
+        'hindi_teacher': 'Mrs. Singh - Hindi',
+        'social_teacher': 'Mr. Gupta - Social Studies',
+        'art_teacher': 'Ms. Kaur - Arts & Crafts'
+    };
+    
+    const priorityColors = {
+        'low': 'success',
+        'medium': 'warning', 
+        'high': 'orange',
+        'urgent': 'danger'
+    };
+    
+    const newConversationHTML = `
+        <div class="conversation-card" onclick="openConversation('new')" data-filter="all unread" style="border-left: 4px solid #667eea;">
+            <div class="conversation-header">
+                <div class="flex-grow-1">
+                    <div class="conversation-title">${subject}</div>
+                    <div class="conversation-participants">
+                        <i class="fas fa-users"></i> ${teacherNames[teacher] || teacher}
+                    </div>
+                    <div class="conversation-student">
+                        <i class="fas fa-user-graduate"></i> About: Your Child
+                    </div>
+                    <div class="conversation-status">
+                        <span class="badge bg-${priorityColors[priority]} me-2">${priority.toUpperCase()}</span>
+                        <span class="badge bg-secondary">${category.toUpperCase()}</span>
+                    </div>
+                </div>
+                <div class="conversation-meta">
+                    <div class="text-end">
+                        <div class="last-message-time">Just now</div>
+                        <span class="unread-badge">New</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    conversationsContainer.insertAdjacentHTML('afterbegin', newConversationHTML);
+}
+
+function exportConversations() {
+    alert('Exporting conversation history... This feature helps you keep records for meetings and follow-ups.');
+    
+    // Simulate export process
+    setTimeout(() => {
+        alert('Export completed! Your conversation history has been saved as PDF.');
+    }, 2000);
+}
+
+// Language button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const languageButtons = document.querySelectorAll('.language-btn');
+    languageButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            languageButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Conversation card click handlers
+    document.querySelectorAll('.conversation-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const conversationId = this.getAttribute('data-conversation-id');
+            if (conversationId) {
+                openConversation(conversationId);
+            }
+        });
+    });
+    
+    // View button click handlers
+    document.querySelectorAll('.view-conversation-btn').forEach(btn => {
+        btn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const conversationId = this.getAttribute('data-conversation-id');
+            if (conversationId) {
+                openConversation(conversationId);
+            }
+        });
+    });
+    
+    // Suggestion card hover effects
+    const suggestionCards = document.querySelectorAll('.suggestion-card');
+    suggestionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
 </script>
+
+<!-- Advanced New Message Modal -->
+<div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px 20px 0 0; color: white;">
+                <h5 class="modal-title" id="newMessageModalLabel">
+                    <i class="fas fa-paper-plane me-2"></i>Start New Conversation with Teacher
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Teacher Selection -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="teacherSelect" class="form-label fw-bold">
+                            <i class="fas fa-chalkboard-teacher text-primary me-2"></i>Select Teacher
+                        </label>
+                        <select id="teacherSelect" class="form-select" style="border-radius: 15px; border: 2px solid #e9ecef;">
+                            <option value="">Choose a teacher...</option>
+                            <option value="math_teacher">Mrs. Sharma - Mathematics</option>
+                            <option value="science_teacher">Mr. Kumar - Science</option>
+                            <option value="english_teacher">Ms. Patel - English</option>
+                            <option value="hindi_teacher">Mrs. Singh - Hindi</option>
+                            <option value="social_teacher">Mr. Gupta - Social Studies</option>
+                            <option value="art_teacher">Ms. Kaur - Arts & Crafts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="prioritySelect" class="form-label fw-bold">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>Priority Level
+                        </label>
+                        <select id="prioritySelect" class="form-select" style="border-radius: 15px; border: 2px solid #e9ecef;">
+                            <option value="low">🟢 Low - General Inquiry</option>
+                            <option value="medium" selected>🟡 Medium - Regular Update</option>
+                            <option value="high">🟠 High - Needs Attention</option>
+                            <option value="urgent">🔴 Urgent - Immediate Response Required</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Subject and Category -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <label for="messageSubject" class="form-label fw-bold">
+                            <i class="fas fa-tag text-info me-2"></i>Subject
+                        </label>
+                        <input type="text" id="messageSubject" class="form-control" placeholder="Enter message subject..." style="border-radius: 15px; border: 2px solid #e9ecef;">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="categorySelect" class="form-label fw-bold">
+                            <i class="fas fa-folder text-success me-2"></i>Category
+                        </label>
+                        <select id="categorySelect" class="form-select" style="border-radius: 15px; border: 2px solid #e9ecef;">
+                            <option value="academic">📚 Academic Performance</option>
+                            <option value="behavior">👨‍👩‍👧‍👦 Behavior & Discipline</option>
+                            <option value="attendance">📅 Attendance & Punctuality</option>
+                            <option value="homework">📝 Homework & Assignments</option>
+                            <option value="health">🏥 Health & Wellbeing</option>
+                            <option value="general">💬 General Discussion</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Smart Suggestions -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>Smart Message Suggestions
+                    </label>
+                    <div class="suggestion-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                        <div class="suggestion-card" onclick="fillMessageTemplate('academic')" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 1rem; border-radius: 15px; cursor: pointer; transition: transform 0.3s;">
+                            <h6><i class="fas fa-chart-line me-2"></i>Academic Progress</h6>
+                            <small>Discuss child's academic performance and improvement areas</small>
+                        </div>
+                        <div class="suggestion-card" onclick="fillMessageTemplate('meeting')" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 1rem; border-radius: 15px; cursor: pointer; transition: transform 0.3s;">
+                            <h6><i class="fas fa-calendar-alt me-2"></i>Schedule Meeting</h6>
+                            <small>Request a parent-teacher meeting to discuss important matters</small>
+                        </div>
+                        <div class="suggestion-card" onclick="fillMessageTemplate('homework')" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 1rem; border-radius: 15px; cursor: pointer; transition: transform 0.3s;">
+                            <h6><i class="fas fa-tasks me-2"></i>Homework Help</h6>
+                            <small>Ask for additional support with homework and assignments</small>
+                        </div>
+                        <div class="suggestion-card" onclick="fillMessageTemplate('appreciation')" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white; padding: 1rem; border-radius: 15px; cursor: pointer; transition: transform 0.3s;">
+                            <h6><i class="fas fa-heart me-2"></i>Appreciation</h6>
+                            <small>Express gratitude and positive feedback to the teacher</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Composer -->
+                <div class="mb-4">
+                    <label for="messageContent" class="form-label fw-bold">
+                        <i class="fas fa-edit text-primary me-2"></i>Your Message
+                    </label>
+                    <textarea id="messageContent" class="form-control" rows="6" placeholder="Type your message here..." style="border-radius: 15px; border: 2px solid #e9ecef; resize: vertical;"></textarea>
+                    <div class="character-count mt-2">
+                        <small class="text-muted">Characters: <span id="charCount">0</span>/1000</small>
+                    </div>
+                </div>
+
+                <!-- Language & Translation -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-language text-info me-2"></i>Compose in Your Language
+                        </label>
+                        <div class="language-buttons d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary language-btn" data-lang="en">English</button>
+                            <button type="button" class="btn btn-outline-primary language-btn" data-lang="hi">हिंदी</button>
+                            <button type="button" class="btn btn-outline-primary language-btn" data-lang="pa">ਪੰਜਾਬੀ</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-clock text-warning me-2"></i>Schedule Message
+                        </label>
+                        <input type="datetime-local" id="scheduleTime" class="form-control" style="border-radius: 15px; border: 2px solid #e9ecef;">
+                        <small class="text-muted">Leave empty to send immediately</small>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-paperclip text-success me-2"></i>Attachments (Optional)
+                    </label>
+                    <input type="file" id="attachments" class="form-control" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="border-radius: 15px; border: 2px solid #e9ecef;">
+                    <small class="text-muted">Max 5 files, 10MB each. Supported: PDF, DOC, Images</small>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; border-radius: 0 0 20px 20px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 25px;">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="sendNewMessage()" style="border-radius: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Search Modal -->
+<div class="modal fade" id="advancedSearchModal" tabindex="-1" aria-labelledby="advancedSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px 20px 0 0; color: white;">
+                <h5 class="modal-title" id="advancedSearchModalLabel">
+                    <i class="fas fa-search me-2"></i>Advanced Search & Filter
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="searchTeacher" class="form-label">Teacher</label>
+                        <select id="searchTeacher" class="form-select">
+                            <option value="">All Teachers</option>
+                            <option value="math_teacher">Mrs. Sharma - Mathematics</option>
+                            <option value="science_teacher">Mr. Kumar - Science</option>
+                            <option value="english_teacher">Ms. Patel - English</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="searchSubject" class="form-label">Subject Contains</label>
+                        <input type="text" id="searchSubject" class="form-control" placeholder="Search in subject...">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="dateFrom" class="form-label">From Date</label>
+                        <input type="date" id="dateFrom" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dateTo" class="form-label">To Date</label>
+                        <input type="date" id="dateTo" class="form-control">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="searchStatus" class="form-label">Status</label>
+                        <select id="searchStatus" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="unread">Unread Only</option>
+                            <option value="read">Read Only</option>
+                            <option value="replied">Replied</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="searchPriority" class="form-label">Priority</label>
+                        <select id="searchPriority" class="form-select">
+                            <option value="">All Priorities</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyAdvancedSearch()">Apply Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

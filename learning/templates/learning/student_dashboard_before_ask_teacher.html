@@ -5,24 +5,7 @@
 
 {% block extra_css %}
 <style>
-/* UNIVERSAL TEXT SHADOW ELIMINATION - HIGHE                                  <h1 class="display-6 fw-bold mb-2" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; box-shadow: none !important;">
-                                    <span id="greetingIcon">📚</span> Welcome to Your Dashboard
-                                </h1>                                  <span id="greetingIcon">📚</    }
-    
-    const currentMode = studyModes[Math.floor(Math.random() * studyModes.length)];
-    const studyModeElement = document.getElementById('studyMode');
-    studyModeElement.innerHTML = currentMode;
-    studyModeElement.style.color = '#ffffff';
-    
-    // Simulate level progression
-    const levels = [3, 4, 5, 6];
-    const currentLevel = levels[Math.floor(Math.random() * levels.length)];
-    const learnerLevelElement = document.getElementById('learnerLevel');
-    learnerLevelElement.textContent = currentLevel;
-    learnerLevelElement.style.color = '#ffffff';
-}ome to Your Dashboard                            <h1 class="display-6 fw-bold mb-2" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; box-shadow: none !important;">
-                                    <span id="greetingIcon">📚</span> Welcome to Your Dashboard
-                                </h1>                                 <span id="greetingIcon">📚</span> Welcome to Your DashboardT PRIORITY */
+/* UNIVERSAL TEXT SHADOW ELIMINATION - HIGHEST PRIORITY */
 * , *::before, *::after {
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
@@ -32,20 +15,6 @@
     -moz-text-shadow: none !important;
     filter: none !important;
     -webkit-filter: none !important;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
-}
-
-/* Ensure all text in greeting card is white */
-.greeting-card, .greeting-card *, .greeting-card *::before, .greeting-card *::after {
-    color: #ffffff !important;
-    text-shadow: none !important;
-    -webkit-text-shadow: none !important;
-    -moz-text-shadow: none !important;
-}
-
-/* Force white color on all dynamic elements */
-#greetingIcon, #dynamicGreeting, #motivationalMessage, #studyMode, #learnerLevel {
-    color: #ffffff !important;
 }
 
 /* Override every possible shadow class */
@@ -228,7 +197,7 @@ p, span, div, a, small, strong, em, i, b, label, button, input, textarea, select
                             <div class="mb-3">
                                 <!-- Dynamic Date Display -->
                                 <div class="d-flex align-items-center mb-2">
-                                    <h6 class="mb-0 me-3" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; font-weight: 500;">
+                                    <h6 class="text-white-50 mb-0 me-3" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; font-weight: 500;">
                                         <i class="bi bi-calendar-event me-1" style="color: #ffffff !important;"></i>
                                         <span id="currentDate" style="color: #ffffff !important;"></span>
                                     </h6>
@@ -239,18 +208,18 @@ p, span, div, a, small, strong, em, i, b, label, button, input, textarea, select
                                 </div>
                                 
                                 <h1 class="display-6 fw-bold mb-2" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; box-shadow: none !important;">
-                                    <span id="greetingIcon">�</span> Welcome to Your Dashboard
+                                    <span id="greetingIcon">�</span> Student Learning Hub
                                 </h1>
-                                <p class="lead mb-0" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important; opacity: 1 !important;">
-                                    <span id="dynamicGreeting" style="color: #ffffff !important;">Good day</span>, <span style="color: #ffffff !important;">{{ user.first_name|default:user.username }}!</span> 
+                                <p class="lead mb-0 opacity-90" style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important;">
+                                    <span id="dynamicGreeting" style="color: #ffffff !important;">Good day</span>, {{ user.first_name|default:user.username }}! 
                                     <span id="motivationalMessage" style="color: #ffffff !important;">Your digital learning adventure awaits! 🚀</span>
                                 </p>
                                 
                                 <!-- Achievement Streak Display -->
                                 <div class="mt-2">
-                                    <small style="color: #ffffff !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important;">
+                                    <small class="text-white-50" style="color: rgba(255,255,255,0.9) !important; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important;">
                                         <i class="bi bi-fire text-warning me-1"></i>
-                                        <span class="fw-bold" style="color: #ffffff !important;">7-day learning streak!</span> <span style="color: #ffffff !important;">Keep up the amazing progress! 🎯</span>
+                                        <span class="fw-bold">7-day learning streak!</span> Keep up the amazing progress! 🎯
                                     </small>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2 mt-3">
@@ -265,12 +234,12 @@ p, span, div, a, small, strong, em, i, b, label, button, input, textarea, select
                                     </div>
                                     {% endif %}
                                     <div class="px-3 py-2 rounded-pill d-inline-flex align-items-center" style="background: rgba(255,255,255,0.2); color: #ffffff !important; font-weight: 600; text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important;">
-                                        <i class="bi bi-trophy me-2" style="color: #ffffff !important;"></i> 
-                                        <span id="studyMode" style="color: #ffffff !important;">Active Learner</span>
+                                        <i class="bi bi-trophy me-2"></i> 
+                                        <span id="studyMode">Active Learner</span>
                                     </div>
                                     <div class="px-3 py-2 rounded-pill d-inline-flex align-items-center" style="background: rgba(255,255,255,0.25); color: #ffffff !important; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); text-shadow: none !important; -webkit-text-shadow: none !important; -moz-text-shadow: none !important;">
-                                        <i class="bi bi-lightning me-2" style="color: #ffffff !important;"></i> 
-                                        Level <span id="learnerLevel" style="color: #ffffff !important;">3</span>
+                                        <i class="bi bi-lightning me-2"></i> 
+                                        Level <span id="learnerLevel">3</span>
                                     </div>
                                 </div>
                             </div>
@@ -645,19 +614,9 @@ function updateDateTime() {
         message = "Late night study? You're truly dedicated! 🌟";
     }
     
-    // Update content and ensure white color
-    const greetingIcon = document.getElementById('greetingIcon');
-    const dynamicGreeting = document.getElementById('dynamicGreeting');
-    const motivationalMessage = document.getElementById('motivationalMessage');
-    
-    greetingIcon.textContent = icon;
-    greetingIcon.style.color = '#ffffff';
-    
-    dynamicGreeting.textContent = greeting;
-    dynamicGreeting.style.color = '#ffffff';
-    
-    motivationalMessage.textContent = message;
-    motivationalMessage.style.color = '#ffffff';
+    document.getElementById('greetingIcon').textContent = icon;
+    document.getElementById('dynamicGreeting').textContent = greeting;
+    document.getElementById('motivationalMessage').textContent = message;
 }
 
 // Animated level and study mode updates

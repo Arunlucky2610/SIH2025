@@ -7,9 +7,9 @@
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="bg-primary text-white rounded p-4" style="color: #ffffff !important; text-shadow: none !important;">
-                <h2 class="mb-1" style="color: #ffffff !important; text-shadow: none !important; font-weight: 700 !important;">📊 Enhanced Parent Dashboard</h2>
-                <p class="mb-0 opacity-75" style="color: #ffffff !important; text-shadow: none !important; font-weight: 500 !important;">Monitor your children's learning journey with detailed analytics</p>
+            <div class="bg-primary text-white rounded p-4" style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important;">
+                <h2 class="mb-1" style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important; font-weight: 700 !important;">📊 Enhanced Parent Dashboard</h2>
+                <p class="mb-0 opacity-75" style="color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important; font-weight: 500 !important;">Monitor your children's learning journey with detailed analytics</p>
                 {% if children_progress %}
                     <div class="mt-3">
                         <span class="badge bg-white text-primary me-2">
@@ -36,9 +36,9 @@
                             <h5 class="mb-0">
                                 <i class="bi bi-person-circle"></i> {{ child_data.child.first_name }} {{ child_data.child.last_name }}
                                 <small class="opacity-75">({{ child_data.child.username }})</small>
-                                {% if 7 > 0 %}
+                                {% if child_data.current_streak > 0 %}
                                     <span class="badge bg-warning text-dark ms-2">
-                                        🔥 7 day streak!
+                                        🔥 {{ child_data.current_streak }} day streak!
                                     </span>
                                 {% endif %}
                             </h5>
@@ -53,7 +53,7 @@
                                             <i class="bi bi-trophy"></i>
                                         </div>
                                         <div class="stats-content">
-                                            <h3>75%</h3>
+                                            <h3>{{ child_data.progress_percentage|floatformat:0 }}%</h3>
                                             <p>Overall Progress</p>
                                         </div>
                                     </div>
@@ -65,7 +65,7 @@
                                             <i class="bi bi-book-check"></i>
                                         </div>
                                         <div class="stats-content">
-                                            <h3>12</h3>
+                                            <h3>{{ child_data.completed_lessons }}</h3>
                                             <p>Lessons Completed</p>
                                         </div>
                                     </div>
@@ -77,7 +77,7 @@
                                             <i class="bi bi-clock"></i>
                                         </div>
                                         <div class="stats-content">
-                                            <h3>15h</h3>
+                                            <h3>{{ child_data.weekly_time_hours }}h</h3>
                                             <p>This Week</p>
                                         </div>
                                     </div>
@@ -89,7 +89,7 @@
                                             <i class="bi bi-fire"></i>
                                         </div>
                                         <div class="stats-content">
-                                            <h3>7</h3>
+                                            <h3>{{ child_data.current_streak }}</h3>
                                             <p>Day Streak</p>
                                         </div>
                                     </div>
@@ -151,8 +151,7 @@
                                             </div>
                                             <div class="progress mb-2" style="height: 10px;">
                                                 <div class="progress-bar bg-info" 
-                                                     data-width="{{ child_data.weekly_time_hours|floatformat:0 }}"
-                                                     style="width: 0%;"></div>
+                                                     style="width: {{ child_data.weekly_time_hours|floatformat:0|add:'0'|slice:':100' }}%"></div>
                                             </div>
                                             <small class="text-muted">
                                                 Recommended: 5-7 hours per week
@@ -314,115 +313,92 @@
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Chart Data -->
-{{ children_progress|json_script:"children-data" }}
-
 <!-- Charts Scripts -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const childrenData = JSON.parse(document.getElementById('children-data').textContent);
-    
-    childrenData.forEach(function(childData, index) {
-        const childIndex = index + 1;
-        
-        // Progress Chart for Child
-        const progressCtxId = 'progressChart' + childIndex;
-        const progressCtxElement = document.getElementById(progressCtxId);
-        if (progressCtxElement) {
-            const progressCtx = progressCtxElement.getContext('2d');
-            new Chart(progressCtx, {
-                type: 'line',
-                data: {
-                    labels: childData.progress_chart_data ? childData.progress_chart_data.labels : [],
-                    datasets: [{
-                        label: 'Lessons Completed',
-                        data: childData.progress_chart_data ? childData.progress_chart_data.lessons : [],
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Average Score',
-                        data: childData.progress_chart_data ? childData.progress_chart_data.scores : [],
-                        borderColor: 'rgb(255, 99, 132)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        tension: 0.4,
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Lessons'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Score (%)'
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                        }
-                    }
+{% for child_data in children_progress %}
+    // Progress Chart for Child {{ forloop.counter }}
+    const progressCtx{{ forloop.counter }} = document.getElementById('progressChart{{ forloop.counter }}').getContext('2d');
+    new Chart(progressCtx{{ forloop.counter }}, {
+        type: 'line',
+        data: {
+            labels: {{ child_data.progress_chart_data.labels|safe }},
+            datasets: [{
+                label: 'Lessons Completed',
+                data: {{ child_data.progress_chart_data.lessons|safe }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Average Score',
+                data: {{ child_data.progress_chart_data.scores|safe }},
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
                 }
-            });
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Lessons'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Score (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
         }
+    });
 
-        // Subject Performance Chart for Child
-        const subjectCtxId = 'subjectChart' + childIndex;
-        const subjectCtxElement = document.getElementById(subjectCtxId);
-        if (subjectCtxElement) {
-            const subjectCtx = subjectCtxElement.getContext('2d');
-            new Chart(subjectCtx, {
-                type: 'radar',
-                data: {
-                    labels: childData.subject_performance_data ? childData.subject_performance_data.subjects : [],
-                    datasets: [{
-                        label: 'Completion %',
-                        data: childData.subject_performance_data ? childData.subject_performance_data.completion : [],
-                        borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100
-                        }
-                    }
+    // Subject Performance Chart for Child {{ forloop.counter }}
+    const subjectCtx{{ forloop.counter }} = document.getElementById('subjectChart{{ forloop.counter }}').getContext('2d');
+    new Chart(subjectCtx{{ forloop.counter }}, {
+        type: 'radar',
+        data: {
+            labels: {{ child_data.subject_performance_data.subjects|safe }},
+            datasets: [{
+                label: 'Completion %',
+                data: {{ child_data.subject_performance_data.completion|safe }},
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
                 }
-            });
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
         }
     });
-    
-    // Set progress bar widths
-    document.querySelectorAll('.progress-bar[data-width]').forEach(function(progressBar) {
-        const width = Math.min(Math.max(parseInt(progressBar.getAttribute('data-width'), 10), 0), 100);
-        progressBar.style.width = width + '%';
-    });
-});
+{% endfor %}
 </script>
 
 <style>

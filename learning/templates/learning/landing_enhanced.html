@@ -1,0 +1,383 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Rural Digital Learning - Empowering Rural Education with Smart Technology{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Enhanced Landing Page Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 1s ease-out forwards;
+}
+
+.slide-in-right {
+    animation: slideInRight 1s ease-out forwards;
+}
+
+.feature-card {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.hero-stats {
+    animation: fadeInUp 1.5s ease-out forwards;
+    animation-delay: 0.8s;
+    opacity: 0;
+}
+
+.floating-icon {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Modern Button Styles */
+.btn-modern {
+    border-radius: 50px;
+    padding: 15px 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+.number-counter {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #4F46E5;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-graphic {
+        width: 300px !important;
+        height: 300px !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Enhanced Hero Section with Modern Design -->
+    <section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%); min-height: 100vh;">
+        <!-- Dynamic Background Particles -->
+        <div class="position-absolute w-100 h-100">
+            <div class="position-absolute floating-icon" style="top: 10%; left: 10%; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+            <div class="position-absolute floating-icon" style="top: 60%; right: 20%; width: 60px; height: 60px; background: rgba(255,255,255,0.08); border-radius: 50%; animation-delay: 2s;"></div>
+            <div class="position-absolute floating-icon" style="bottom: 20%; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.06); border-radius: 50%; animation-delay: 4s;"></div>
+        </div>
+        
+        <div class="container position-relative">
+            <div class="row align-items-center min-vh-100 py-5">
+                <div class="col-lg-6 text-white">
+                    <div class="fade-in-up">
+                        <!-- Innovation Badge -->
+                        <div class="badge bg-light text-primary rounded-pill px-4 py-2 mb-4 fw-bold">
+                            <i class="bi bi-lightning-charge-fill me-1"></i>
+                            🏆 SIH 2025 Innovation
+                        </div>
+                        
+                        <!-- Dynamic Title -->
+                        <h1 class="display-3 fw-bold mb-4" style="line-height: 1.2;">
+                            Revolutionizing
+                            <span class="gradient-text d-block">
+                                Rural Education
+                            </span>
+                            <span class="text-warning">with AI & Technology</span>
+                        </h1>
+                        
+                        <!-- Enhanced Description -->
+                        <p class="lead mb-5 fs-5" style="opacity: 0.95; max-width: 500px;">
+                            🚀 Transforming rural learning with cutting-edge technology, offline capabilities, 
+                            and personalized AI-driven education. Connect villages to world-class learning opportunities.
+                        </p>
+                        
+                        <!-- Enhanced Feature Pills -->
+                        <div class="d-flex flex-wrap gap-3 mb-5">
+                            <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-4 py-2 fs-6">
+                                <i class="bi bi-wifi-off me-2"></i> 📡 Offline Learning
+                            </span>
+                            <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-4 py-2 fs-6">
+                                <i class="bi bi-translate me-2"></i> 🌍 12+ Languages
+                            </span>
+                            <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-4 py-2 fs-6">
+                                <i class="bi bi-robot me-2"></i> 🤖 AI-Powered
+                            </span>
+                            <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-4 py-2 fs-6">
+                                <i class="bi bi-phone me-2"></i> 📱 Mobile-First
+                            </span>
+                        </div>
+                        
+                        <!-- Modern Action Buttons -->
+                        <div class="d-flex flex-column flex-sm-row gap-4 mb-5">
+                            <a href="{% url 'signup' %}" class="btn btn-light btn-lg btn-modern shadow-lg">
+                                <i class="bi bi-rocket-takeoff me-2"></i>
+                                🎯 Start Learning Journey
+                            </a>
+                            <a href="#features" class="btn btn-outline-light btn-lg btn-modern">
+                                <i class="bi bi-play-circle me-2"></i>
+                                🔍 Explore Features
+                            </a>
+                        </div>
+                        
+                        <!-- Enhanced Live Stats -->
+                        <div class="hero-stats d-flex flex-wrap gap-5 text-white">
+                            <div class="text-center">
+                                <div class="number-counter text-warning" id="studentsCount">0</div>
+                                <small style="opacity: 0.9; font-weight: 500;">👥 Active Students</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="number-counter text-success" id="teachersCount">0</div>
+                                <small style="opacity: 0.9; font-weight: 500;">👨‍🏫 Expert Teachers</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="number-counter text-info" id="successRate">0</div>
+                                <small style="opacity: 0.9; font-weight: 500;">📈 Success Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Hero Graphic -->
+                <div class="col-lg-6 text-center">
+                    <div class="position-relative fade-in-up hero-graphic mx-auto" style="width: 450px; height: 450px; animation-delay: 0.3s;">
+                        <!-- Pulsing Background -->
+                        <div class="position-absolute w-100 h-100 rounded-circle" style="background: rgba(255,255,255,0.1); animation: pulse 4s infinite;"></div>
+                        
+                        <!-- Central Icon -->
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="bi bi-mortarboard-fill text-white" style="font-size: 9rem; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.4));"></i>
+                        </div>
+                        
+                        <!-- Enhanced Floating Icons -->
+                        <div class="position-absolute floating-icon" style="top: 5%; right: 15%; animation-delay: 1s;">
+                            <div class="bg-white rounded-circle p-3 shadow-lg">
+                                <i class="bi bi-book-fill text-primary fs-3"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute floating-icon" style="bottom: 15%; left: 5%; animation-delay: 2s;">
+                            <div class="bg-white rounded-circle p-3 shadow-lg">
+                                <i class="bi bi-award-fill text-warning fs-3"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute floating-icon" style="top: 45%; right: -5%; animation-delay: 3s;">
+                            <div class="bg-white rounded-circle p-2 shadow-lg">
+                                <i class="bi bi-graph-up text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute floating-icon" style="top: 20%; left: 0%; animation-delay: 4s;">
+                            <div class="bg-white rounded-circle p-2 shadow-lg">
+                                <i class="bi bi-globe text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute floating-icon" style="bottom: 30%; right: 5%; animation-delay: 5s;">
+                            <div class="bg-white rounded-circle p-2 shadow-lg">
+                                <i class="bi bi-cpu text-danger fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4">
+            <div class="text-white text-center">
+                <div class="mb-2">Scroll to explore</div>
+                <i class="bi bi-chevron-down fs-4 floating-icon"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-dark mb-3 slide-in-left">🎯 Revolutionary Features</h2>
+                <p class="lead text-muted slide-in-right">Cutting-edge technology meeting rural education needs</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card rounded-4 p-4 h-100 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-wifi-off text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">📡 Offline-First Learning</h5>
+                        <p class="text-muted">Download lessons and continue learning without internet. Perfect for rural areas with limited connectivity.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card rounded-4 p-4 h-100 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-robot text-success" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">🤖 AI-Powered Assistance</h5>
+                        <p class="text-muted">Personalized learning paths with AI tutors that adapt to each student's learning style and pace.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card rounded-4 p-4 h-100 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-translate text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">🌍 Multi-Language Support</h5>
+                        <p class="text-muted">Learn in your native language with support for 12+ regional languages and real-time translation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
+        <div class="container py-5 text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="display-5 fw-bold text-white mb-4">🚀 Ready to Transform Education?</h2>
+                    <p class="lead text-white-50 mb-5">Join thousands of students, teachers, and parents in revolutionizing rural education</p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{% url 'signup' %}" class="btn btn-primary btn-lg btn-modern">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg btn-modern">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+// Enhanced Landing Page Interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Animated Counter
+    function animateCounter(elementId, target, suffix = '') {
+        const element = document.getElementById(elementId);
+        let current = 0;
+        const increment = target / 50;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current) + suffix;
+        }, 30);
+    }
+    
+    // Start counters after a delay
+    setTimeout(() => {
+        animateCounter('studentsCount', 1250);
+        animateCounter('teachersCount', 150);
+        animateCounter('successRate', 98, '%');
+    }, 1500);
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add stagger animation to feature cards
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.2}s`;
+        card.classList.add('fade-in-up');
+    });
+});
+</script>
+{% endblock %}
