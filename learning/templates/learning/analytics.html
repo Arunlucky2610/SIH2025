@@ -9,9 +9,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{% static 'css/ultra-modern.css' %}" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <!-- 
+    ===============================================
+    REVERT INSTRUCTIONS FOR MULTIPLE SUBJECTS:
+    ===============================================
+    
+    TO RESTORE MULTI-SUBJECT VERSION:
+    1. Backup this single-subject optimized file
+    2. Copy content from analytics_multi_subject_backup.html
+    3. Replace this file's content with the backup
+    4. Update subject data in views accordingly
+    
+    This single-subject version is optimized for:
+    - Digital Literacy only
+    - Enhanced detail and focus
+    - Larger display areas for key metrics
+    - Better visual hierarchy for one subject
+    ===============================================
+    -->
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             min-height: 100vh;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
@@ -26,10 +44,9 @@
         }
         
         .analytics-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
         
@@ -40,20 +57,23 @@
         .analytics-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            background: #f1f5f9;
         }
         
         .progress-modern {
-            height: 12px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            height: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
         }
         
         .progress-bar-modern {
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
             transition: width 0.8s ease;
             position: relative;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
         }
         
         .progress-bar-modern::after {
@@ -96,36 +116,46 @@
         }
         
         .metric-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 4px 6px rgba(34, 197, 94, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .metric-card:hover {
+            background: #d1fae5;
+            border: 1px solid #86efac;
+            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+            transform: translateY(-2px);
         }
         
         .achievement-item {
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(251, 191, 36, 0.2);
         }
         
         .achievement-item:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+            background: #fcd34d;
             transform: translateX(5px);
+            box-shadow: 0 6px 12px rgba(251, 191, 36, 0.4);
         }
         
         .text-dark-modern {
-            color: #2d3748 !important;
+            color: #000000 !important;
             font-weight: 600;
             text-shadow: none;
         }
         
         .text-muted-modern {
-            color: #718096 !important;
+            color: #4a5568 !important;
             text-shadow: none;
         }
         
         .navbar-dark {
             background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
-            backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
@@ -135,7 +165,6 @@
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
-            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             font-weight: 600;
         }
@@ -148,7 +177,7 @@
         }
         
         .display-1-modern {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 700;
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
@@ -157,22 +186,66 @@
             text-shadow: none;
         }
         
+        .display-2-modern {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+        
         .badge-modern {
-            padding: 8px 12px;
-            border-radius: 20px;
+            padding: 10px 16px;
+            border-radius: 25px;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 1rem;
         }
         
         .icon-wrapper {
-            width: 50px;
-            height: 50px;
-            border-radius: 15px;
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+        }
+        
+        /* Enhanced single subject styling */
+        .subject-hero {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 25px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .subject-hero:hover {
+            background: #e2e8f0;
+            border: 2px solid #94a3b8;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .skill-breakdown {
+            background: #ede9fe;
+            border: 1px solid #c4b5fd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .skill-breakdown:hover {
+            background: #ddd6fe;
+            border: 1px solid #a78bfa;
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
         }
         
         /* Force remove all text shadows */
@@ -183,6 +256,110 @@
         /* Override any Bootstrap or external CSS text shadows */
         .text-white, .text-dark, .text-muted, .text-primary, .text-success, .text-warning, .text-info {
             text-shadow: none !important;
+        }
+        
+        /* Force dark text for achievement items */
+        .achievement-item .fw-semibold, 
+        .achievement-item .text-dark-modern {
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+        
+        .achievement-item small,
+        .achievement-item .text-muted-modern {
+            color: #333333 !important;
+        }
+        
+        .achievement-item:hover .fw-semibold,
+        .achievement-item:hover .text-dark-modern {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+        
+        .achievement-item:hover small,
+        .achievement-item:hover .text-muted-modern {
+            color: #1a1a1a !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Force dark text for weekly activity */
+        .analytics-card .fw-semibold.small,
+        .analytics-card .text-dark-modern.small {
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+        
+        .analytics-card .text-muted-modern.small {
+            color: #333333 !important;
+        }
+        
+        /* Additional override for any remaining white text */
+        .achievement-item div,
+        .achievement-item span,
+        .col .fw-semibold,
+        .col .text-muted-modern {
+            color: #000000 !important;
+        }
+        
+        /* Force dark text for metric cards */
+        .metric-card .fw-bold,
+        .metric-card .text-dark-modern {
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+        
+        .metric-card small,
+        .metric-card .text-muted-modern {
+            color: #333333 !important;
+        }
+        
+        /* Force dark text for key metrics section headers */
+        .analytics-card h4.text-dark-modern {
+            color: #000000 !important;
+        }
+        
+        .analytics-card p.text-muted-modern {
+            color: #333333 !important;
+        }
+        
+        /* Hover effects for metric cards text */
+        .metric-card:hover .fw-bold,
+        .metric-card:hover .text-dark-modern {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+        
+        .metric-card:hover small,
+        .metric-card:hover .text-muted-modern {
+            color: #1a1a1a !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Hover effects for weekly activity */
+        .col:hover .fw-semibold.small {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+        
+        .col:hover .text-muted-modern.small {
+            color: #1a1a1a !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Back to Dashboard Button Styling */
+        .btn-primary.btn-lg {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .btn-primary.btn-lg:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -208,76 +385,149 @@
             <div class="col-12">
                 <!-- Header Section -->
                 <div class="text-center mb-5">
-                    <h1 class="display-4 fw-bold text-white mb-3" style="text-shadow: none;">Learning Analytics</h1>
-                    <p class="lead text-white opacity-75" style="text-shadow: none;">Comprehensive progress tracking and insights</p>
+                    <h1 class="display-4 fw-bold text-dark mb-3" style="text-shadow: none; color: #000000 !important;">Learning Analytics</h1>
+                    <p class="lead text-muted" style="text-shadow: none; color: #333333 !important;">Comprehensive progress tracking for all subjects</p>
+                </div>
+
+                <!-- Subject Hero Section -->
+                <div class="subject-hero mb-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper me-4" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-laptop text-primary" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-dark-modern mb-2">Digital Literacy</h2>
+                                    <p class="text-muted-modern mb-0">Master essential computer and digital skills</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="display-2-modern mb-2">87%</div>
+                            <div class="text-muted-modern fw-semibold">Overall Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-modern mt-4" style="height: 20px;">
+                        <div class="progress-bar-modern" style="width: 87%"></div>
+                    </div>
                 </div>
 
                 <!-- Analytics Dashboard -->
                 <div class="row g-4">
-                    <!-- Subject Progress Card -->
-                    <div class="col-lg-6">
+                    <!-- Skill Breakdown -->
+                    <div class="col-lg-8">
                         <div class="analytics-card rounded-4 p-4 h-100">
                             <div class="d-flex align-items-center mb-4">
                                 <div class="icon-wrapper me-3">
                                     <i class="bi bi-graph-up text-primary fs-3"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-dark-modern mb-1">Subject Progress</h4>
-                                    <p class="text-muted-modern mb-0">Overall academic performance</p>
+                                    <h4 class="text-dark-modern mb-1">Skill Breakdown</h4>
+                                    <p class="text-muted-modern mb-0">Detailed progress in each digital literacy area</p>
                                 </div>
                             </div>
                             
-                            <!-- Enhanced Progress Bars -->
-                            <div class="space-y-4">
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-calculator text-primary me-2"></i>
-                                            <span class="fw-semibold text-dark-modern">Mathematics</span>
+                            <!-- Enhanced Progress Bars for Digital Literacy Skills -->
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="skill-breakdown rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-keyboard text-primary me-2"></i>
+                                                <span class="fw-semibold text-dark-modern">Basic Computer Operations</span>
+                                            </div>
+                                            <span class="badge bg-primary badge-modern">92%</span>
                                         </div>
-                                        <span class="badge bg-primary badge-modern">78%</span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern" style="width: 78%"></div>
+                                        <div class="progress-modern">
+                                            <div class="progress-bar-modern" style="width: 92%"></div>
+                                        </div>
+                                        <small class="text-muted-modern mt-1 d-block">Keyboard, mouse, file management</small>
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-book text-success me-2"></i>
-                                            <span class="fw-semibold text-dark-modern">English</span>
+                                <div class="col-md-6">
+                                    <div class="skill-breakdown rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-globe text-info me-2"></i>
+                                                <span class="fw-semibold text-dark-modern">Internet & Web Browsing</span>
+                                            </div>
+                                            <span class="badge bg-info badge-modern">85%</span>
                                         </div>
-                                        <span class="badge bg-success badge-modern">92%</span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-success" style="width: 92%"></div>
+                                        <div class="progress-modern">
+                                            <div class="progress-bar-modern bg-info" style="width: 85%"></div>
+                                        </div>
+                                        <small class="text-muted-modern mt-1 d-block">Search, navigation, bookmarks</small>
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-flask text-info me-2"></i>
-                                            <span class="fw-semibold text-dark-modern">Science</span>
+                                <div class="col-md-6">
+                                    <div class="skill-breakdown rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-envelope text-success me-2"></i>
+                                                <span class="fw-semibold text-dark-modern">Digital Communication</span>
+                                            </div>
+                                            <span class="badge bg-success badge-modern">78%</span>
                                         </div>
-                                        <span class="badge bg-info badge-modern">85%</span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-info" style="width: 85%"></div>
+                                        <div class="progress-modern">
+                                            <div class="progress-bar-modern bg-success" style="width: 78%"></div>
+                                        </div>
+                                        <small class="text-muted-modern mt-1 d-block">Email, messaging, video calls</small>
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-globe text-warning me-2"></i>
-                                            <span class="fw-semibold text-dark-modern">Social Studies</span>
+                                <div class="col-md-6">
+                                    <div class="skill-breakdown rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-shield-check text-warning me-2"></i>
+                                                <span class="fw-semibold text-dark-modern">Digital Safety</span>
+                                            </div>
+                                            <span class="badge bg-warning badge-modern">81%</span>
                                         </div>
-                                        <span class="badge bg-warning badge-modern">71%</span>
+                                        <div class="progress-modern">
+                                            <div class="progress-bar-modern bg-warning" style="width: 81%"></div>
+                                        </div>
+                                        <small class="text-muted-modern mt-1 d-block">Privacy, security, safe browsing</small>
                                     </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-warning" style="width: 71%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="col-lg-4">
+                        <div class="analytics-card rounded-4 p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="bi bi-speedometer2 text-success fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-dark-modern mb-1" style="color: #000000 !important;">Key Metrics</h4>
+                                    <p class="text-muted-modern mb-0" style="color: #333333 !important;">Current performance stats</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="metric-card rounded-3 p-3 text-center">
+                                        <div class="fw-bold text-dark-modern fs-3" style="color: #000000 !important;">15</div>
+                                        <small class="text-muted-modern" style="color: #333333 !important;">Lessons Completed</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="metric-card rounded-3 p-3 text-center">
+                                        <div class="fw-bold text-dark-modern fs-3" style="color: #000000 !important;">8.5h</div>
+                                        <small class="text-muted-modern" style="color: #333333 !important;">Total Study Time</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="metric-card rounded-3 p-3 text-center">
+                                        <div class="fw-bold text-dark-modern fs-3" style="color: #000000 !important;">89%</div>
+                                        <small class="text-muted-modern" style="color: #333333 !important;">Average Quiz Score</small>
                                     </div>
                                 </div>
                             </div>
@@ -301,81 +551,81 @@
                             <div class="row text-center g-2">
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 75%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Mon</div>
-                                    <div class="text-muted-modern small">2.1h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Mon</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">1.2h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 60%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Tue</div>
-                                    <div class="text-muted-modern small">1.8h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Tue</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">0.9h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 90%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Wed</div>
-                                    <div class="text-muted-modern small">2.5h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Wed</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">1.5h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 45%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Thu</div>
-                                    <div class="text-muted-modern small">1.3h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Thu</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">0.7h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 80%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Fri</div>
-                                    <div class="text-muted-modern small">2.2h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Fri</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">1.3h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 65%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Sat</div>
-                                    <div class="text-muted-modern small">1.9h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Sat</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">1.0h</div>
                                 </div>
                                 <div class="col">
                                     <div class="mb-3">
-                                        <div class="bg-light rounded-3 position-relative" style="height: 120px;">
+                                        <div class="bg-light rounded-3 position-relative" style="height: 140px;">
                                             <div class="chart-bar position-absolute bottom-0 w-100" style="height: 30%;"></div>
                                         </div>
                                     </div>
-                                    <div class="fw-semibold text-dark-modern small">Sun</div>
-                                    <div class="text-muted-modern small">0.9h</div>
+                                    <div class="fw-semibold text-dark-modern small" style="color: #000000 !important;">Sun</div>
+                                    <div class="text-muted-modern small" style="color: #333333 !important;">0.5h</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Achievements -->
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <div class="analytics-card rounded-4 p-4 h-100">
                             <div class="d-flex align-items-center mb-4">
                                 <div class="icon-wrapper me-3">
                                     <i class="bi bi-trophy text-warning fs-3"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-dark-modern mb-1">Recent Achievements</h4>
-                                    <p class="text-muted-modern mb-0">Latest milestones</p>
+                                    <h4 class="text-dark-modern mb-1">Digital Achievements</h4>
+                                    <p class="text-muted-modern mb-0">Latest milestones unlocked</p>
                                 </div>
                             </div>
                             
@@ -386,8 +636,8 @@
                                             <i class="bi bi-trophy-fill text-warning"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-semibold text-dark-modern">Math Quiz Master</div>
-                                            <small class="text-muted-modern">Scored 95% in Algebra</small>
+                                            <div class="fw-semibold text-dark-modern" style="color: #000000 !important;">Typing Champion</div>
+                                            <small class="text-muted-modern" style="color: #333333 !important;">Reached 40 WPM typing speed</small>
                                         </div>
                                     </div>
                                 </div>
@@ -398,113 +648,47 @@
                                             <i class="bi bi-star-fill text-success"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-semibold text-dark-modern">Reading Streak</div>
-                                            <small class="text-muted-modern">7 days in a row</small>
+                                            <div class="fw-semibold text-dark-modern" style="color: #000000 !important;">Internet Explorer</div>
+                                            <small class="text-muted-modern" style="color: #333333 !important;">Completed all web browsing lessons</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="achievement-item rounded-3 p-3 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info bg-opacity-20 rounded-circle p-2 me-3">
+                                            <i class="bi bi-lightning-fill text-info"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark-modern" style="color: #000000 !important;">Email Expert</div>
+                                            <small class="text-muted-modern" style="color: #333333 !important;">Sent first formatted email</small>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="achievement-item rounded-3 p-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-info bg-opacity-20 rounded-circle p-2 me-3">
-                                            <i class="bi bi-lightning-fill text-info"></i>
+                                        <div class="bg-primary bg-opacity-20 rounded-circle p-2 me-3">
+                                            <i class="bi bi-shield-check-fill text-primary"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-semibold text-dark-modern">Quick Learner</div>
-                                            <small class="text-muted-modern">Completed 3 lessons today</small>
+                                            <div class="fw-semibold text-dark-modern" style="color: #000000 !important;">Safety First</div>
+                                            <small class="text-muted-modern" style="color: #333333 !important;">Completed digital security course</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Study Time Tracking -->
-                    <div class="col-lg-4">
-                        <div class="analytics-card rounded-4 p-4 h-100">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="icon-wrapper me-3">
-                                    <i class="bi bi-clock text-primary fs-3"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-dark-modern mb-1">Study Time</h4>
-                                    <p class="text-muted-modern mb-0">This week's progress</p>
-                                </div>
-                            </div>
-                            
-                            <div class="text-center mb-4">
-                                <div class="display-1-modern mb-2">12.5</div>
-                                <div class="text-muted-modern fw-semibold">Hours</div>
-                            </div>
-
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <div class="metric-card rounded-3 p-3 text-center">
-                                        <div class="fw-bold text-dark-modern fs-4">85%</div>
-                                        <small class="text-muted-modern">Goal Achieved</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="metric-card rounded-3 p-3 text-center">
-                                        <div class="fw-bold text-dark-modern fs-4">2.1</div>
-                                        <small class="text-muted-modern">Avg per day</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Performance Trends -->
-                    <div class="col-lg-4">
-                        <div class="analytics-card rounded-4 p-4 h-100">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="icon-wrapper me-3">
-                                    <i class="bi bi-trending-up text-success fs-3"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-dark-modern mb-1">Performance Trends</h4>
-                                    <p class="text-muted-modern mb-0">Recent improvements</p>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-4">
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-semibold text-dark-modern">Quiz Scores</span>
-                                        <span class="badge bg-success badge-modern">
-                                            <i class="bi bi-arrow-up me-1"></i>+12%
-                                        </span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-success" style="width: 88%"></div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-semibold text-dark-modern">Assignment Completion</span>
-                                        <span class="badge bg-primary badge-modern">
-                                            <i class="bi bi-arrow-up me-1"></i>+8%
-                                        </span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-primary" style="width: 92%"></div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-semibold text-dark-modern">Study Consistency</span>
-                                        <span class="badge bg-warning badge-modern">
-                                            <i class="bi bi-arrow-down me-1"></i>-3%
-                                        </span>
-                                    </div>
-                                    <div class="progress-modern">
-                                        <div class="progress-bar-modern bg-warning" style="width: 75%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Back to Dashboard Button Section -->
+                <div class="row mt-5">
+                    <div class="col-12 text-center">
+                        <a href="{% url 'parent_dashboard' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Back to Dashboard
+                        </a>
                     </div>
                 </div>
             </div>
@@ -513,21 +697,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Enhanced JavaScript for Interactions -->
+    <!-- Enhanced JavaScript for Single Subject Analytics -->
     <script>
         // Add smooth scroll behavior
         document.documentElement.style.scrollBehavior = 'smooth';
         
-        // Animate progress bars on load
+        // Animate progress bars on load with enhanced timing for single subject
         window.addEventListener('load', function() {
             const progressBars = document.querySelectorAll('.progress-bar-modern');
-            progressBars.forEach(bar => {
+            progressBars.forEach((bar, index) => {
                 const width = bar.style.width;
                 bar.style.width = '0%';
                 setTimeout(() => {
-                    bar.style.transition = 'width 1.5s ease-in-out';
+                    bar.style.transition = 'width 2s ease-in-out';
                     bar.style.width = width;
-                }, 300);
+                }, 500 + (index * 200)); // Staggered animation for better effect
             });
             
             // Animate chart bars
@@ -536,16 +720,28 @@
                 const height = bar.style.height;
                 bar.style.height = '0%';
                 setTimeout(() => {
-                    bar.style.transition = 'height 1s ease-in-out';
+                    bar.style.transition = 'height 1.5s ease-in-out';
                     bar.style.height = height;
-                }, 500 + (index * 100));
+                }, 800 + (index * 150));
             });
+            
+            // Animate main progress bar with special effect
+            const mainProgress = document.querySelector('.subject-hero .progress-bar-modern');
+            if (mainProgress) {
+                const width = mainProgress.style.width;
+                mainProgress.style.width = '0%';
+                setTimeout(() => {
+                    mainProgress.style.transition = 'width 3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    mainProgress.style.width = width;
+                }, 200);
+            }
         });
         
-        // Add hover effects for achievement items
+        // Enhanced hover effects for achievement items
         document.querySelectorAll('.achievement-item').forEach(item => {
             item.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateX(5px) scale(1.02)';
+                this.style.transform = 'translateX(8px) scale(1.03)';
+                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
             });
             
             item.addEventListener('mouseleave', function() {
@@ -553,15 +749,38 @@
             });
         });
         
-        // Add click effects for analytics cards
+        // Enhanced click effects for analytics cards
         document.querySelectorAll('.analytics-card').forEach(card => {
             card.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
+                this.style.transform = 'scale(0.97)';
                 setTimeout(() => {
                     this.style.transform = 'scale(1)';
-                }, 150);
+                }, 200);
             });
         });
+        
+        // Skill breakdown hover effects
+        document.querySelectorAll('.skill-breakdown').forEach(skill => {
+            skill.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            skill.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Add pulsing effect to main subject display
+        const subjectHero = document.querySelector('.subject-hero');
+        if (subjectHero) {
+            setInterval(() => {
+                subjectHero.style.transform = 'scale(1.005)';
+                setTimeout(() => {
+                    subjectHero.style.transform = 'scale(1)';
+                }, 1000);
+            }, 5000);
+        }
         
         // Dynamic time update
         function updateTime() {
@@ -572,13 +791,15 @@
                 minute: '2-digit' 
             });
             
-            // You can add a time display element if needed
             console.log('Current time:', timeString);
         }
         
         // Update time every minute
         setInterval(updateTime, 60000);
         updateTime();
+        
+        // Log analytics view
+        console.log('Digital Literacy Analytics Dashboard Loaded - Single Subject Optimized Version');
     </script>
 </body>
 </html>
