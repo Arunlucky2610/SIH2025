@@ -4,6 +4,11 @@
 
 {% block extra_css %}
 <style>
+    /* Global text shadow removal for clear, readable text */
+    * {
+        text-shadow: none !important;
+    }
+    
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-10px); }
@@ -226,7 +231,7 @@
         <div class="row g-4">
             <!-- Teacher Communication Card -->
             <div class="col-xl-3 col-lg-6 col-md-6">
-                <div class="glass-card quick-action-card rounded-4 h-100 position-relative" onclick="startConversation()" style="cursor: pointer;">
+                <div class="glass-card quick-action-card rounded-4 h-100 position-relative" onclick="navigateToTeacherCommunication()" style="cursor: pointer;">
                     <!-- Unread Messages Badge -->
                     {% if unread_messages_count > 0 %}
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 10;">
@@ -397,126 +402,14 @@
     </div>
 
     <!-- Schedule Modal -->
-    <!-- Quick Message Dialog -->
-    <div class="modal fade" id="quickMessageDialog" tabindex="-1" aria-labelledby="quickMessageLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
-                <!-- Header -->
-                <div class="modal-header text-white position-relative" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-white bg-opacity-20 p-2 me-3">
-                            <i class="bi bi-chat-dots text-white fs-4"></i>
-                        </div>
-                        <div>
-                            <h5 class="modal-title mb-0" id="quickMessageLabel">💬 New Message</h5>
-                            <small class="opacity-75">Send a quick message to your child's teacher</small>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <!-- Body -->
-                <div class="modal-body p-4">
-                    <!-- Quick Buttons -->
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold text-secondary">🎯 Quick Topics</label>
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickMessage('progress')">
-                                📈 Progress Check
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuickMessage('homework')">
-                                📚 Homework Help
-                            </button>
-                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="setQuickMessage('behavior')">
-                                😊 Behavior Update
-                            </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="setQuickMessage('meeting')">
-                                📅 Schedule Meeting
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Teacher Selection -->
-                    <div class="mb-3">
-                        <label for="quickTeacher" class="form-label fw-semibold">👨‍🏫 Select Teacher</label>
-                        <select class="form-select" id="quickTeacher" required>
-                            <option value="">Choose teacher...</option>
-                            <option value="sarah">🧑‍🏫 Ms. Sarah Johnson (Class Teacher)</option>
-                            <option value="david">📐 Mr. David Wilson (Mathematics)</option>
-                            <option value="emily">🧪 Dr. Emily Chen (Science)</option>
-                            <option value="rachel">📖 Ms. Rachel Smith (English)</option>
-                            <option value="robert">🏛️ Mr. Robert Davis (History)</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Message Subject -->
-                    <div class="mb-3">
-                        <label for="quickSubject" class="form-label fw-semibold">📝 Subject</label>
-                        <input type="text" class="form-control" id="quickSubject" 
-                               placeholder="What's this about?" maxlength="100">
-                        <div class="form-text">
-                            <small class="text-muted">Brief topic description</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Message Content -->
-                    <div class="mb-3">
-                        <label for="quickMessage" class="form-label fw-semibold">💬 Your Message</label>
-                        <textarea class="form-control" id="quickMessage" rows="4" 
-                                  placeholder="Type your message here..." 
-                                  maxlength="500" required></textarea>
-                        <div class="form-text d-flex justify-content-between">
-                            <small class="text-muted">
-                                <i class="bi bi-lightbulb me-1"></i>Be clear and specific for better responses
-                            </small>
-                            <small class="text-muted">
-                                <span id="charCount">0</span>/500
-                            </small>
-                        </div>
-                    </div>
-                    
-                    <!-- Priority -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">⏱️ Priority</label>
-                        <div class="d-flex gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="priority" id="normalPriority" value="normal" checked>
-                                <label class="form-check-label" for="normalPriority">
-                                    <span class="badge bg-success">Normal</span>
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="priority" id="highPriority" value="high">
-                                <label class="form-check-label" for="highPriority">
-                                    <span class="badge bg-warning">High</span>
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="priority" id="urgentPriority" value="urgent">
-                                <label class="form-check-label" for="urgentPriority">
-                                    <span class="badge bg-danger">Urgent</span>
-                                </label>
-                            </div>
-                        </div>
-                        <small class="text-muted">Normal: 24-48hrs | High: 24hrs | Urgent: ASAP</small>
-                    </div>
-                </div>
-                
-                <!-- Footer -->
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>Cancel
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="sendQuickMessage()">
-                        <i class="bi bi-send me-1"></i>Send Message
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Modal completely removed - using page navigation -->
 
 <style>
+/* Global text shadow removal for all elements */
+* {
+    text-shadow: none !important;
+}
+
 /* Enhanced Progress Circle Styles */
 .progress-circle {
     width: 80px;
@@ -1493,6 +1386,10 @@ function showNotifications() { alert('Loading notifications... (Feature coming s
 function navigateToSchedule() {
     window.location.href = '/study-schedule/';
 }
+
+function navigateToTeacherCommunication() {
+    window.location.href = '/teacher-communication/';
+}
 function openMessages() { window.location.href = '{% url "teacher_communication_dashboard" %}'; }
 function viewAfternoonSchedule() { alert('Viewing afternoon schedule... (Feature coming soon!)'); }
 function showAchievements() { alert('Loading achievements... (Feature coming soon!)'); }
@@ -1674,7 +1571,8 @@ function toggleChatWindow() {
     }
 }
 
-// Conversation Starter Functions
+// Conversation Starter Functions - DISABLED: Using page navigation instead
+/*
 function startConversation() {
     const modal = new bootstrap.Modal(document.getElementById('quickMessageDialog'));
     modal.show();
@@ -1682,7 +1580,9 @@ function startConversation() {
     // Reset form
     resetQuickMessageForm();
 }
+*/
 
+/*
 function resetQuickMessageForm() {
     document.getElementById('quickTeacher').value = '';
     document.getElementById('quickSubject').value = '';
@@ -1741,7 +1641,10 @@ function updateCharCount() {
         charCountElement.style.color = '#6c757d'; // muted
     }
 }
+*/
 
+// DISABLED: Modal-based messaging functions - Using page navigation instead
+/*
 function sendQuickMessage() {
     const teacher = document.getElementById('quickTeacher').value;
     const subject = document.getElementById('quickSubject').value;
@@ -1785,7 +1688,9 @@ function sendQuickMessage() {
         
     }, 1500);
 }
+*/
 
+/*
 function showValidationError(message) {
     // Create error alert
     const alertHtml = `
@@ -1807,7 +1712,9 @@ function showValidationError(message) {
         }
     }, 3000);
 }
+*/
 
+/*
 function showQuickSuccessMessage() {
     // Create success notification
     const notificationHtml = `
@@ -1841,6 +1748,7 @@ function showQuickSuccessMessage() {
         }
     }, 2000);
 }
+*/
 
 // Add character counter event listener
 document.addEventListener('DOMContentLoaded', function() {
@@ -1848,11 +1756,13 @@ document.addEventListener('DOMContentLoaded', function() {
     interceptHomeButton();
     initializeProfessionalNavigation();
     
-    // Character counter for message textarea
+    // Character counter for message textarea - DISABLED: Modal removed
+    /*
     const messageTextarea = document.getElementById('quickMessage');
     if (messageTextarea) {
         messageTextarea.addEventListener('input', updateCharCount);
     }
+    */
     
     // Update every minute
     setInterval(() => {

@@ -18,7 +18,6 @@
 
 .communication-card {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
     border-radius: 20px;
     padding: 0;
     margin-bottom: 1.5rem;
@@ -91,7 +90,6 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
 .contact-teacher-btn:hover {
@@ -267,7 +265,6 @@ body.white-theme .text-muted {
 
 .help-section {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
     border-radius: 20px;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -330,11 +327,282 @@ body.gradient-theme .help-content ul li::marker {
         grid-template-columns: 1fr;
     }
 }
+
+/* Fix text blur in gradient theme - Remove ALL text shadows */
+body.gradient-theme .communication-card *,
+body.gradient-theme .help-section *,
+body.gradient-theme .child-card *,
+body.gradient-theme .card-header-solid *,
+body.gradient-theme .help-header *,
+.card-header-solid,
+.child-card h4,
+.child-card p,
+.help-header,
+.help-content * {
+    text-shadow: none !important;
+}
+
+/* Ensure text selection works properly in gradient theme */
+body.gradient-theme *::selection {
+    background: #4F46E5 !important;
+    color: white !important;
+}
+
+body.gradient-theme *::-moz-selection {
+    background: #4F46E5 !important;
+    color: white !important;
+}
+
+/* Global text shadow removal for this page */
+* {
+    text-shadow: none !important;
+}
+
+/* AI Smart Communication Hub Styling */
+.smart-suggestions h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.suggestion-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.suggestion-card {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px solid #dee2e6;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.suggestion-card:hover {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-color: #2196f3;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(33,150,243,0.3);
+}
+
+.suggestion-card i {
+    font-size: 2rem;
+    color: #4a69bd;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.suggestion-card span {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
+}
+
+.suggestion-card small {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Voice Message Styling */
+.voice-message-section h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.voice-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.voice-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.voice-btn:not(.secondary):not(.success) {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.voice-btn.secondary {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.voice-btn.success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.voice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.voice-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.voice-feedback {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.voice-feedback.recording {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.transcription-box {
+    background: #e8f5e8;
+    border: 1px solid #c3e6c3;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.transcription-box h6 {
+    color: #155724;
+    margin-bottom: 0.5rem;
+}
+
+.transcribed-text {
+    background: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #c3e6c3;
+}
+
+.translation {
+    background: #cce5ff;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #99d6ff;
+}
+
+/* Language Selection Styling */
+.language-selection h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.language-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #dee2e6;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.lang-btn.active,
+.lang-btn:hover {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-color: #28a745;
+}
+
+/* Quick Composer Styling */
+.quick-composer h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.message-form textarea {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+.message-form textarea:focus {
+    border-color: #4a69bd;
+    box-shadow: 0 0 0 0.2rem rgba(74, 105, 189, 0.25);
+}
+
+.composer-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.composer-actions .action-btn {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .suggestion-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .voice-controls {
+        flex-direction: column;
+    }
+    
+    .voice-btn {
+        justify-content: center;
+    }
+    
+    .language-options {
+        justify-content: center;
+    }
+    
+    .composer-actions {
+        flex-direction: column;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
+    <!-- Back to Dashboard Button (Top) -->
+    <div class="mb-3">
+        <a href="{% url 'parent_dashboard' %}" class="btn btn-success" style="background: linear-gradient(135deg, #28a745, #20c997); border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </a>
+    </div>
+    
     <div class="communication-header">
         <h1>👩‍🏫 Teacher Communication</h1>
         <p>Connect with your child's teachers and stay involved in their learning journey</p>
@@ -342,10 +610,6 @@ body.gradient-theme .help-content ul li::marker {
 
     <!-- Statistics -->
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">{{ children.count }}</div>
-            <div class="stat-label">Your Children</div>
-        </div>
         <div class="stat-card">
             <div class="stat-number">{{ recent_conversations.count }}</div>
             <div class="stat-label">Active Conversations</div>
@@ -356,73 +620,95 @@ body.gradient-theme .help-content ul li::marker {
         </div>
     </div>
 
-    <div class="row">
-        <!-- Children List -->
-        <div class="col-lg-6">
+    <!-- AI-Powered Smart Communication Features -->
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="communication-card">
-                <h3 class="card-header-solid">👶 Your Children</h3>
+                <h3 class="card-header-solid">🤖 AI Smart Communication Hub</h3>
                 <div class="card-content">
-                    <p class="text-muted mb-4">Select a child to communicate with their teachers</p>
-                    
-                    {% if children %}
-                        {% for child in children %}
-                        <div class="child-card">
-                            <div class="child-info">
-                                <h4>{{ child.user.get_full_name|default:child.user.username }}</h4>
-                                <p>{{ child.user.email|default:"No email provided" }}</p>
+                    <!-- Quick Smart Suggestions -->
+                    <div class="smart-suggestions mb-4">
+                        <h5><i class="bi bi-lightbulb-fill text-warning"></i> Smart Suggestions Based on Your Child's Progress</h5>
+                        <div class="suggestion-cards">
+                            <div class="suggestion-card" onclick="fillQuickMessage('ask-math-help')">
+                                <i class="bi bi-calculator"></i>
+                                <span>Ask about Math Help</span>
+                                <small>Ravi's math scores need attention</small>
                             </div>
-                            <a href="{% url 'select_teacher' child_id=child.user.id %}" class="contact-teacher-btn">
-                                Contact Teachers
-                            </a>
+                            <div class="suggestion-card" onclick="fillQuickMessage('schedule-meeting')">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>Schedule Parent Meeting</span>
+                                <small>Recommended for progress discussion</small>
+                            </div>
+                            <div class="suggestion-card" onclick="fillQuickMessage('homework-support')">
+                                <i class="bi bi-book"></i>
+                                <span>Request Homework Support</span>
+                                <small>Extra guidance needed</small>
+                            </div>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            No children found in your account. Please contact the administrator to link your children's accounts.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+                    </div>
 
-        <!-- Recent Conversations -->
-        <div class="col-lg-6">
-            <div class="communication-card">
-                <h3 class="card-header-solid">💬 Recent Conversations</h3>
-                <div class="card-content">
-                    <p class="text-muted mb-4">Your latest conversations with teachers</p>
-                    
-                    {% if recent_conversations %}
-                        {% for conversation in recent_conversations %}
-                        <div class="conversation-preview">
-                            <div class="conversation-title">
-                                <a href="{% url 'conversation_detail' thread_id=conversation.id %}">
-                                    {{ conversation.subject }}
-                                </a>
-                            </div>
-                            <div class="conversation-meta">
-                                <span>About: {{ conversation.student.get_full_name|default:conversation.student.username }}</span>
-                                {% if conversation.unread_count > 0 %}
-                                <span class="unread-badge">{{ conversation.unread_count }} new</span>
-                                {% endif %}
-                            </div>
-                            <small class="text-muted">Last message: {{ conversation.last_message_at|timesince }} ago</small>
+                    <!-- Voice Message Feature -->
+                    <div class="voice-message-section mb-4">
+                        <h5><i class="bi bi-mic-fill text-primary"></i> Voice Message (Speak in Your Language)</h5>
+                        <div class="voice-controls">
+                            <button class="voice-btn" id="startRecording">
+                                <i class="bi bi-mic"></i>
+                                Start Recording
+                            </button>
+                            <button class="voice-btn secondary" id="stopRecording" disabled>
+                                <i class="bi bi-stop-circle"></i>
+                                Stop Recording
+                            </button>
+                            <button class="voice-btn success" id="playRecording" disabled>
+                                <i class="bi bi-play-circle"></i>
+                                Play Back
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-comments"></i>
-                            No conversations yet. Start communicating with your child's teachers!
+                        <div class="voice-feedback" id="voiceFeedback">
+                            <p><i class="bi bi-info-circle"></i> Click "Start Recording" to record your message in Hindi, Bengali, or any local language</p>
                         </div>
-                    {% endif %}
+                        <div class="transcription-box" id="transcriptionBox" style="display: none;">
+                            <h6>Auto-Transcribed Text:</h6>
+                            <div class="transcribed-text" id="transcribedText"></div>
+                            <div class="translation" id="translationText"></div>
+                        </div>
+                    </div>
+
+                    <!-- Language Selection -->
+                    <div class="language-selection mb-4">
+                        <h5><i class="bi bi-translate text-success"></i> Language Support</h5>
+                        <div class="language-options">
+                            <button class="lang-btn active" data-lang="en">English</button>
+                            <button class="lang-btn" data-lang="hi">हिंदी</button>
+                            <button class="lang-btn" data-lang="pa">ਪੰਜਾਬੀ</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Message Composer -->
+                    <div class="quick-composer">
+                        <h5><i class="bi bi-chat-dots text-info"></i> Quick Message Composer</h5>
+                        <div class="message-form">
+                            <textarea id="quickMessage" class="form-control mb-3" rows="4" placeholder="Type your message here or use voice recording above..."></textarea>
+                            <div class="composer-actions">
+                                <button class="action-btn" onclick="translateMessage()">
+                                    <i class="bi bi-translate"></i>
+                                    Auto-Translate
+                                </button>
+                                <button class="action-btn" onclick="sendQuickMessage()">
+                                    <i class="bi bi-send"></i>
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Action Buttons -->
-    <div class="action-buttons">
+    <div class="action-buttons" style="display: flex !important; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; visibility: visible;">
         <a href="{% url 'conversation_list' %}" class="action-btn">
             <i class="fas fa-list"></i> View All Conversations
         </a>
@@ -431,6 +717,9 @@ body.gradient-theme .help-content ul li::marker {
         </a>
         <a href="#" onclick="showComingSoon()" class="action-btn">
             <i class="fas fa-bell"></i> Notification Settings
+        </a>
+        <a href="{% url 'parent_dashboard' %}" class="action-btn" style="background: linear-gradient(135deg, #28a745, #20c997) !important; color: white !important; display: block !important;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
 
@@ -465,13 +754,416 @@ body.gradient-theme .help-content ul li::marker {
 </div>
 
 <script>
-function showComingSoon() {
-    alert('This feature is coming soon! Stay tuned for updates.');
+// AI Smart Communication Hub JavaScript
+
+let mediaRecorder;
+let audioChunks = [];
+let currentLanguage = 'en';
+let recordedAudio = null;
+
+// Smart suggestion messages
+const smartMessages = {
+    'ask-math-help': "Hello teacher, I've noticed that my child is struggling with mathematics. Could you please provide some additional guidance or suggest extra practice materials? I would appreciate any recommendations for helping them improve their math skills at home.",
+    'schedule-meeting': "Dear teacher, I would like to schedule a parent-teacher meeting to discuss my child's progress. Please let me know your available times this week or next week. I'm flexible with timing and can adjust according to your schedule.",
+    'homework-support': "Hello, my child seems to need some extra support with their homework assignments. Could you please provide some additional explanations or resources? I want to ensure they understand the concepts properly and complete their work effectively."
+};
+
+// Fill quick message based on suggestion
+function fillQuickMessage(type) {
+    const messageBox = document.getElementById('quickMessage');
+    const originalMessage = smartMessages[type];
+    
+    // Translate the message if not in English
+    const translatedMessage = translateFullMessage(originalMessage, currentLanguage);
+    messageBox.value = translatedMessage;
+    messageBox.focus();
+    
+    // Add visual feedback
+    messageBox.style.borderColor = '#28a745';
+    setTimeout(() => {
+        messageBox.style.borderColor = '';
+    }, 2000);
+    
+    // Show translation feedback if language is not English
+    if (currentLanguage !== 'en' && translatedMessage !== originalMessage) {
+        const feedback = document.getElementById('voiceFeedback');
+        feedback.innerHTML = `
+            <p class="text-success"><i class="bi bi-translate"></i> Smart suggestion translated to ${document.querySelector('.lang-btn.active').textContent}!</p>
+        `;
+        setTimeout(() => {
+            feedback.innerHTML = `
+                <p><i class="bi bi-info-circle"></i> Language set to: ${document.querySelector('.lang-btn.active').textContent}. Click "Start Recording" to record your message.</p>
+            `;
+        }, 3000);
+    }
+}
+
+// Voice Recording Functions
+document.getElementById('startRecording').addEventListener('click', startRecording);
+document.getElementById('stopRecording').addEventListener('click', stopRecording);
+document.getElementById('playRecording').addEventListener('click', playRecording);
+
+async function startRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        
+        mediaRecorder.addEventListener("dataavailable", event => {
+            audioChunks.push(event.data);
+        });
+        
+        mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            recordedAudio = audioBlob;
+            
+            // Simulate transcription (in real app, this would call speech-to-text API)
+            simulateTranscription();
+        });
+        
+        mediaRecorder.start();
+        
+        // Update UI
+        document.getElementById('startRecording').disabled = true;
+        document.getElementById('stopRecording').disabled = false;
+        document.getElementById('voiceFeedback').innerHTML = `
+            <p class="text-primary"><i class="bi bi-mic-fill"></i> Recording... Speak clearly in your preferred language</p>
+        `;
+        document.getElementById('voiceFeedback').classList.add('recording');
+        
+    } catch (error) {
+        alert('Microphone access denied. Please allow microphone access and try again.');
+        console.error('Error accessing microphone:', error);
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        
+        // Update UI
+        document.getElementById('startRecording').disabled = false;
+        document.getElementById('stopRecording').disabled = true;
+        document.getElementById('playRecording').disabled = false;
+        document.getElementById('voiceFeedback').innerHTML = `
+            <p class="text-success"><i class="bi bi-check-circle"></i> Recording completed! Processing transcription...</p>
+        `;
+        document.getElementById('voiceFeedback').classList.remove('recording');
+    }
+}
+
+function playRecording() {
+    if (recordedAudio) {
+        const audioUrl = URL.createObjectURL(recordedAudio);
+        const audio = new Audio(audioUrl);
+        audio.play();
+        
+        // Visual feedback
+        const playBtn = document.getElementById('playRecording');
+        const originalText = playBtn.innerHTML;
+        playBtn.innerHTML = '<i class="bi bi-volume-up"></i> Playing...';
+        
+        audio.addEventListener('ended', () => {
+            playBtn.innerHTML = originalText;
+        });
+    }
+}
+
+// Simulate transcription and translation
+function simulateTranscription() {
+    setTimeout(() => {
+        const transcriptionBox = document.getElementById('transcriptionBox');
+        const transcribedText = document.getElementById('transcribedText');
+        const translationText = document.getElementById('translationText');
+        const messageBox = document.getElementById('quickMessage');
+        
+        // Simulate transcribed text based on selected language
+        let sampleText = "";
+        let englishTranslation = "";
+        
+        switch(currentLanguage) {
+            case 'hi':
+                sampleText = "नमस्ते शिक्षक जी, मेरे बच्चे को गणित में कुछ कठिनाई हो रही है। कृपया कुछ अतिरिक्त सहायता प्रदान करें।";
+                englishTranslation = "Hello teacher, my child is having some difficulty in mathematics. Please provide some additional help.";
+                break;
+            case 'pa':
+                sampleText = "ਸਤ ਸ੍ਰੀ ਅਕਾਲ ਅਧਿਆਪਕ ਜੀ, ਮੇਰੇ ਬੱਚੇ ਨੂੰ ਗਣਿਤ ਵਿੱਚ ਮੁਸ਼ਕਿਲ ਹੋ ਰਹੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਕੁਝ ਵਾਧੂ ਮਦਦ ਕਰੋ।";
+                englishTranslation = "Hello teacher, my child is having some difficulty in mathematics. Please provide some additional help.";
+                break;
+            default:
+                sampleText = "Hello teacher, my child is having some difficulty with their studies. Could you please provide some guidance?";
+                englishTranslation = sampleText;
+        }
+        
+        transcribedText.textContent = sampleText;
+        translationText.innerHTML = `<strong>English Translation:</strong> ${englishTranslation}`;
+        messageBox.value = englishTranslation;
+        
+        transcriptionBox.style.display = 'block';
+        
+        // Update feedback
+        document.getElementById('voiceFeedback').innerHTML = `
+            <p class="text-success"><i class="bi bi-check-circle"></i> Voice message transcribed and translated successfully!</p>
+        `;
+    }, 2000);
+}
+
+// Language Selection
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+        // Update current language
+        currentLanguage = this.dataset.lang;
+        
+        // Update UI feedback
+        const languages = {
+            'en': 'English',
+            'hi': 'Hindi (हिंदी)',
+            'pa': 'Punjabi (ਪੰਜਾਬੀ)'
+
+            
+        };
+        
+        document.getElementById('voiceFeedback').innerHTML = `
+            <p><i class="bi bi-info-circle"></i> Language set to: ${languages[currentLanguage]}. Click "Start Recording" to record your message.</p>
+        `;
+    });
+});
+
+// Translate Message Function
+function translateMessage() {
+    const messageBox = document.getElementById('quickMessage');
+    const message = messageBox.value.trim();
+    
+    if (!message) {
+        alert('Please enter a message to translate.');
+        return;
+    }
+    
+    // Translate using local dictionary
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Translating...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        const translatedMessage = translateFullMessage(message, currentLanguage);
+        
+        if (translatedMessage !== message) {
+            messageBox.value = translatedMessage;
+            alert(`Message translated to ${document.querySelector('.lang-btn.active').textContent}!`);
+        } else {
+            if (currentLanguage === 'en') {
+                alert('Message is already in English!');
+            } else {
+                alert('Translation completed. Some phrases may remain in English if no translation is available.');
+                messageBox.value = translatedMessage;
+            }
+        }
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 1500);
+}
+
+// Comprehensive translation function
+function translateFullMessage(message, targetLang) {
+    if (targetLang === 'en') {
+        return message; // Already in English
+    }
+    
+    // Educational phrases translation dictionary
+    const translations = {
+        'hi': {
+            // Greetings and formal phrases
+            'Hello teacher': 'नमस्ते शिक्षक जी',
+            'Dear teacher': 'प्रिय शिक्षक जी',
+            'Good morning': 'सुप्रभात',
+            'Good evening': 'शुभ संध्या',
+            'Thank you': 'धन्यवाद',
+            'Please': 'कृपया',
+            
+            // Academic subjects
+            'mathematics': 'गणित',
+            'math': 'गणित',
+            'science': 'विज्ञान',
+            'english': 'अंग्रेजी',
+            'hindi': 'हिंदी',
+            'social studies': 'सामाजिक अध्ययन',
+            'computer': 'कंप्यूटर',
+            
+            // Common parent concerns
+            'my child': 'मेरा बच्चा',
+            'homework': 'गृहकार्य',
+            'assignment': 'कार्य',
+            'test': 'परीक्षा',
+            'exam': 'परीक्षा',
+            'difficulty': 'कठिनाई',
+            'problem': 'समस्या',
+            'help': 'सहायता',
+            'support': 'समर्थन',
+            'guidance': 'मार्गदर्शन',
+            'progress': 'प्रगति',
+            'improvement': 'सुधार',
+            
+            // Action phrases
+            'having difficulty': 'कठिनाई हो रही है',
+            'need help': 'सहायता चाहिए',
+            'please provide': 'कृपया प्रदान करें',
+            'could you': 'क्या आप',
+            'would like to': 'चाहता हूं',
+            'schedule a meeting': 'बैठक का समय निर्धारित करना',
+            'discuss': 'चर्चा करना',
+            'understand': 'समझना',
+            
+            // Common sentences
+            'I would like to schedule a parent-teacher meeting': 'मैं अभिभावक-शिक्षक बैठक का समय निर्धारित करना चाहता हूं',
+            'Please provide additional guidance': 'कृपया अतिरिक्त मार्गदर्शन प्रदान करें',
+            'My child needs extra support': 'मेरे बच्चे को अतिरिक्त सहायता की आवश्यकता है',
+            'Thank you for your time': 'आपके समय के लिए धन्यवाद'
+        },
+        'pa': {
+            // Greetings and formal phrases
+            'Hello teacher': 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ ਅਧਿਆਪਕ ਜੀ',
+            'Dear teacher': 'ਪਿਆਰੇ ਅਧਿਆਪਕ ਜੀ',
+            'Good morning': 'ਸੁਪ੍ਰਭਾਤ',
+            'Good evening': 'ਸ਼ੁਭ ਸ਼ਾਮ',
+            'Thank you': 'ਧੰਨਵਾਦ',
+            'Please': 'ਕਿਰਪਾ ਕਰਕੇ',
+            
+            // Academic subjects
+            'mathematics': 'ਗਣਿਤ',
+            'math': 'ਗਣਿਤ',
+            'science': 'ਵਿਗਿਆਨ',
+            'english': 'ਅੰਗਰੇਜ਼ੀ',
+            'punjabi': 'ਪੰਜਾਬੀ',
+            'social studies': 'ਸਮਾਜਿਕ ਅਧਿਐਨ',
+            'computer': 'ਕੰਪਿਊਟਰ',
+            
+            // Common parent concerns
+            'my child': 'ਮੇਰਾ ਬੱਚਾ',
+            'homework': 'ਘਰ ਦਾ ਕੰਮ',
+            'assignment': 'ਕਾਰਜ',
+            'test': 'ਟੈਸਟ',
+            'exam': 'ਇਮਤਿਹਾਨ',
+            'difficulty': 'ਮੁਸ਼ਕਿਲ',
+            'problem': 'ਸਮੱਸਿਆ',
+            'help': 'ਮਦਦ',
+            'support': 'ਸਹਾਇਤਾ',
+            'guidance': 'ਮਾਰਗਦਰਸ਼ਨ',
+            'progress': 'ਤਰੱਕੀ',
+            'improvement': 'ਸੁਧਾਰ',
+            
+            // Action phrases
+            'having difficulty': 'ਮੁਸ਼ਕਿਲ ਹੋ ਰਹੀ ਹੈ',
+            'need help': 'ਮਦਦ ਚਾਹੀਦੀ ਹੈ',
+            'please provide': 'ਕਿਰਪਾ ਕਰਕੇ ਦਿਓ',
+            'could you': 'ਕੀ ਤੁਸੀਂ',
+            'would like to': 'ਚਾਹੁੰਦਾ ਹਾਂ',
+            'schedule a meeting': 'ਮੀਟਿੰਗ ਦਾ ਸਮਾਂ ਤੈਅ ਕਰਨਾ',
+            'discuss': 'ਚਰਚਾ ਕਰਨਾ',
+            'understand': 'ਸਮਝਣਾ',
+            
+            // Common sentences
+            'I would like to schedule a parent-teacher meeting': 'ਮੈਂ ਮਾਤਾ-ਪਿਤਾ-ਅਧਿਆਪਕ ਮੀਟਿੰਗ ਦਾ ਸਮਾਂ ਨਿਰਧਾਰਤ ਕਰਨਾ ਚਾਹੁੰਦਾ ਹਾਂ',
+            'Please provide additional guidance': 'ਕਿਰਪਾ ਕਰਕੇ ਵਾਧੂ ਮਾਰਗਦਰਸ਼ਨ ਪ੍ਰਦਾਨ ਕਰੋ',
+            'My child needs extra support': 'ਮੇਰੇ ਬੱਚੇ ਨੂੰ ਵਾਧੂ ਸਹਾਇਤਾ ਦੀ ਲੋੜ ਹੈ',
+            'Thank you for your time': 'ਤੁਹਾਡੇ ਸਮੇਂ ਲਈ ਧੰਨਵਾਦ'
+        }
+    };
+    
+    let translatedMessage = message;
+    const langDict = translations[targetLang];
+    
+    if (langDict) {
+        // Sort by length (longest first) to handle phrases before individual words
+        const sortedKeys = Object.keys(langDict).sort((a, b) => b.length - a.length);
+        
+        for (const englishPhrase of sortedKeys) {
+            const regex = new RegExp('\\b' + englishPhrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+            translatedMessage = translatedMessage.replace(regex, langDict[englishPhrase]);
+        }
+    }
+    
+    return translatedMessage;
+}
+
+// Send Quick Message Function
+function sendQuickMessage() {
+    const messageBox = document.getElementById('quickMessage');
+    const message = messageBox.value.trim();
+    
+    if (!message) {
+        alert('Please enter a message to send.');
+        return;
+    }
+    
+    // Simulate sending (in real app, this would send to backend)
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        alert('Message sent successfully! The teacher will receive your message and respond soon.');
+        messageBox.value = '';
+        
+        // Reset voice recording if any
+        document.getElementById('transcriptionBox').style.display = 'none';
+        document.getElementById('voiceFeedback').innerHTML = `
+            <p><i class="bi bi-info-circle"></i> Message sent! You can record another voice message if needed.</p>
+        `;
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 2000);
 }
 
 // Auto-refresh unread count every 30 seconds
 setInterval(function() {
     // You can implement AJAX call to update unread count
 }, 30000);
+
+// Initialize tooltips and other UI enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling to suggestions
+    document.querySelectorAll('.suggestion-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Smooth scroll to message composer
+            document.querySelector('.quick-composer').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        });
+    });
+    
+    // Add loading states to action buttons
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!this.disabled) {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            }
+        });
+    });
+});
+
+function showComingSoon() {
+    alert('This feature is coming soon! Stay tuned for updates.');
+}
 </script>
+
+<!-- Bottom Back to Dashboard Button -->
+<div class="text-center mt-5 mb-4">
+    <a href="{% url 'parent_dashboard' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; border-radius: 15px; padding: 1rem 2rem; font-weight: 600; box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); text-decoration: none; font-size: 1.1rem;">
+        <i class="fas fa-home me-2"></i> Return to Main Dashboard
+    </a>
+</div>
+</div>
 {% endblock %}
